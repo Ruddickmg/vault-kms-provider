@@ -1,3 +1,5 @@
+use base64::Engine;
+use base64::prelude::BASE64_STANDARD;
 use serde::{Serialize, Deserialize};
 
 #[derive(Deserialize)]
@@ -11,9 +13,9 @@ pub struct DecryptionRequest {
 }
 
 impl DecryptionRequest {
-  pub fn new<T: ToString>(data: &T) -> Self {
+  pub fn new(data: &Vec<u8>) -> Self {
     DecryptionRequest {
-      ciphertext: data.to_string()
+      ciphertext: BASE64_STANDARD.encode(data)
     }
   }
 }

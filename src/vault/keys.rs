@@ -27,14 +27,14 @@ pub struct KeyResponse {
 
 impl KeyResponse {
   pub fn info(&self) -> KeyInfo {
-    let keys: Vec<_> = self.keys.iter()
-      .map(|(a, b)| (a, b.to_string()))
-      .collect()
-      .sort_by(| (a, _), (b, _) | a.cmp(b));
-    let (version, id) = keys.first();
+    let mut keys: Vec<(String, String)> = self.keys.iter()
+      .map(|(a, b)| (a.to_string(), b.to_string()))
+      .collect::<Vec<(String, String)>>();
+    keys.sort_by(| (a, _), (b, _) | a.cmp(b));
+    let (version, id) = keys.first().unwrap();
     KeyInfo {
-      version,
-      id,
+      version: version.to_string(),
+      id: id.to_string(),
     }
   }
 }
