@@ -1,19 +1,18 @@
-use grpc::{ClientStub, ServerHandlerContext, ServerRequestSingle, ServerResponseUnarySink};
-use grpc_compiler;
-mod api_grpc;
 mod vault;
+mod kms;
 
-use api_grpc::KeyManagementServiceClient;
-use crate::api_grpc::{KeyManagementServiceServer};
+use tonic::{transport::Server};
+use tonic::server::ClientStreamingService;
+use vault::server;
 
-fn main() {
-    let host = "localhost";
-    let port = 8200;
-    let vaultKms = vault::kms::VaultKms::new();
-    let Ok(client) = grpc::ClientBuilder::new(host, port)
-      .build();
-    let kmsClient = KeyManagementServiceClient::with_client(client.into());
-    let kmxServer = KeyManagementServiceServer::new_service_def(vaultKms);
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+  let addr = "[::1]:50051".parse()?;
+  let vault_kms_server = server::VaultKmsServer::new();
+  Server::builder()
+    .add_service(vault_kms_server)
+    .serve(addr)
+    .await?;
 
-    println!("Hello, world!");
+  Ok(())
 }

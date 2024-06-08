@@ -1,31 +1,32 @@
+use std::collections::HashMap;
 use std::fmt::Display;
 use std::string::ToString;
-use grpc::{ServerHandlerContext, ServerRequestSingle, ServerResponseUnarySink};
-use crate::api_grpc::KeyManagementService;
-use crate::vault::api::{DecryptRequest, DecryptResponse, EncryptRequest, EncryptResponse, StatusRequest, StatusResponse};
 use serde::Serialize;
-use crate::vault::decryption::{DecryptionRequest, DecryptionResponse};
-use crate::vault::encryption::{EncryptionRequest, EncryptionResponse};
 use crate::vault::transit::TransitPath;
 use reqwest;
 use crate::vault::data::Data;
 use crate::vault::keys::{KeyInfo, KeyResponse};
+use tonic::{Request, Response, Status};
+use crate::kms::api;
+use crate::kms::api::{DecryptRequest, DecryptResponse, EncryptRequest, EncryptResponse, StatusRequest, StatusResponse};
+use crate::vault::decryption::{DecryptionRequest, DecryptionResponse};
+use crate::vault::encryption::{EncryptionRequest, EncryptionResponse};
 
 const VERSION: &str = "v2";
 const OKAY_RESPONSE: &str = "ok";
 
 type HttpResponse = reqwest::blocking::Response;
 
-pub struct VaultKms {
+pub struct VaultKmsServer {
   client: reqwest::blocking::Client,
   url: String,
   token: String,
   key_name: String,
 }
 
-impl VaultKms {
+impl VaultKmsServer {
   pub fn new(name: &str, url: &str, token: &str) -> Self {
-    VaultKms {
+    VaultKmsServer {
       client: reqwest::blocking::Client::new(),
       key_name: name.to_string(),
       url: url.to_string(),
@@ -56,33 +57,35 @@ impl VaultKms {
   }
 }
 
-impl KeyManagementService for VaultKms {
-  fn status(&self, _context: ServerHandlerContext, _req: ServerRequestSingle<StatusRequest>, resp: ServerResponseUnarySink<StatusResponse>) -> grpc::Result<()> {
+#[tonic::async_trait]
+impl api::key_management_service_server::KeyManagementService for VaultKmsServer {
+  async fn status(&self, _: Request<StatusRequest>) -> Result<Response<StatusResponse>, Status> {
     let key = self.request_key()?;
-    resp.finish(StatusResponse {
+    Ok(Response::new(StatusResponse {
       version: key.version,
       key_id: key.id,
       healthz: OKAY_RESPONSE.to_string(),
-    })
+    }))
   }
 
-  fn decrypt(&self, _context: ServerHandlerContext, req: ServerRequestSingle<DecryptRequest>, resp: ServerResponseUnarySink<DecryptResponse>) -> grpc::Result<()> {
-    let DecryptionResponse { plaintext }: DecryptionResponse = self.request_decryption(&req.message.ciphertext)?;
-    resp.finish(DecryptResponse {
+  async fn decrypt(&self, request: Request<DecryptRequest>) -> Result<Response<DecryptResponse>, Status> {
+    let DecryptionResponse { plaintext }: DecryptionResponse = self.request_decryption(&request.get_ref().ciphertext)?;
+    Ok(Response::new(DecryptResponse {
       plaintext: plaintext.as_bytes(),
-    })
+    }))
   }
 
-  fn encrypt(&self, _context: ServerHandlerContext, req: ServerRequestSingle<EncryptRequest>, resp: ServerResponseUnarySink<EncryptResponse>) -> grpc::Result<()> {
-    let EncryptionResponse { ciphertext }: EncryptionResponse = self.request_encryption(&req.message.plaintext)?;
+  async fn encrypt(&self, request: Request<EncryptRequest>) -> Result<Response<EncryptResponse>, Status> {
+    let EncryptionResponse { ciphertext }: EncryptionResponse = self.request_encryption(request.get_ref().plaintext)?;
     let key = self.request_key()?;
-    resp.finish(EncryptResponse {
+    Ok(Response::new(EncryptResponse {
       key_id: key.id,
       ciphertext: ciphertext.as_bytes(),
-      annotations: None,
-    })
+      annotations: HashMap::new(),
+    }))
   }
 }
+
 
 
 

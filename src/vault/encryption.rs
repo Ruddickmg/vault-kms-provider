@@ -8,7 +8,7 @@ pub struct EncryptionResponse {
 }
 
 impl EncryptionResponse {
-  pub fn from_json<T: Deserialize>(data: T) -> Self {
+  pub fn from_json<'a, T: Deserialize<'a>>(data: T) -> Self {
     let something: EncryptionResponse = data.into();
     let text = something.ciphertext;
     EncryptionResponse {

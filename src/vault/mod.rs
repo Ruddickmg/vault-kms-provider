@@ -1,5 +1,4 @@
-pub mod kms;
-pub mod api;
+pub mod server;
 mod decryption;
 mod encryption;
 mod transit;

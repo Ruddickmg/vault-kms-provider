@@ -1,12 +1,12 @@
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-pub struct Data<T: Deserialize> {
+pub struct Data<'a, T: Deserialize<'a>> {
   pub data: T
 }
 
-impl<T: Deserialize> Data<T> {
-  pub fn new(data: T) -> Self<T> {
+impl<'a, T: Deserialize<'a>> Data<'a, T> {
+  pub fn new(data: T) -> Data<'a, T> {
     Data {
       data
     }
