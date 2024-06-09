@@ -1,3 +1,3 @@
 pub mod api {
-  tonic::include_proto!("v2");
+    tonic::include_proto!("v2");
 }
