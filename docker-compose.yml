@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    networks:
+      - vault-kms-provider
+    expose:
+      - 8200:8200
+
+  vault-kms-provider:
+    build:
+      dockerfile: ./Dockerfile
+    container_name: vault-kms-provider
+    networks:
+      - vault-kms-provider
+    volumes:
+      - ./
+
+networks:
+  vault-kms-provider:
+    name: vault-kms-provider-net

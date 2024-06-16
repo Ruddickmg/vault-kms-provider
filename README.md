@@ -26,3 +26,15 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
   - [ ] Create Helm Chart for easy deployment
   - [ ] Document manual integration steps
 
+## Kubernetes authentication
+
+Official documentation on kubernetes authentication can be found 
+- here in the vault docs 
+- and here in the Kubernetes docs.
+
+In order to access vault the kms provider will need to authenticate with it. In order for authentication to work via kubernetes, you will need a few things:
+1. The CA used by kubernetes, this can be retrieved using the following command, which will output a file `ca.crt` containing the kubernetes CA certificate
+```shell
+kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 --decode > ca.crt
+```
+2. 

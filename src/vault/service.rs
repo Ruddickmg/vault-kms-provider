@@ -1,5 +1,5 @@
-use crate::kms::api::{
-    key_management_service_server::{KeyManagementService, KeyManagementServiceServer},
+use crate::kms::{
+    key_management_service_server::KeyManagementService,
     DecryptRequest, DecryptResponse, EncryptRequest, EncryptResponse, StatusRequest,
     StatusResponse,
 };
@@ -7,16 +7,14 @@ use crate::vault::keys::KeyInfo;
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
 use std::collections::HashMap;
-use std::net::SocketAddr;
 use std::string::ToString;
-use tonic::transport::Server;
 use tonic::{Code, Request, Response, Status};
 use vaultrs::{client, error::ClientError, transit};
 
 const OKAY_RESPONSE: &str = "ok";
 const TRANSIT_MOUNT: &str = "transit";
 
-struct VaultKmsServer {
+pub struct VaultKmsServer {
     client: client::VaultClient,
     key_name: String,
 }
@@ -108,14 +106,4 @@ impl KeyManagementService for VaultKmsServer {
             Err(error) => Err(Status::new(Code::Internal, error.to_string())),
         }
     }
-}
-
-pub async fn server(address: SocketAddr) -> Result<(), tonic::transport::Error> {
-    let vault_kms_server =
-        VaultKmsServer::new("kms", "https://vault.vault.svc.local:8200", "token");
-    println!("Server listening at socket: {}", address);
-    Server::builder()
-        .add_service(KeyManagementServiceServer::new(vault_kms_server))
-        .serve(address)
-        .await
 }
