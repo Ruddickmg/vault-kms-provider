@@ -34,20 +34,19 @@ RUN if [ "$TARGETPLATFORM" = "$ARM_64" ]; then cargo build --release --target=$A
 RUN if [ "$TARGETPLATFORM" = "$AMD_64" ]; then cargo build --release --target=$AMD_64_TARGET && mv /usr/src/$PKG_NAME/target/$AMD_64_TARGET/release/$BIN_NAME /usr/src/$PKG_NAME/target/release/$BIN_NAME; fi
 RUN if [ "$TARGETPLATFORM" != "$ARM_64" ] && [ "$TARGETPLATFORM" != "$AMD_64" ]; then cargo build --release --target=$TARGET && mv /usr/src/$PKG_NAME/target/$TARGET/release/$BIN_NAME /usr/src/$PKG_NAME/target/release/$BIN_NAME; fi
 
-RUN groupadd -g 10001 -r $PKG_NAME
-RUN useradd -r -g $PKG_NAME -u 10001 $PKG_NAME
-
 # ------------------------------------------------------------------------------
 # Final Stage
 # ------------------------------------------------------------------------------
 
 FROM scratch
 LABEL authors="grant"
+ARG UID=10001
+ARG GID=10001
 ARG PKG_NAME="vault-kms-provider"
 ARG BIN_NAME="server"
 WORKDIR /user/local/bin/
 COPY --from=0 /etc/passwd /etc/passwd
 COPY --from=builder /usr/src/$PKG_NAME/target/release/$BIN_NAME ./app
-USER $PKG_NAME
+USER $UID:$GID
 
 CMD ["./app"]
