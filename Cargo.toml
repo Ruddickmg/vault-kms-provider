@@ -1,5 +1,5 @@
 [package]
-name = "vault-kms-provider"
+name = "vault_kms_provider"
 version = "0.1.0"
 edition = "2021"
 
@@ -21,10 +21,6 @@ tonic-build = "0.11.0"
 [lib]
 name = "lib"
 path = "src/lib.rs"
-
-[[bin]]
-name = "client"
-path = "src/client.rs"
 
 [[bin]]
 name = "server"

@@ -47,7 +47,7 @@ pub fn create_unix_socket(
 }
 
 pub async fn connect_to_unix_socket(path: &str) -> Result<Channel, tonic::transport::Error> {
-    UNIX_SOCKET_PATH.set(path.to_string()).unwrap();
+    UNIX_SOCKET_PATH.get_or_init(|| path.to_string());
     // this url doesn't matter since we are replacing it with the unix stream connection
     Endpoint::try_from("http://[::]:50051")?
         .connect_with_connector(service_fn(|_| async {
