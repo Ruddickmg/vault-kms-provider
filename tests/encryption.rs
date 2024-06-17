@@ -30,7 +30,7 @@ mod vault_integration_tests {
   }
 
   #[tokio::test]
-  async fn vault_status() -> Result<(), Box<dyn std::error::Error>> {
+  async fn status() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = lib::client().await?;
     let status_resp = client.status(Request::new(StatusRequest {})).await?;
     assert_eq!(status_resp.into_inner().healthz, "ok");

@@ -7,24 +7,25 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
     - [x] Generate rust code from k8s proto
     - [x] Provide implementations for generated traits
     - [x] Get server in a running state
-  - [ ] Create vault client for performing KMS actions
+  - [x] Create vault client for performing KMS actions
     - [x] Create all methods required for KMS service
-    - [ ] Test encryption with vault
-    - [ ] Test decryption with vault
-    - [ ] Test status checks (key info retrieval) with vault
-    - [ ] Set up Authentication
-      - [ ] ServiceAccount
-      - [ ] Jwt
-      - [ ] Test authentication methods
-  - [ ] Ensure Tls is used for all communication
-  - [ ] Set up socket communication
-    - [ ] Connect to kubernetes kms provider via socket
-    - [ ] Secure Socket connection
-    - [ ] Test socket communication
-  - [ ] Create docker container for plugin
+    - [x] Test encryption with vault
+    - [x] Test decryption with vault
+    - [x] Test status checks (key info retrieval) with vault
+  - [x] Set up socket communication
+    - [x] Connect to kubernetes kms provider via socket
+    - [x] Secure Socket connection
+    - [x] Test socket communication
+  - [x] Create docker container for plugin
   - [ ] Set up ci for deployment
-  - [ ] Create Helm Chart for easy deployment
+  - [ ] Set up Authentication
+    - [ ] ServiceAccount
+    - [ ] Jwt
+    - [ ] Test authentication methods
+  - [ ] Allow Tls for http communication
   - [ ] Document manual integration steps
+  - [ ] Create Helm Chart for easy deployment
+  - [ ] Set up helm char repository via github pages
 
 ## Kubernetes authentication
 
