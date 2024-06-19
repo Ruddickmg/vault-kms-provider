@@ -75,7 +75,6 @@ workflows:
             - integration-tests
           context:
             - dockerhub
-            - github
 
       - publish-amd:
 #          filters:
@@ -91,7 +90,6 @@ workflows:
             - integration-tests
           context:
             - dockerhub
-            - github
 
       - publish-manifest:
 #          filters:
@@ -206,7 +204,7 @@ jobs:
       - run:
           name: Log in to Docker
           command: |
-            echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - attach_workspace:
           at: /tmp/workspace
       - run:
@@ -232,7 +230,7 @@ jobs:
       - run:
           name: Log in to Docker
           command: |
-            echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - attach_workspace:
           at: /tmp/workspace
       - run:
@@ -256,7 +254,7 @@ jobs:
       - run:
           name: Log in to Docker
           command: |
-            echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - attach_workspace:
           at: /tmp/workspace
       - run:
