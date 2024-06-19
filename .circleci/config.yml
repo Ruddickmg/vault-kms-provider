@@ -101,17 +101,7 @@ workflows:
           requires:
             - publish-amd
             - publish-arm
-
-      - publish-latest-manifest:
-#          filters:
-#            branches:
-#              only:
-#                - main
-          context:
-            - dockerhub
-          requires:
-            - publish-amd
-            - publish-arm
+            - generate_tag
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -286,6 +276,7 @@ jobs:
             TAG="$(cat /tmp/workspace/docker_tag)"
             docker manifest push "${DOCKERHUB_REPOSITORY}:${TAG}"
 
+
   publish-latest-manifest:
     executor: ubuntu
     environment:
@@ -295,11 +286,14 @@ jobs:
           name: Log in to Docker
           command: |
             echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
           name: Create Manifest
           command: |
-            REPO="$DOCKERHUB_REPOSITORY:latest"
-            docker manifest create $REPO \
+            TAG="$(cat /tmp/workspace/docker_tag)"
+            REPO="$DOCKERHUB_REPOSITORY:$TAG"
+            docker manifest create "$DOCKERHUB_REPOSITORY:latest" \
               --amend "${REPO}-arm64" \
               --amend "${REPO}-amd64"
       - run:
