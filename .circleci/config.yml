@@ -113,6 +113,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Update
+          command: sudo apt-get update
+      - run:
           name: Install proto
           command: sudo apt-get install protobuf-compiler
       - restore_cache:
