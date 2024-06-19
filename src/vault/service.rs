@@ -27,7 +27,6 @@ impl From<ClientError> for VaultError {
     }
 }
 
-
 pub struct VaultKmsServer {
     client: client::VaultClient,
     key_name: String,
@@ -62,9 +61,11 @@ impl VaultKmsServer {
         )
     }
     async fn request_decryption(&self, data: &str) -> Result<String, VaultError> {
-        Ok(transit::data::decrypt(&self.client, TRANSIT_MOUNT, &self.key_name, data, None)
-          .await?
-          .plaintext)
+        Ok(
+            transit::data::decrypt(&self.client, TRANSIT_MOUNT, &self.key_name, data, None)
+                .await?
+                .plaintext,
+        )
     }
 }
 
@@ -87,7 +88,9 @@ impl KeyManagementService for VaultKmsServer {
             .map_err(|error| Status::new(Code::Internal, error.to_string()))?;
         let plaintext = self.request_decryption(&encrypted).await?;
         Ok(Response::new(DecryptResponse {
-            plaintext: BASE64_STANDARD.decode(plaintext.as_bytes()).map_err(| error | Status::new(Code::Internal, error.to_string()))?,
+            plaintext: BASE64_STANDARD
+                .decode(plaintext.as_bytes())
+                .map_err(|error| Status::new(Code::Internal, error.to_string()))?,
         }))
     }
 
@@ -96,9 +99,7 @@ impl KeyManagementService for VaultKmsServer {
         request: Request<EncryptRequest>,
     ) -> Result<Response<EncryptResponse>, Status> {
         let encoded = BASE64_STANDARD.encode(&request.get_ref().plaintext);
-        let ciphertext = self
-            .request_encryption(&encoded)
-            .await?;
+        let ciphertext = self.request_encryption(&encoded).await?;
         let key = self.request_key().await?;
         Ok(Response::new(EncryptResponse {
             key_id: key.id,

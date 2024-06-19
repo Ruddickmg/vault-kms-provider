@@ -1,3 +1,3 @@
 pub fn setup() {
-  println!("Setting up integration tests");
+    println!("Setting up integration tests");
 }
