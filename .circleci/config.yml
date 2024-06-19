@@ -103,6 +103,18 @@ workflows:
             - publish-arm
             - generate_tag
 
+      - publish-latest-manifest:
+#          filters:
+#            branches:
+#              only:
+#                - main
+          context:
+            - dockerhub
+          requires:
+            - publish-amd
+            - publish-arm
+            - generate_tag
+
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
