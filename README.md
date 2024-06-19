@@ -17,7 +17,7 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
     - [x] Secure Socket connection
     - [x] Test socket communication
   - [x] Create docker container for plugin
-  - [ ] Set up ci for deployment
+  - [x] Set up ci for deployment
   - [ ] Set up Authentication
     - [ ] ServiceAccount
     - [ ] Jwt
@@ -25,7 +25,7 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
   - [ ] Allow Tls for http communication
   - [ ] Document manual integration steps
   - [ ] Create Helm Chart for easy deployment
-  - [ ] Set up helm char repository via github pages
+  - [ ] Set up helm char repository via GitHub pages
 
 ## Kubernetes authentication
 

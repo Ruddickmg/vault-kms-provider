@@ -56,16 +56,16 @@ workflows:
             branches:
               ignore:
                 - main
-      - generate_tag:
-          filters:
-            branches:
-              only:
-                - main
+      - generate_tag
+#          filters:
+#            branches:
+#              only:
+#                - main
       - publish-arm:
-          filters:
-            branches:
-              only:
-                - main
+#          filters:
+#            branches:
+#              only:
+#                - main
           requires:
             - generate_tag
             - check_version
@@ -78,10 +78,10 @@ workflows:
             - github
 
       - publish-amd:
-          filters:
-            branches:
-              only:
-                - main
+#          filters:
+#            branches:
+#              only:
+#                - main
           requires:
             - generate_tag
             - check_version
@@ -94,10 +94,10 @@ workflows:
             - github
 
       - publish-manifest:
-          filters:
-            branches:
-              only:
-                - main
+#          filters:
+#            branches:
+#              only:
+#                - main
           context:
             - dockerhub
           requires:
