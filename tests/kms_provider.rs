@@ -1,12 +1,12 @@
 #[cfg(test)]
-mod vault_integration_tests {
+mod encryption_and_decryption {
   use tokio;
   use tonic::Request;
   use lib;
-  use lib::kms::{DecryptRequest, EncryptRequest, StatusRequest};
+  use lib::kms::{DecryptRequest, EncryptRequest};
 
   #[tokio::test]
-  async fn encryption_and_decryption() -> Result<(), Box<dyn std::error::Error>> {
+  async fn can_encrypt_and_decrypt_messages() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = lib::client().await?;
     let text = "hello world!";
     let uid = "123";
@@ -28,11 +28,26 @@ mod vault_integration_tests {
     assert_eq!(&decrypted, text);
     Ok(())
   }
+}
+
+#[cfg(test)]
+mod status {
+  use tonic::Request;
+  use lib::kms::{EncryptRequest, StatusRequest};
 
   #[tokio::test]
-  async fn status() -> Result<(), Box<dyn std::error::Error>> {
+  async fn returns_ok_status_when_key_exists() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = lib::client().await?;
+    let text = "hello world!";
+    let uid = "123";
+    client
+      .encrypt(Request::new(EncryptRequest {
+        plaintext: text.as_bytes().to_vec(),
+        uid: uid.to_string(),
+      }))
+      .await?;
     let status_resp = client.status(Request::new(StatusRequest {})).await?;
+
     assert_eq!(status_resp.into_inner().healthz, "ok");
     Ok(())
   }
