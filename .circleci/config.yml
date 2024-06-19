@@ -114,7 +114,7 @@ jobs:
       - checkout
       - run:
           name: Install proto
-          command: apt get install protobuf-compiler
+          command: apt-get install protobuf-compiler
       - restore_cache:
           key: project-cache
       - run:
