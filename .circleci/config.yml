@@ -71,7 +71,8 @@ workflows:
             - check_version
             - check_formatting
             - build
-            - test
+            - unit-tests
+            - integration-tests
           context:
             - dockerhub
             - github
@@ -86,7 +87,8 @@ workflows:
             - check_version
             - check_formatting
             - build
-            - test
+            - unit-tests
+            - integration-tests
           context:
             - dockerhub
             - github
