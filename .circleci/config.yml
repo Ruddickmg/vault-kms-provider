@@ -126,7 +126,7 @@ jobs:
   check_version:
     executor: ubuntu
     environment:
-      MAIN_BRANCH_URL: git@github.com:byThePeoples-com/vault-kms-provider.git
+      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
     steps:
       - checkout
       - run:
