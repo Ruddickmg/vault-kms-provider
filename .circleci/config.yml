@@ -140,13 +140,15 @@ jobs:
           command: |
             cr upload --generate-release-notes --skip-existing \
               --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner 'Marcus Ruddick'
+              --owner 'Marcus Ruddick' \
+              --token $GITHUB_TOKEN
       - run:
           name: Add chart to gh-pages
           command: |
             cr index --push \
               --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner 'Marcus Ruddick'
+              --owner 'Marcus Ruddick' \
+              --token $GITHUB_TOKEN
 
   build:
     executor: rust-app
