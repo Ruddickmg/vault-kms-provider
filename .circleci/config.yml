@@ -14,6 +14,9 @@ executors:
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
+  release:
+    docker:
+      - image: 'helmpack/chart-releaser:latest'
   rust-app:
     environment:
       PIPELINE_NUM: << pipeline.number >>
@@ -116,6 +119,25 @@ workflows:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
+  release:
+    executor: release
+    steps:
+      - checkout
+      - run:
+          name: Release chart
+          command: |
+            cr upload --generate-release-notes --skip-existing \
+              --git-repo $CIRCLE_PROJECT_REPONAME \
+              --owner 'Marcus Ruddick' \
+              --token $GITHUB_TOKEN
+      - run:
+          name: Add chart to gh-pages
+          command: |
+            cr index --push \
+              --git-repo $CIRCLE_PROJECT_REPONAME \
+              --owner 'Marcus Ruddick' \
+              --token $GITHUB_TOKEN
+
   build:
     executor: rust-app
     steps:
