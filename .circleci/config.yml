@@ -141,6 +141,7 @@ jobs:
             cr upload --generate-release-notes --skip-existing \
               --git-repo $CIRCLE_PROJECT_REPONAME \
               --owner 'Marcus Ruddick' \
+              --package-path ./charts \
               --token $GITHUB_TOKEN
       - run:
           name: Add chart to gh-pages
@@ -319,7 +320,6 @@ jobs:
           command: |
             TAG="$(cat /tmp/workspace/docker_tag)"
             docker manifest push "${DOCKERHUB_REPOSITORY}:${TAG}"
-
 
   publish-latest-manifest:
     executor: ubuntu
