@@ -116,6 +116,15 @@ workflows:
             - publish-amd
             - publish-arm
 
+      - release:
+          filters:
+            branches:
+              only:
+                - main
+                - set-up-helm-repository
+#          requires:
+#            - publish-latest-manifest
+
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
@@ -123,20 +132,21 @@ jobs:
     executor: release
     steps:
       - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - SHA256:59eE1ztvCGeiGASA3YtvTYwyyHMcoAGTUMl8P7f2INw
       - run:
           name: Release chart
           command: |
             cr upload --generate-release-notes --skip-existing \
               --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner 'Marcus Ruddick' \
-              --token $GITHUB_TOKEN
+              --owner 'Marcus Ruddick'
       - run:
           name: Add chart to gh-pages
           command: |
             cr index --push \
               --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner 'Marcus Ruddick' \
-              --token $GITHUB_TOKEN
+              --owner 'Marcus Ruddick'
 
   build:
     executor: rust-app
