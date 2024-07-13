@@ -16,7 +16,7 @@ executors:
       TZ: "America/Los_Angeles"
   release:
     docker:
-      - image: 'helmpack/chart-releaser:latest'
+      - image: 'quay.io/helmpack/chart-releaser:latest'
   rust-app:
     environment:
       PIPELINE_NUM: << pipeline.number >>
