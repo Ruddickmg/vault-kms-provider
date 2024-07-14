@@ -249,7 +249,7 @@ jobs:
       - checkout
       - run:
           name: Lint helm chart
-          command: ct lint --all
+          command: ct lint --all --chart-dirs .
 
   unit-tests:
     executor: ubuntu
