@@ -1,10 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vault-kms-provider
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
 spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
   replicas: 1
   template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
     spec:
       serviceAccountName:  {{ .Values.serviceAccount.name }}
       securityContext:
