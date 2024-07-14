@@ -213,7 +213,7 @@ jobs:
           name: Check that the chart's app version matches the current app version
           command: |
             export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export BRANCH_CHART_VERSION="$(cat helm/Chart.yaml | grep '^version:' | awk '{print $2}')"
+            export CHART_APP_VERSION="$(cat helm/Chart.yaml | grep -oP '^appVersion: "\K[^"]+')"
             if [ "$BRANCH_VERSION" = "$CHART_APP_VERSION" ]; then exit 0; else exit 1; fi
 
   generate_tag:
