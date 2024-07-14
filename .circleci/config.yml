@@ -135,21 +135,20 @@ jobs:
       - run:
           name: Package chart
           command: |
-            cr package --help
             cr package ./helm
       - run:
           name: Release chart
           command: |
             cr upload --generate-release-notes --skip-existing \
               --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner 'Marcus Ruddick' \
+              --owner 'Ruddickmg' \
               --token $GITHUB_TOKEN
       - run:
           name: Add chart to gh-pages
           command: |
             cr index --push \
               --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner 'Marcus Ruddick' \
+              --owner 'Ruddickmg' \
               --token $GITHUB_TOKEN
 
   build:
