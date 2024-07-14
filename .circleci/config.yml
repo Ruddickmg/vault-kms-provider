@@ -121,9 +121,8 @@ workflows:
             branches:
               only:
                 - main
-                - set-up-helm-repository
-#          requires:
-#            - publish-latest-manifest
+          requires:
+            - publish-latest-manifest
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -152,6 +151,7 @@ jobs:
               --commit $CIRCLE_BRANCH \
               --git-repo $CIRCLE_PROJECT_REPONAME \
               --owner $CIRCLE_PROJECT_USERNAME \
+              --release-name-template "v{{ .Version }}" \
               --token $GITHUB_TOKEN
       - run:
           name: Add chart to gh-pages
