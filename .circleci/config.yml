@@ -1,0 +1,361 @@
+version: 2.1
+
+orbs:
+  kubernetes: circleci/kubernetes@1.3.1
+  helm: circleci/helm@3.0.2
+  rust: circleci/rust@1.6.1
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
+executors:
+  deployment:
+    docker:
+      - image: 'cimg/base:stable'
+    environment:
+      PIPELINE_NUM: << pipeline.number >>
+      TZ: "America/Los_Angeles"
+  release:
+    docker:
+      - image: 'quay.io/helmpack/chart-releaser:latest'
+  rust-app:
+    environment:
+      PIPELINE_NUM: << pipeline.number >>
+      TZ: "America/Los_Angeles"
+    docker:
+      - image: cimg/rust:1.79.0
+  arm-builder:
+    environment:
+      PIPELINE_NUM: << pipeline.number >>
+      TZ: "America/Los_Angeles"
+    machine:
+      image: ubuntu-2204:2024.05.1
+      resource_class: arm.medium
+      docker_layer_caching: true
+  docker-publisher:
+    environment:
+      PIPELINE_NUM: << pipeline.number >>
+      TZ: "America/Los_Angeles"
+    docker:
+      - image: circleci/buildpack-deps:stretch
+  ubuntu:
+    environment:
+      PIPELINE_NUM: << pipeline.number >>
+      TZ: "America/Los_Angeles"
+    machine:
+      image: ubuntu-2204:2024.05.1
+      docker_layer_caching: true
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
+workflows:
+  ci-cd:
+    jobs:
+      - check_formatting
+      - build
+      - unit-tests
+      - integration-tests
+      - check_version:
+          filters:
+            branches:
+              ignore:
+                - main
+      - generate_tag:
+          filters:
+            branches:
+              only:
+                - main
+      - publish-arm:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - generate_tag
+            - check_version
+            - check_formatting
+            - build
+            - unit-tests
+            - integration-tests
+          context:
+            - dockerhub
+
+      - publish-amd:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - generate_tag
+            - check_version
+            - check_formatting
+            - build
+            - unit-tests
+            - integration-tests
+          context:
+            - dockerhub
+
+      - publish-manifest:
+          filters:
+            branches:
+              only:
+                - main
+          context:
+            - dockerhub
+          requires:
+            - publish-amd
+            - publish-arm
+
+      - publish-latest-manifest:
+          filters:
+            branches:
+              only:
+                - main
+          context:
+            - dockerhub
+          requires:
+            - publish-amd
+            - publish-arm
+
+      - release:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - publish-latest-manifest
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
+jobs:
+  release:
+    executor: release
+    steps:
+      - checkout
+      - run:
+          name: Install ssh
+          command: apk add openssh-client
+      - run:
+          name: Configure git
+          command: |
+            git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
+            git config --global user.email "ruddickmg@gmail.com"
+            git config --global user.name "Marcus Ruddick"
+      - run:
+          name: Package chart
+          command: |
+            cr package ./helm
+      - run:
+          name: Release chart
+          command: |
+            cr upload --generate-release-notes --skip-existing \
+              --commit $CIRCLE_BRANCH \
+              --git-repo $CIRCLE_PROJECT_REPONAME \
+              --owner $CIRCLE_PROJECT_USERNAME \
+              --release-name-template "v{{ .Version }}" \
+              --token $GITHUB_TOKEN
+      - run:
+          name: Add chart to gh-pages
+          command: |
+            mkdir .cr-index
+            cr index --push \
+              --git-repo $CIRCLE_PROJECT_REPONAME \
+              --owner $CIRCLE_PROJECT_USERNAME \
+              --token $GITHUB_TOKEN
+
+  build:
+    executor: rust-app
+    steps:
+      - checkout
+      - run:
+          name: Update
+          command: sudo apt-get update
+      - run:
+          name: Install proto
+          command: sudo apt-get install protobuf-compiler
+      - restore_cache:
+          key: project-cache
+      - run:
+          name: Stable Build
+          command: cargo build
+      - save_cache:
+          key: project-cache
+          paths:
+            - "~/.cargo"
+            - "./target"
+
+  check_version:
+    executor: ubuntu
+    environment:
+      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
+    steps:
+      - checkout
+      - run:
+          name: Checkout main
+          command: git clone "$MAIN_BRANCH_URL"
+      - run:
+          name: Check that version has changed
+          command: |
+            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            if [ "$MAIN_VERSION" = "$BRANCH_VERSION" ]; then exit 1; else exit 0; fi
+
+  generate_tag:
+    executor: ubuntu
+    steps:
+      - checkout
+      - run:
+          name: Create workspace
+          command: mkdir /tmp/workspace
+      - run:
+          name: Generate Tag
+          command: |
+            VERSION="v$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            TIME_STAMP="$(printf '%(%d.%m.%Y)T\n' -1)"
+            TAG="$VERSION-$PIPELINE_NUM-$TIME_STAMP"
+            echo $TAG >> /tmp/workspace/docker_tag
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - docker_tag
+
+  check_formatting:
+    executor: rust-app
+    steps:
+      - checkout
+      - run:
+          name: Check formatting
+          command: cargo fmt -- --check
+
+  unit-tests:
+    executor: ubuntu
+    steps:
+      - checkout
+      - rust/install
+      - run:
+          name: Run unit tests
+          command: cargo test --bins --lib
+
+  integration-tests:
+    executor: ubuntu
+    steps:
+      - checkout
+      - run:
+          name: Start vault and kms provider
+          command: docker compose up -d
+      - rust/install
+      - run:
+          name: Enable transit
+          command: docker compose exec vault vault secrets enable transit
+      - run:
+          name: Run integration tests
+          command: cargo test --test '*'
+
+  publish-amd:
+    executor: ubuntu
+    environment:
+      ARCH: amd64
+      PLATFORM: linux/amd64
+    steps:
+      - checkout
+      - run:
+          name: Log in to Docker
+          command: |
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Build
+          command: |
+            TAG="$(cat /tmp/workspace/docker_tag)"
+            docker build \
+              --build-arg TARGETPLATFORM=$PLATFORM \
+              -t "${DOCKERHUB_REPOSITORY}:${TAG}-${ARCH}" .
+      - run:
+          name: Publish
+          command: |
+            TAG="$(cat /tmp/workspace/docker_tag)"
+            docker push "${DOCKERHUB_REPOSITORY}:${TAG}-${ARCH}"
+
+  publish-arm:
+    executor: arm-builder
+    environment:
+      ARCH: arm64
+      PLATFORM: linux/arm64
+    steps:
+      - checkout
+      - run:
+          name: Log in to Docker
+          command: |
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Build
+          command: |
+            TAG="$(cat /tmp/workspace/docker_tag)"
+            docker build \
+              --build-arg TARGETPLATFORM=$PLATFORM \
+              -t "${DOCKERHUB_REPOSITORY}:${TAG}-${ARCH}" .
+      - run:
+          name: Publish
+          command: |
+            TAG="$(cat /tmp/workspace/docker_tag)"
+            docker push "${DOCKERHUB_REPOSITORY}:${TAG}-${ARCH}"
+
+  publish-manifest:
+    executor: ubuntu
+    environment:
+      DOCKER_CLI_EXPERIMENTAL: enabled
+    steps:
+      - run:
+          name: Log in to Docker
+          command: |
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Create Manifest
+          command: |
+            TAG="$(cat /tmp/workspace/docker_tag)"
+            REPO="$DOCKERHUB_REPOSITORY:$TAG"
+            docker manifest create $REPO \
+              --amend "${REPO}-arm64" \
+              --amend "${REPO}-amd64"
+      - run:
+          name: Show Manifest
+          command: |
+            TAG="$(cat /tmp/workspace/docker_tag)"
+            docker manifest inspect "${DOCKERHUB_REPOSITORY}:${TAG}"
+      - run:
+          name: Publish Manifest
+          command: |
+            TAG="$(cat /tmp/workspace/docker_tag)"
+            docker manifest push "${DOCKERHUB_REPOSITORY}:${TAG}"
+
+  publish-latest-manifest:
+    executor: ubuntu
+    environment:
+      DOCKER_CLI_EXPERIMENTAL: enabled
+    steps:
+      - run:
+          name: Log in to Docker
+          command: |
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Create Manifest
+          command: |
+            TAG="$(cat /tmp/workspace/docker_tag)"
+            REPO="$DOCKERHUB_REPOSITORY:$TAG"
+            docker manifest create "$DOCKERHUB_REPOSITORY:latest" \
+              --amend "${REPO}-arm64" \
+              --amend "${REPO}-amd64"
+      - run:
+          name: Show Manifest
+          command: |
+            docker manifest inspect "${DOCKERHUB_REPOSITORY}:latest"
+      - run:
+          name: Publish Manifest
+          command: |
+            docker manifest push "${DOCKERHUB_REPOSITORY}:latest"

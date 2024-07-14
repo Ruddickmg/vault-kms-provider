@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: SiQOECxwSDCeQt1r0n5kqQCr
+      VAULT_LOG_LEVEL: debug
+      VAULT_ADDR: http://127.0.0.1:8200
+      VAULT_TOKEN: SiQOECxwSDCeQt1r0n5kqQCr
+    networks:
+      - vault-kms-provider
+    expose:
+      - 8200:8200
+
+  vault-kms-provider:
+    environment:
+      VAULT_TOKEN: SiQOECxwSDCeQt1r0n5kqQCr
+      VAULT_ADDRESS: http://vault:8200
+      SOCKET_PATH: /sockets/vault-kms-provider.socket
+    build:
+      args:
+        UID: 0
+        GID: 0
+      dockerfile: ./Dockerfile
+    container_name: vault-kms-provider
+    networks:
+      - vault-kms-provider
+    volumes:
+      - ./sockets:/sockets
+
+networks:
+  vault-kms-provider:
+    name: vault-kms-provider-net

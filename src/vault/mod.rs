@@ -1,8 +1,4 @@
-mod service;
-mod decryption;
-mod encryption;
-mod transit;
 mod keys;
-mod data;
+mod service;
 
-pub use service::server;
+pub use service::VaultKmsServer;
