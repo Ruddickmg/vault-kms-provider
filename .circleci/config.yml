@@ -148,6 +148,7 @@ jobs:
           name: Add chart to gh-pages
           command: |
             mkdir .cr-index
+            touch .cr-index/index.yaml
             cr index --push \
               --git-repo $CIRCLE_PROJECT_REPONAME \
               --owner $CIRCLE_PROJECT_USERNAME \
