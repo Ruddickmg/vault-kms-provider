@@ -133,6 +133,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install ssh
+          command: apk add openssh-client
+      - run:
           name: Package chart
           command: |
             cr package ./helm
