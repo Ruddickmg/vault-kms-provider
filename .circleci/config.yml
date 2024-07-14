@@ -201,19 +201,19 @@ jobs:
           name: Check that version has changed
           command: |
             export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
             export MAIN_CHART_VERSION="$(cat ./vault-kms-provider/helm/Chart.yaml | grep '^version:' | awk '{print $2}')"
+            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
             export BRANCH_CHART_VERSION="$(cat helm/Chart.yaml | grep '^version:' | awk '{print $2}')"
-            export CHART_APP_VERSION="$(cat helm/Chart.yaml | grep -oP '^appVersion: "\K[^"]+')"
-
-            # Error out if neither the app version or the chart version have changed
             if [ "$MAIN_VERSION" = "$BRANCH_VERSION" ]; then
               if [ "$MAIN_CHART_VERSION" = "$BRANCH_CHART_VERSION" ]; then exit 1; else exit 0; fi
             else
               exit 0;
             fi
-
-            # Error out if the app version is not matching between the Chart.yaml and the Cargo.toml
+      - run:
+          name: Check that the chart's app version matches the current app version
+          command: |
+            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export BRANCH_CHART_VERSION="$(cat helm/Chart.yaml | grep '^version:' | awk '{print $2}')"
             if [ "$BRANCH_VERSION" = "$CHART_APP_VERSION" ]; then exit 0; else exit 1; fi
 
   generate_tag:
