@@ -140,15 +140,16 @@ jobs:
           name: Release chart
           command: |
             cr upload --generate-release-notes --skip-existing \
+              --commit $CIRCLE_BRANCH \
               --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner 'Ruddickmg' \
+              --owner $CIRCLE_PROJECT_USERNAME \
               --token $GITHUB_TOKEN
       - run:
           name: Add chart to gh-pages
           command: |
             cr index --push \
               --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner 'Ruddickmg' \
+              --owner $CIRCLE_PROJECT_USERNAME \
               --token $GITHUB_TOKEN
 
   build:
