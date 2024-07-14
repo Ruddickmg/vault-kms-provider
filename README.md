@@ -25,7 +25,7 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
   - [ ] Allow Tls for http communication
   - [ ] Document manual integration steps
   - [ ] Create Helm Chart for easy deployment
-  - [ ] Set up helm char repository via GitHub pages
+  - [x] Set up helm char repository via GitHub pages
 
 ## Kubernetes authentication
 
@@ -38,4 +38,3 @@ In order to access vault the kms provider will need to authenticate with it. In 
 ```shell
 kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 --decode > ca.crt
 ```
-2. 
