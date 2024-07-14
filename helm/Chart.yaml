@@ -1,4 +1,7 @@
 apiVersion: v2
+maintainers:
+  - name: Marcus Ruddick
+    email: ruddickmg@gmail.com
 name: vault-kms-provider
 description: A Helm chart for deploying the vault-kms-provider. vault-kms-provider is a plugin allowing vault to be used as a kms service for kubernetes encryption at rest
 
