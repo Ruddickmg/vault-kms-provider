@@ -289,6 +289,9 @@ jobs:
       - helm/install_helm_client:
           version: v3.15.1
       - run:
+          name: Grant permissions on kube config
+          command: sudo chown $USER:$USER $KUBECONFIG
+      - run:
           name: Deploy vault
           command: |
             helm repo add hashicorp https://helm.releases.hashicorp.com
