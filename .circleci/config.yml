@@ -285,8 +285,11 @@ jobs:
           name: Install openrc
           command: apk add openrc
       - run:
-          name: Install k3s
-          command: curl -sfL https://get.k3s.io | sh -
+          name: Check k3s version
+          command: |
+            helm version
+            kubectl version
+            kubectl get pods --all-namespaces
       - run:
           name: Deploy vault
           command: |
