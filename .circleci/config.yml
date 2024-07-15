@@ -282,6 +282,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install openrc
+          command: apk add openrc
+      - run:
           name: Install k3s
           command: curl -sfL https://get.k3s.io | sh -
       - run:
