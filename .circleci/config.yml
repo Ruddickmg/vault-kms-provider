@@ -282,15 +282,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install openrc
-          command: apk add openrc
-      - run:
-          name: Check k3s version
-          command: |
-            helm version
-            kubectl version
-            kubectl get pods --all-namespaces
-      - run:
           name: Deploy vault
           command: |
             helm repo add hashicorp https://helm.releases.hashicorp.com
