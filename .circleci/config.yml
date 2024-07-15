@@ -278,12 +278,24 @@ jobs:
           command: cargo test --test '*'
 
   e2e_tests:
-    executor: chart-test
+    executor: ubuntu
     steps:
       - checkout
       - run:
+          name: Install k3s
+          command: curl -sfL https://get.k3s.io | sh -
+      - run:
+          name: Deploy vault
+          command: |
+            helm repo add hashicorp https://helm.releases.hashicorp.com
+            helm install vault hashicorp/vault -n vault --create-namespace --set "server.dev.enabled=true"
+      - run:
+          name: Deploy vault-kms-provider
+          command: |
+            helm install vault-kms-provider ./helm -n vault
+      - run:
           name: Run e2e tests
-          command: ct install --all --chart-dirs .
+          command: helm test
 
   publish-amd:
     executor: ubuntu
