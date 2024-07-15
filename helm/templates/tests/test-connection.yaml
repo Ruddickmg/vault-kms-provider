@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "vault-kms-provider.fullname" . }}-test-connection"
+  name: "{{ .Chart.Name }}-test-connection"
   labels:
-    {{- include "vault-kms-provider.labels" . | nindent 4 }}
+    {{- .Chart.Name | nindent 4 }}
   annotations:
     "helm.sh/hook": test
 spec:
@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "vault-kms-provider.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ .Chart.Name }}:{{ .Values.service.port }}']
   restartPolicy: Never
