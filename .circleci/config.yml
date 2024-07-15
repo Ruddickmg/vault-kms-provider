@@ -279,6 +279,8 @@ jobs:
 
   e2e_tests:
     executor: ubuntu
+    environment:
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
     steps:
       - checkout
       - run:
