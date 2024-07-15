@@ -282,11 +282,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Deploy vault
-          command: |
-            helm repo add hashicorp https://helm.releases.hashicorp.com
-            helm install vault hashicorp/vault -n vault --create-namespace --set "server.dev.enabled=true"
-      - run:
           name: Run e2e tests
           command: ct install --all --chart-dirs .
 
