@@ -55,9 +55,10 @@ workflows:
     jobs:
       - check_formatting
       - build
-      - unit-tests
-      - integration-tests
-      - chart-lint
+      - unit_tests
+      - integration_tests
+      - e2e_tests
+      - chart_formatting
       - check_version:
           filters:
             branches:
@@ -76,10 +77,11 @@ workflows:
           requires:
             - generate_tag
             - check_version
+            - chart_formatting
             - check_formatting
             - build
-            - unit-tests
-            - integration-tests
+            - unit_tests
+            - integration_tests
           context:
             - dockerhub
 
@@ -93,8 +95,8 @@ workflows:
             - check_version
             - check_formatting
             - build
-            - unit-tests
-            - integration-tests
+            - unit_tests
+            - integration_tests
           context:
             - dockerhub
 
@@ -127,7 +129,7 @@ workflows:
                 - main
           requires:
             - publish-latest-manifest
-            - chart-lint
+            - chart_formatting
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -243,7 +245,7 @@ jobs:
           name: Check formatting
           command: cargo fmt -- --check
 
-  chart-lint:
+  chart_formatting:
     executor: chart-test
     steps:
       - checkout
@@ -251,7 +253,7 @@ jobs:
           name: Lint helm chart
           command: ct lint --all --chart-dirs .
 
-  unit-tests:
+  unit_tests:
     executor: ubuntu
     steps:
       - checkout
@@ -260,7 +262,7 @@ jobs:
           name: Run unit tests
           command: cargo test --bins --lib
 
-  integration-tests:
+  integration_tests:
     executor: ubuntu
     steps:
       - checkout
@@ -274,6 +276,22 @@ jobs:
       - run:
           name: Run integration tests
           command: cargo test --test '*'
+
+  e2e_tests:
+    executor: chart-test
+    steps:
+      - checkout
+      - run:
+          name: Install k3s
+          command: curl -sfL https://get.k3s.io | sh -
+      - run:
+          name: Deploy vault
+          command: |
+            helm repo add hashicorp https://helm.releases.hashicorp.com
+            helm install vault hashicorp/vault -n vault --create-namespace --set "server.dev.enabled=true"
+      - run:
+          name: Run e2e tests
+          command: ct install --all --chart-dirs .
 
   publish-amd:
     executor: ubuntu
