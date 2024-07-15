@@ -302,7 +302,7 @@ jobs:
             helm install vault-kms-provider ./helm -n vault
       - run:
           name: Run e2e tests
-          command: helm test vault-kms-provider
+          command: helm test vault-kms-provider -n vault
 
   publish-amd:
     executor: ubuntu
