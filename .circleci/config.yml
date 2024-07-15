@@ -284,6 +284,8 @@ jobs:
       - run:
           name: Install k3s
           command: curl -sfL https://get.k3s.io | sh -
+      - helm/install_helm_client:
+          version: v3.15.1
       - run:
           name: Deploy vault
           command: |
