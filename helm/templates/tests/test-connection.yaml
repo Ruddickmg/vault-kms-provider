@@ -3,7 +3,7 @@ kind: Pod
 metadata:
   name: "{{ .Chart.Name }}-test-connection"
   labels:
-    {{- .Chart.Name | nindent 4 }}
+    app: {{ .Chart.Name }}
   annotations:
     "helm.sh/hook": test
 spec:
