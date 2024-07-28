@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['test', '--test', '*']
-      args: ['{{ .Chart.Name }}:{{ .Values.service.port }}']
+      args: []
   restartPolicy: Never
