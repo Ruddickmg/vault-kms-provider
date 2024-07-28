@@ -38,6 +38,9 @@ pub fn create_unix_socket(
     permissions: UnixSocketPermissions,
 ) -> Result<UnixListenerStream, Box<dyn std::error::Error>> {
     let file_path = Path::new(path);
+    if file_path.exists() {
+        std::fs::remove_file(file_path)?;
+    }
     let directory_path = file_path.parent().unwrap();
     std::fs::create_dir_all(directory_path)?;
     let uds = UnixListener::bind(path)?;

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.socketVolume.name }}
+spec:
+  capacity:
+    storage: 300Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: {{ .Values.socketVolume.storageClass }}
+  local:
+    path: {{ .Values.socketVolume.mountPath }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: {{ .Values.nodeLabel.key }}
+              operator: In
+              values:
+                - "{{ .Values.nodeLabel.value }}"

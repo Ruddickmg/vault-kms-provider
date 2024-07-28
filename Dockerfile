@@ -39,7 +39,7 @@ RUN if [ "$TARGETPLATFORM" != "$ARM_64" ] && [ "$TARGETPLATFORM" != "$AMD_64" ];
 # ------------------------------------------------------------------------------
 
 FROM scratch
-LABEL authors="grant"
+LABEL authors="ruddickmg"
 ARG UID=10001
 ARG GID=10001
 ARG PKG_NAME="vault-kms-provider"

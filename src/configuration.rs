@@ -2,7 +2,7 @@ use crate::utilities::env::get_env;
 use crate::utilities::socket::UnixSocketPermissions;
 
 const DEFAULT_VAULT_ADDRESS: &str = "https://vault.vault.cluster.svc.local:8200";
-const DEFAULT_SOCKET_PATH: &str = "./sockets/vault-kms-provider.socket";
+const DEFAULT_SOCKET_PATH: &str = "./sockets/vault-kms-provider.sock";
 const DEFAULT_SOCKET_PERMISSIONS: &str = "any";
 const DEFAULT_VAULT_TRANSIT_KEY: &str = "vault-kms-provider";
 const DEFAULT_VAULT_TOKEN: &str = "";
