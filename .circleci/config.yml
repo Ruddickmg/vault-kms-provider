@@ -57,23 +57,17 @@ workflows:
       - build
       - unit_tests
       - integration_tests
-      - e2e_tests
+      - e2e_tests:
+          requires:
+            - publish-test-manifest
       - chart_formatting
+      - generate_tag
       - check_version:
           filters:
             branches:
               ignore:
                 - main
-      - generate_tag:
-          filters:
-            branches:
-              only:
-                - main
       - publish-arm:
-          filters:
-            branches:
-              only:
-                - main
           requires:
             - generate_tag
             - check_version
@@ -86,10 +80,6 @@ workflows:
             - dockerhub
 
       - publish-amd:
-          filters:
-            branches:
-              only:
-                - main
           requires:
             - generate_tag
             - check_version
@@ -99,6 +89,18 @@ workflows:
             - integration_tests
           context:
             - dockerhub
+
+      - publish-manifest:
+          name: publish-test-manifest
+          suffix: test
+          filters:
+            branches:
+              ignore: main
+          context:
+            - dockerhub
+          requires:
+            - publish-amd
+            - publish-arm
 
       - publish-manifest:
           filters:
@@ -111,7 +113,9 @@ workflows:
             - publish-amd
             - publish-arm
 
-      - publish-latest-manifest:
+      - publish-manifest:
+          name: publish-latest-manifest
+          tag: latest
           filters:
             branches:
               only:
@@ -296,14 +300,16 @@ jobs:
           command: |
             helm repo add hashicorp https://helm.releases.hashicorp.com
             helm install vault hashicorp/vault -n vault --create-namespace --set "server.dev.enabled=true"
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
           name: Deploy vault-kms-provider
           command: |
-            helm install vault-kms-provider ./helm -n vault
+            TAG="$(cat /tmp/workspace/docker_tag)"
+            helm install vault-kms-provider ./helm -n vault --set "image.tag=$TAG-test"
       - run:
           name: Run e2e tests
           command: |
-            sleep 5
             helm test vault-kms-provider -n vault
 
   publish-amd:
@@ -362,6 +368,15 @@ jobs:
     executor: ubuntu
     environment:
       DOCKER_CLI_EXPERIMENTAL: enabled
+    parameters:
+      tag:
+        default: ""
+        description: "Tag for the manifest"
+        type: string
+      suffix:
+        default: ""
+        description: "Suffix for the manifest tag"
+        type: string
     steps:
       - run:
           name: Log in to Docker
@@ -370,9 +385,19 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run:
+          name: Generate tag
+          command: |
+            if [["<< parameters.tag >>" = ""]] then
+              export TAG="$(cat /tmp/workspace/docker_tag)"
+            else 
+              export TAG="<< parameters.tag >>"
+            fi
+            if [["<< parameters.suffix >>" != ""]] then
+              export TAG="$TAG-<< parameters.suffix >>"
+            fi
+      - run:
           name: Create Manifest
           command: |
-            TAG="$(cat /tmp/workspace/docker_tag)"
             REPO="$DOCKERHUB_REPOSITORY:$TAG"
             docker manifest create $REPO \
               --amend "${REPO}-arm64" \
@@ -380,38 +405,8 @@ jobs:
       - run:
           name: Show Manifest
           command: |
-            TAG="$(cat /tmp/workspace/docker_tag)"
             docker manifest inspect "${DOCKERHUB_REPOSITORY}:${TAG}"
       - run:
           name: Publish Manifest
           command: |
-            TAG="$(cat /tmp/workspace/docker_tag)"
             docker manifest push "${DOCKERHUB_REPOSITORY}:${TAG}"
-
-  publish-latest-manifest:
-    executor: ubuntu
-    environment:
-      DOCKER_CLI_EXPERIMENTAL: enabled
-    steps:
-      - run:
-          name: Log in to Docker
-          command: |
-            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-      - attach_workspace:
-          at: /tmp/workspace
-      - run:
-          name: Create Manifest
-          command: |
-            TAG="$(cat /tmp/workspace/docker_tag)"
-            REPO="$DOCKERHUB_REPOSITORY:$TAG"
-            docker manifest create "$DOCKERHUB_REPOSITORY:latest" \
-              --amend "${REPO}-arm64" \
-              --amend "${REPO}-amd64"
-      - run:
-          name: Show Manifest
-          command: |
-            docker manifest inspect "${DOCKERHUB_REPOSITORY}:latest"
-      - run:
-          name: Publish Manifest
-          command: |
-            docker manifest push "${DOCKERHUB_REPOSITORY}:latest"
