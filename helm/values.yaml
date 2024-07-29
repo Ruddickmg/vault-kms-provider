@@ -63,11 +63,15 @@ securityContext:
   runAsNonRoot: true
 
 livenessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
   httpGet:
     path: /health
     port: 8080
 
 readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
   httpGet:
     path: /ready
     port: 8080
