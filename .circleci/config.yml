@@ -62,8 +62,6 @@ workflows:
       - e2e_tests:
           requires:
             - publish-manifest
-          context:
-            - dockerhub
       - check_version:
           filters:
             branches:
@@ -366,16 +364,15 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run:
-          name: Set tag
-          command: |
-            if [[ -z "<< parameters.tag >>" ]]; then
-              export TAG="<< parameters.tag >>"
-            else 
-              export TAG="$(cat /tmp/workspace/docker_tag)"
-            fi
-      - run:
           name: Create Manifest
           command: |
+            if [[ -z "<< parameters.tag >>" ]]; then
+              echo "Setting tag: << parameters.tag >>"
+              export TAG="<< parameters.tag >>"
+            else 
+              echo "Setting tag: $(cat /tmp/workspace/docker_tag)"
+              export TAG="$(cat /tmp/workspace/docker_tag)"
+            fi
             REPO="$DOCKERHUB_REPOSITORY:$TAG"
             docker manifest create $REPO \
               --amend "${REPO}-arm64" \
