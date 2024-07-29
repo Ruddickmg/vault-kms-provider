@@ -357,21 +357,21 @@ jobs:
         description: "Tag for the manifest"
         type: string
     steps:
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
           name: Log in to Docker
           command: |
             echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-      - attach_workspace:
-          at: /tmp/workspace
       - run:
           name: Create Manifest
           command: |
             if [[ -z "<< parameters.tag >>" ]]; then
-              echo "Setting tag: << parameters.tag >>"
-              export TAG="<< parameters.tag >>"
-            else 
-              echo "Setting tag: $(cat /tmp/workspace/docker_tag)"
+              echo "Setting tag from workspace: $(cat /tmp/workspace/docker_tag)"
               export TAG="$(cat /tmp/workspace/docker_tag)"
+            else
+              echo "Setting tag from parameters: << parameters.tag >>"
+              export TAG="<< parameters.tag >>"
             fi
             REPO="$DOCKERHUB_REPOSITORY:$TAG"
             docker manifest create $REPO \
