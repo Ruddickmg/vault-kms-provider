@@ -49,6 +49,19 @@ volumeMounts:
 
 priorityClassName: system-cluster-critical
 
+podSecurityContext:
+  fsGroup: 1001
+  runAsUser: 10001
+  runAsGroup: 1001
+  fsGroupChangePolicy: "OnRootMismatch"
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+#  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -62,17 +75,6 @@ serviceAccount:
 
 podAnnotations: {}
 podLabels: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
