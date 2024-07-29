@@ -1,11 +1,10 @@
 extern crate lib;
 
-use tokio::join;
 use lib::{
-    configuration,
-    kms::key_management_service_server::KeyManagementServiceServer,
+    configuration, kms::key_management_service_server::KeyManagementServiceServer,
     utilities::socket::create_unix_socket, vault,
 };
+use tokio::join;
 use tonic::transport::Server;
 
 mod checks;
