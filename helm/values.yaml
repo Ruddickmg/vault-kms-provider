@@ -14,12 +14,11 @@ nodeLabel:
 
 socket:
   name: vault-kms-provider.sock
-  path: sockets
+  path: &mount-path /run
   permissions: any
   output: false
 
 socketVolume:
-  mountPath: &mount-path /run
   name: &volume-name vault-kms-provider-socket-volume
   claim: &volume-claim-name socket-volume
   storageClass: unix-socket-storage
