@@ -390,17 +390,21 @@ jobs:
           name: Generate tag
           command: |
             if [[ -z "<< parameters.tag >>" ]]; then
+              echo "tag is present << parameters.tag >>"
               export TAG="$(cat /tmp/workspace/docker_tag)"
             else 
+              echo "tag is not present"
               export TAG="<< parameters.tag >>"
             fi
             if [[ ! -z "<< parameters.suffix >>" ]]; then
+              echo "setting suffix << parameters.suffix >>"
               export TAG="$TAG-<< parameters.suffix >>"
             fi
       - run:
           name: Create Manifest
           command: |
             REPO="$DOCKERHUB_REPOSITORY:$TAG"
+            echo "creating repo from $REPO"
             docker manifest create $REPO \
               --amend "${REPO}-arm64" \
               --amend "${REPO}-amd64"
