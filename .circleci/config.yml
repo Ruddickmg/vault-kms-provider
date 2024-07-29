@@ -93,22 +93,6 @@ workflows:
             - dockerhub
 
       - publish-manifest:
-          name: publish-test-manifest
-          suffix: test
-          filters:
-            branches:
-              ignore: main
-          context:
-            - dockerhub
-          requires:
-            - publish-amd
-            - publish-arm
-
-      - publish-manifest:
-          filters:
-            branches:
-              only:
-                - main
           context:
             - dockerhub
           requires:
@@ -307,8 +291,7 @@ jobs:
       - run:
           name: Deploy vault-kms-provider
           command: |
-            TAG="$(cat /tmp/workspace/docker_tag)"
-            helm install vault-kms-provider ./helm -n vault --set "image.tag=$TAG-test"
+            helm install vault-kms-provider ./helm -n vault --set "image.tag=$(cat /tmp/workspace/docker_tag)"
       - run:
           name: Run e2e tests
           command: |
@@ -375,10 +358,6 @@ jobs:
         default: ""
         description: "Tag for the manifest"
         type: string
-      suffix:
-        default: ""
-        description: "Suffix for the manifest tag"
-        type: string
     steps:
       - run:
           name: Log in to Docker
@@ -390,15 +369,9 @@ jobs:
           name: Generate tag
           command: |
             if [[ -z "<< parameters.tag >>" ]]; then
-              echo "tag is present << parameters.tag >>"
-              export TAG="$(cat /tmp/workspace/docker_tag)"
-            else 
-              echo "tag is not present"
               export TAG="<< parameters.tag >>"
-            fi
-            if [[ ! -z "<< parameters.suffix >>" ]]; then
-              echo "setting suffix << parameters.suffix >>"
-              export TAG="$TAG-<< parameters.suffix >>"
+            else 
+              export TAG="$(cat /tmp/workspace/docker_tag)"
             fi
       - run:
           name: Create Manifest
