@@ -51,7 +51,7 @@ priorityClassName: system-cluster-critical
 
 podSecurityContext:
   fsGroup: 1001
-  runAsUser: 10001
+  runAsUser: 1001
   runAsGroup: 1001
   fsGroupChangePolicy: "OnRootMismatch"
 
@@ -61,6 +61,16 @@ securityContext:
       - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 80
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 80
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -75,7 +85,7 @@ serviceAccount:
 
 podAnnotations: {}
 podLabels: {}
-
+affinity: {}
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -88,13 +98,3 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-livenessProbe:
-  httpGet:
-    path: /
-    port: http
-readinessProbe:
-  httpGet:
-    path: /
-    port: http
-
-affinity: {}

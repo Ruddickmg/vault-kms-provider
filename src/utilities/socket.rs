@@ -2,6 +2,7 @@ use std::fs::Permissions;
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use std::sync::OnceLock;
+use hyper_util::rt::TokioIo;
 use tokio::net::{UnixListener, UnixStream};
 use tokio_stream::wrappers::UnixListenerStream;
 use tonic::transport::{Channel, Endpoint};
@@ -54,7 +55,7 @@ pub async fn connect_to_unix_socket(path: &str) -> Result<Channel, tonic::transp
     // this url doesn't matter since we are replacing it with the unix stream connection
     Endpoint::try_from("http://[::]:50051")?
         .connect_with_connector(service_fn(|_| async {
-            Ok::<_, std::io::Error>(UnixStream::connect(UNIX_SOCKET_PATH.get().unwrap()).await?)
+            Ok::<_, std::io::Error>(TokioIo::new(UnixStream::connect(UNIX_SOCKET_PATH.get().unwrap()).await?))
         }))
         .await
 }

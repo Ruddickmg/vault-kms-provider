@@ -6,6 +6,8 @@ use lib::{
 };
 use tonic::transport::Server;
 
+mod checks;
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let vault_config = configuration::vault();
