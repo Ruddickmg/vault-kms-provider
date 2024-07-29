@@ -380,8 +380,22 @@ jobs:
       - run:
           name: Show Manifest
           command: |
+            if [[ -z "<< parameters.tag >>" ]]; then
+              echo "Setting tag from workspace: $(cat /tmp/workspace/docker_tag)"
+              export TAG="$(cat /tmp/workspace/docker_tag)"
+            else
+              echo "Setting tag from parameters: << parameters.tag >>"
+              export TAG="<< parameters.tag >>"
+            fi
             docker manifest inspect "${DOCKERHUB_REPOSITORY}:${TAG}"
       - run:
           name: Publish Manifest
           command: |
+            if [[ -z "<< parameters.tag >>" ]]; then
+              echo "Setting tag from workspace: $(cat /tmp/workspace/docker_tag)"
+              export TAG="$(cat /tmp/workspace/docker_tag)"
+            else
+              echo "Setting tag from parameters: << parameters.tag >>"
+              export TAG="<< parameters.tag >>"
+            fi
             docker manifest push "${DOCKERHUB_REPOSITORY}:${TAG}"
