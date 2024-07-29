@@ -53,6 +53,8 @@ executors:
 workflows:
   ci-cd:
     jobs:
+      - chart_formatting
+      - generate_tag
       - check_formatting
       - build
       - unit_tests
@@ -60,8 +62,8 @@ workflows:
       - e2e_tests:
           requires:
             - publish-test-manifest
-      - chart_formatting
-      - generate_tag
+          context:
+            - dockerhub
       - check_version:
           filters:
             branches:
@@ -387,12 +389,12 @@ jobs:
       - run:
           name: Generate tag
           command: |
-            if [["<< parameters.tag >>" = ""]] then
+            if [[ -z "<< parameters.tag >>" ]]; then
               export TAG="$(cat /tmp/workspace/docker_tag)"
             else 
               export TAG="<< parameters.tag >>"
             fi
-            if [["<< parameters.suffix >>" != ""]] then
+            if [[ ! -z "<< parameters.suffix >>" ]]; then
               export TAG="$TAG-<< parameters.suffix >>"
             fi
       - run:
