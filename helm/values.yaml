@@ -65,12 +65,12 @@ securityContext:
 livenessProbe:
   httpGet:
     path: /health
-    port: 80
+    port: 8080
 
 readinessProbe:
   httpGet:
     path: /ready
-    port: 80
+    port: 8080
 
 serviceAccount:
   # Specifies whether a service account should be created

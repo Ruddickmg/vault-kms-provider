@@ -29,7 +29,7 @@ async fn checks(
 }
 
 pub async fn serve() -> Result<(), Error> {
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
     let listener = TcpListener::bind(addr).await?;
     println!(
         "Health and liveness checks listening at: {:?}",
