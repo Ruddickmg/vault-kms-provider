@@ -61,7 +61,7 @@ workflows:
       - integration_tests
       - e2e_tests:
           requires:
-            - publish-test-manifest
+            - publish-manifest
           context:
             - dockerhub
       - check_version:
@@ -366,7 +366,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run:
-          name: Generate tag
+          name: Set tag
           command: |
             if [[ -z "<< parameters.tag >>" ]]; then
               export TAG="<< parameters.tag >>"
@@ -377,7 +377,6 @@ jobs:
           name: Create Manifest
           command: |
             REPO="$DOCKERHUB_REPOSITORY:$TAG"
-            echo "creating repo from $REPO"
             docker manifest create $REPO \
               --amend "${REPO}-arm64" \
               --amend "${REPO}-amd64"
