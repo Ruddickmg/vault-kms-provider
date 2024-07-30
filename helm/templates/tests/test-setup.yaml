@@ -1,8 +1,8 @@
-{{- if .Values.testing -}}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: test-secret
-data:
-  hello: d29ybGQ= # world
-{{- end }}
+{{/*{{- if .Values.testing -}}*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: Secret*/}}
+{{/*metadata:*/}}
+{{/*  name: test-secret*/}}
+{{/*data:*/}}
+{{/*  hello: d29ybGQ= # world*/}}
+{{/*{{- end }}*/}}
