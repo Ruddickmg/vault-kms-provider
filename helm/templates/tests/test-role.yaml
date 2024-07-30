@@ -1,3 +1,9 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: test-service-account
+automountServiceAccountToken: true
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -21,4 +27,4 @@ roleRef:
   name: test-role
 subjects:
   - kind: ServiceAccount
-    name: default
+    name: test-service-account
