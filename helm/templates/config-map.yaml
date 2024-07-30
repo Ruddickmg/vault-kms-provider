@@ -8,3 +8,4 @@ data:
   VAULT_TOKEN: "{{ .Values.vault.token }}"
   VAULT_ADDRESS: "{{ .Values.vault.address }}"
   VAULT_TRANSIT_KEY: "{{ .Values.vault.transitKey }}"
+  HTTP_ADDRESS: "{{ .Values.service.host }}:{{ .Values.service.port }}"

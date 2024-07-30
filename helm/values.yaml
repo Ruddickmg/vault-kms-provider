@@ -18,6 +18,10 @@ socket:
   permissions: any
   output: false
 
+service:
+  port: &healthCheckPort 8080
+  host: 0.0.0.0
+
 socketVolume:
   name: &volumeName vault-kms-provider-socket-volume
   claim: &volumeClaimName socket-volume
@@ -67,7 +71,7 @@ livenessProbe:
   periodSeconds: 5
   httpGet:
     path: /health
-    port: &healthCheckPort 8080
+    port: *healthCheckPort
 
 startupProbe:
   initialDelaySeconds: 5

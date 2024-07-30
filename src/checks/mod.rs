@@ -6,8 +6,11 @@ use hyper::service::service_fn;
 use hyper_util::rt::TokioIo;
 use std::convert::Infallible;
 use std::net::SocketAddr;
+use std::str::FromStr;
 use tokio::io::Error;
 use tokio::net::TcpListener;
+
+extern crate lib;
 
 mod health;
 mod readiness;
@@ -29,7 +32,9 @@ async fn checks(
 }
 
 pub async fn serve() -> Result<(), Error> {
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
+    let http_address = lib::configuration::health_check_endpoint();
+    let addr = SocketAddr::from_str(&http_address.endpoint)
+      .expect(&format!("Invalid http address: {:?}", http_address.endpoint));
     let listener = TcpListener::bind(addr).await?;
     println!(
         "Health and liveness checks listening at: {:?}",
