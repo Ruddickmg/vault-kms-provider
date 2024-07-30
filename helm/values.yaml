@@ -112,6 +112,3 @@ resources: {}
   # requests:
   #   cpu: 100m
   #   memory: 128Mi
-
-# toggles whether the deployment should include test setup files
-testing: false
