@@ -97,9 +97,9 @@ serviceAccount:
 role:
   name: vault-kms-access
   rules:
-    - apiGroups: [ "" ]
-      resources: [ "secrets" ]
-      verbs: [ "get", "create" ]
+    - apiGroups: [""]
+      resources: ["secrets"]
+      verbs: ["get", "create"]
 
 podAnnotations: {}
 podLabels: {}
