@@ -9,18 +9,18 @@ configuration:
   name: vault-kms-provider-configuration
 
 nodeLabel:
-  key: &label-key node-role.kubernetes.io/control-plane
-  value: &label-value "true"
+  key: &labelKey node-role.kubernetes.io/control-plane
+  value: &labelValue "true"
 
 socket:
   name: vault-kms-provider.sock
-  path: &mount-path /run
+  path: &mountPath /run
   permissions: any
   output: false
 
 socketVolume:
-  name: &volume-name vault-kms-provider-socket-volume
-  claim: &volume-claim-name socket-volume
+  name: &volumeName vault-kms-provider-socket-volume
+  claim: &volumeClaimName socket-volume
   storageClass: unix-socket-storage
   size: 300mi
 
@@ -30,22 +30,22 @@ vault:
   transitKey: vault-kms-provider
 
 nodeSelector:
-  *label-key: *label-value
+  *labelKey: *labelValue
 
 tolerations:
-  - key: *label-key
+  - key: *labelKey
     operator: "Equal"
-    value: *label-value
+    value: *labelValue
     effect: "NoSchedule"
 
 volumes:
-  - name: *volume-name
+  - name: *volumeName
     persistentVolumeClaim:
-      claimName: *volume-claim-name
+      claimName: *volumeClaimName
 
 volumeMounts:
-  - mountPath: *mount-path
-    name: *volume-name
+  - mountPath: *mountPath
+    name: *volumeName
 
 priorityClassName: system-cluster-critical
 
@@ -67,14 +67,22 @@ livenessProbe:
   periodSeconds: 5
   httpGet:
     path: /health
-    port: 8080
+    port: &healthCheckPort 8080
+
+startupProbe:
+  initialDelaySeconds: 5
+  failureThreshold: 30
+  periodSeconds: 5
+  httpGet:
+    path: /health
+    port: *healthCheckPort
 
 readinessProbe:
   initialDelaySeconds: 5
-  periodSeconds: 5
+  periodSeconds: 3
   httpGet:
     path: /ready
-    port: 8080
+    port: *healthCheckPort
 
 serviceAccount:
   # Specifies whether a service account should be created

@@ -48,5 +48,6 @@ WORKDIR /user/local/bin/
 COPY --from=0 /etc/passwd /etc/passwd
 COPY --from=builder /usr/src/$PKG_NAME/target/release/$BIN_NAME ./app
 USER $UID:$GID
+EXPOSE 8080
 
 CMD ["./app"]
