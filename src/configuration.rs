@@ -9,7 +9,7 @@ const DEFAULT_VAULT_TOKEN: &str = "";
 const DEFAULT_HEALTH_ENDPOINT: &str = "0.0.0.0:8080";
 
 pub struct HealthCheckConfiguration {
-    pub endpoint: String
+    pub endpoint: String,
 }
 
 pub struct VaultConfiguration {

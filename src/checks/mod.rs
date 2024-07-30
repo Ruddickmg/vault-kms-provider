@@ -33,8 +33,10 @@ async fn checks(
 
 pub async fn serve() -> Result<(), Error> {
     let http_address = lib::configuration::health_check_endpoint();
-    let addr = SocketAddr::from_str(&http_address.endpoint)
-      .expect(&format!("Invalid http address: {:?}", http_address.endpoint));
+    let addr = SocketAddr::from_str(&http_address.endpoint).expect(&format!(
+        "Invalid http address: {:?}",
+        http_address.endpoint
+    ));
     let listener = TcpListener::bind(addr).await?;
     println!(
         "Health and liveness checks listening at: {:?}",
