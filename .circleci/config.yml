@@ -295,10 +295,9 @@ jobs:
               --set "role.rules[0].apiGroups={}" \
               --set "role.rules[0].resources={secrets}" \
               --set "role.rules[0].verbs={get,create}"
-
       - run:
           name: Wait for startup
-          command: sleep 10
+          command: sleep 5
       - run:
           name: Run e2e tests
           command: |
