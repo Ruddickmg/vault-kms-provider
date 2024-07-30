@@ -292,8 +292,8 @@ jobs:
           command: |
             helm install vault-kms-provider ./helm -n vault \
               --set "image.tag=$(cat /tmp/workspace/docker_tag)" \
-              --set "role.rules[0].apiGroups=[\"\"]" \
-              --set "role.rules[0].resources=[\"secrets\"]" \
+              --set "role.rules[0].apiGroups={}" \
+              --set "role.rules[0].resources={secrets}" \
               --set "role.rules[0].verbs={get,create}" \
               --set "testing=true"
 
