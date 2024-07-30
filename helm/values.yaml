@@ -89,10 +89,17 @@ readinessProbe:
     port: *healthCheckPort
 
 serviceAccount:
-  name: "vault-kms-server-service-account"
+  name: vault-kms-provider-service-account
   create: true
   automount: true
   annotations: {}
+
+role:
+  name: vault-kms-access
+  rules:
+    - apiGroups: [ "" ]
+      resources: [ "secrets" ]
+      verbs: [ "get", "create" ]
 
 podAnnotations: {}
 podLabels: {}

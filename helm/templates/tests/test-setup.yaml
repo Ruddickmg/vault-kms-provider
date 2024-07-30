@@ -5,25 +5,4 @@ metadata:
   name: test-secret
 data:
   hello: d29ybGQ= # world
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: test-role
-rules:
-  - apiGroups: [""]
-    resources: ["secrets"]
-    verbs: ["get", "list", "watch", "create"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: test-role-binding
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: test-role
-subjects:
-  - kind: ServiceAccount
-    name: {{ .Values.serviceAccount.name }}
 {{- end }}
