@@ -1,9 +1,8 @@
+{{- if .Values.testing -}}
 apiVersion: v1
 kind: Secret
 metadata:
   name: test-secret
-  annotations:
-    "helm.sh/hook": test
 data:
   hello: d29ybGQ= # world
 ---
@@ -11,8 +10,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: test-role
-  annotations:
-    "helm.sh/hook": test
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
@@ -22,8 +19,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: test-role-binding
-  annotations:
-    "helm.sh/hook": test
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -31,3 +26,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ .Values.serviceAccount.name }}
+{{- end }}

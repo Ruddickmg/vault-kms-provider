@@ -290,7 +290,9 @@ jobs:
       - run:
           name: Deploy vault-kms-provider
           command: |
-            helm install vault-kms-provider ./helm -n vault --set "image.tag=$(cat /tmp/workspace/docker_tag)"
+            helm install vault-kms-provider ./helm -n vault \
+              --set "image.tag=$(cat /tmp/workspace/docker_tag)" \
+              --set "testing=true"
       - run:
           name: Wait for startup
           command: sleep 10
