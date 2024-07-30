@@ -273,8 +273,14 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install brew
+          command: apt install brew
+      - run:
+          name: Install etcd
+          command: brew install etcd
+      - run:
           name: Install k3s
-          command: curl -sfL https://get.k3s.io | sh -
+          command: curl -sfL https://get.k3s.io | sh - -- --datastore-endpoint http://127.0.0.1:2379
       - helm/install_helm_client:
           version: v3.15.1
       - run:
