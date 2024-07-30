@@ -7,13 +7,6 @@ metadata:
 data:
   hello: d29ybGQ= # world
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: test-service-account
-  annotations:
-    "helm.sh/hook": test
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -37,4 +30,4 @@ roleRef:
   name: test-role
 subjects:
   - kind: ServiceAccount
-    name: test-service-account
+    name: {{ .Values.serviceAccount.name }}
