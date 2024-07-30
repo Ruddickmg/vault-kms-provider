@@ -292,6 +292,9 @@ jobs:
           command: |
             helm install vault-kms-provider ./helm -n vault --set "image.tag=$(cat /tmp/workspace/docker_tag)"
       - run:
+          name: Wait for startup
+          command: sleep 15
+      - run:
           name: Run e2e tests
           command: |
             helm test vault-kms-provider -n vault
