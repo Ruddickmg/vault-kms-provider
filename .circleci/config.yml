@@ -282,7 +282,7 @@ jobs:
       - checkout
       - run:
           name: Generate certificates
-          command: sudo ./helm_test_files/generate-custom-ca-certs.sh
+          command: sudo helm_test_files/generate-custom-ca-certs.sh
       - run:
           name: Install brew
           command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
