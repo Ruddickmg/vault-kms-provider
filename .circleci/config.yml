@@ -296,6 +296,9 @@ jobs:
           name: Verify etcdctl installation
           command: etcdctl version
       - run:
+          name: Start etcd
+          command: etcd --insecure-transport=false --insecure-skip-tls-verify
+      - run:
           name: Install k3s
           command: curl -sfL https://get.k3s.io | sh -
       - helm/install_helm_client:
