@@ -276,9 +276,10 @@ jobs:
           name: Install brew
           command: |
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            eval $(/opt/homebrew/bin/brew shellenv)
       - run:
           name: Install etcd
-          command: /opt/homebrew/bin/brew install etcd
+          command: brew install etcd
       - run:
           name: Install k3s
           command: curl -sfL https://get.k3s.io | sh - -- --datastore-endpoint http://127.0.0.1:2379
