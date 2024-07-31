@@ -290,6 +290,9 @@ jobs:
           name: Install etcd
           command: brew install etcd
       - run:
+          name: Verify etcd installation
+          command: etcd --version
+      - run:
           name: Install etcd client
           command: sudo apt install etcd-client
       - run:
