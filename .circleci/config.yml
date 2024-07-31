@@ -274,7 +274,7 @@ jobs:
       - checkout
       - run:
           name: Install brew
-          command: sudo apt install brew
+          command: sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       - run:
           name: Install etcd
           command: sudo brew install etcd
