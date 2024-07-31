@@ -16,11 +16,11 @@ services:
       ETCD_INITIAL_CLUSTER_TOKEN: etcd-cluster-1
       ETCD_INITIAL_CLUSTER_STATE: new
       ETCDCTL_API: 3
-#      ETCDCTL_CACERT: '/var/lib/rancher/k3s/server/tls/etcd/server-ca.crt'
-#      ETCDCTL_CERT: '/var/lib/rancher/k3s/server/tls/etcd/server-client.crt'
-#      ETCDCTL_KEY: '/var/lib/rancher/k3s/server/tls/etcd/server-client.key'
-#    volumes:
-#      - /var/lib/rancher/k3s/server/tls/etcd:/etc/ssl/certs
+      ETCDCTL_CACERT: '/etc/ssl/certs/server-ca.crt'
+      ETCDCTL_CERT: '/etc/ssl/certs/server-client.crt'
+      ETCDCTL_KEY: '/etc/ssl/certs/server-client.key'
+    volumes:
+      - /var/lib/rancher/k3s/server/tls/etcd/certs:/etc/ssl/certs
     network_mode: host
     expose:
       - 4001:4001
