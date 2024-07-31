@@ -293,19 +293,13 @@ jobs:
           name: Verify etcdctl installation
           command: etcdctl version
       - run:
-          name:
-          command: sudo chown $USER:$USER -R $K3S_CERTS
-      - run:
           name: Run etcd
-          command: docker compose up -d -f docker-compose.etcd.yml etcd
+          command: docker compose up -d -f docker-compose.etcd.yml
       - run:
           name: Install k3s
           command: curl -sfL https://get.k3s.io | sh -
       - helm/install_helm_client:
           version: v3.15.1
-      - run:
-          name: Grant permissions on kube config
-          command: sudo chown $USER:$USER $KUBECONFIG
       - run:
           name: Deploy vault
           command: |
