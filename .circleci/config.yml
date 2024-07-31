@@ -271,6 +271,11 @@ jobs:
     environment:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       K3S_DATASTORE_ENDPOINT: http://127.0.0.1:2379
+      ETCDCTL_ENDPOINTS: https://127.0.0.1:2379
+      ETCDCTL_CACERT: '/var/lib/rancher/k3s/server/tls/etcd/server-ca.crt'
+      ETCDCTL_CERT: '/var/lib/rancher/k3s/server/tls/etcd/server-client.crt'
+      ETCDCTL_KEY: '/var/lib/rancher/k3s/server/tls/etcd/server-client.key'
+      ETCDCTL_API: 3
     steps:
       - checkout
       - run:
@@ -284,6 +289,9 @@ jobs:
       - run:
           name: Install etcd
           command: brew install etcd
+      - run:
+          name: Install etcd client
+          command: sudo apt install etcd-client
       - run:
           name: Start etcd
           command: brew services start etcd
