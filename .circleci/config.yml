@@ -293,11 +293,8 @@ jobs:
           name: Verify etcd installation
           command: etcd --version
       - run:
-          name: Install etcd client
-          command: sudo apt install etcd-client
-      - run:
-          name: Start etcd
-          command: brew services start etcd
+          name: Verify etcdctl installation
+          command: etcdctl --version
       - run:
           name: Install k3s
           command: curl -sfL https://get.k3s.io | sh -
