@@ -274,10 +274,10 @@ jobs:
       - checkout
       - run:
           name: Install brew
-          command: apt install brew
+          command: sudo apt install brew
       - run:
           name: Install etcd
-          command: brew install etcd
+          command: sudo brew install etcd
       - run:
           name: Install k3s
           command: curl -sfL https://get.k3s.io | sh - -- --datastore-endpoint http://127.0.0.1:2379
