@@ -294,7 +294,7 @@ jobs:
           command: etcdctl version
       - run:
           name: Run etcd
-          command: docker compose up -d -f docker-compose.etcd.yml
+          command: docker compose -f docker-compose.etcd.yml up -d
       - run:
           name: Install k3s
           command: curl -sfL https://get.k3s.io | sh -
