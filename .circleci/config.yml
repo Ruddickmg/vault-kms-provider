@@ -270,7 +270,7 @@ jobs:
     executor: ubuntu
     environment:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-      K3S_DATASTORE_ENDPOINT: http://127.0.0.1:2379
+      K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
       ETCDCTL_ENDPOINTS: https://127.0.0.1:2379
       ETCDCTL_CACERT: '/var/lib/rancher/k3s/server/tls/etcd/server-ca.crt'
       ETCDCTL_CERT: '/var/lib/rancher/k3s/server/tls/etcd/server-client.crt'
