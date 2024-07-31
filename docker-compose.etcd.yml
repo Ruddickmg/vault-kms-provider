@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.15
+    container_name: etcd
+    hostname: localhost
+    environment:
+      ETCD_NAME: etcd0
+      ETCD_INITIAL_CLUSTER: etcd0=http://127.0.0.1:2380
+      ETCDCTL_ENDPOINTS: https://0.0.0.0:2379
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://127.0.0.1:2380
+      ETCD_ADVERTISE_CLIENT_URLS: http://127.0.0.1:2379,http://127.0.0.1:4001
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379,http://0.0.0.0:4001
+      ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
+      ETCD_INITIAL_CLUSTER_TOKEN: etcd-cluster-1
+      ETCD_INITIAL_CLUSTER_STATE: new
+      ETCDCTL_CACERT: '/var/lib/rancher/k3s/server/tls/etcd/server-ca.crt'
+      ETCDCTL_CERT: '/var/lib/rancher/k3s/server/tls/etcd/server-client.crt'
+      ETCDCTL_KEY: '/var/lib/rancher/k3s/server/tls/etcd/server-client.key'
+      ETCDCTL_API: 3
+    volumes:
+      - /var/lib/rancher/k3s/server/tls/etcd:/etc/ssl/certs
+    network_mode: host
+    expose:
+      - 4001:4001
+      - 2380:2380
+      - 2379:2379
