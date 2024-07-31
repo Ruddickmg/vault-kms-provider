@@ -276,7 +276,10 @@ jobs:
           name: Install brew
           command: |
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-            eval $(/opt/homebrew/bin/brew shellenv)
+      - run:
+          name: Add brew to path
+          command: |
+            echo 'export PATH=/home/linuxbrew/.linuxbrew:${PATH}' >> $BASH_ENV
       - run:
           name: Install etcd
           command: brew install etcd
