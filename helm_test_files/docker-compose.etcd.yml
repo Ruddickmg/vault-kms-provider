@@ -17,10 +17,10 @@ services:
       ETCD_INITIAL_CLUSTER_STATE: new
       ETCDCTL_API: 3
       ETCDCTL_CACERT: '/etc/ssl/certs/server-ca.crt'
-      ETCDCTL_CERT: '/etc/ssl/certs/server-client.crt'
-      ETCDCTL_KEY: '/etc/ssl/certs/server-client.key'
+      ETCDCTL_CERT: '/etc/ssl/certs/client-ca.crt'
+      ETCDCTL_KEY: '/etc/ssl/certs/client-ca.key'
     volumes:
-      - /var/lib/rancher/k3s/server/tls:/etc/ssl/certs
+      - /tmp/certs:/etc/ssl/certs
     network_mode: host
     expose:
       - 4001:4001
