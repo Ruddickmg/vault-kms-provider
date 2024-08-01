@@ -304,7 +304,7 @@ jobs:
           command: sudo chown $USER:$USER -R /var/lib/rancher
       - run:
           name: Copy certificates
-          command: cp $K3S_CERTS $ETCDCTL_CERTS
+          command: cp -r $K3S_CERTS $ETCDCTL_CERTS
       - run:
           name: Run etcd
           command: docker compose -f ./helm_test_files/docker-compose.etcd.yml up -d
