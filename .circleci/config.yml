@@ -301,9 +301,7 @@ jobs:
       - run:
           name: Grant permissions on certificates
           command: |
-            sudo chown $USER:$USER $ETCDCTL_CACERT
-            sudo chown $USER:$USER $ETCDCTL_CERT
-            sudo chown $USER:$USER $ETCDCTL_KEY
+            sudo chown $USER:$USER -R /var/lib/rancher
       - run:
           name: Check that etcd is working
           command: |
