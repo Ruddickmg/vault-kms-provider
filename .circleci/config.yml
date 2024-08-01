@@ -301,9 +301,9 @@ jobs:
       - run:
           name: Grant permissions on certificates
           command: |
-            sudo ls $K3S_CERTS
-            sudo chown $USER:$USER -R $K3S_CERTS
-            sudo chown $USER:$USER $K3S_CERTS/*
+            sudo chown $USER:$USER $ETCDCTL_CACERT
+            sudo chown $USER:$USER $ETCDCTL_CERT
+            sudo chown $USER:$USER $ETCDCTL_KEY
       - run:
           name: Check that etcd is working
           command: |
