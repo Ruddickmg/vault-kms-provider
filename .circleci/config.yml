@@ -338,7 +338,7 @@ jobs:
           command: kubectl create secret generic testing123 --from-literal=hello=world -n default
       - run:
           name: Get secret from etcd
-          command: echo "secret $(etcdctl get /kubernetes.io/secrets/default/testing123)"
+          command: etcdctl get /registry/secrets/default/testing123 | hexdump -C
 
   publish-amd:
     executor: ubuntu
