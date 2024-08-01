@@ -14,11 +14,9 @@ services:
       ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
       ETCD_INITIAL_CLUSTER_TOKEN: etcd-cluster-1
       ETCD_INITIAL_CLUSTER_STATE: new
-      ETCDCTL_ENDPOINTS: https://0.0.0.0:2379
-      ETCDCTL_API: 3
-      ETCDCTL_CACERT: '/etc/ssl/certs/server.crt'
-      ETCDCTL_CERT: '/etc/ssl/certs/client.crt'
-      ETCDCTL_KEY: '/etc/ssl/certs/client.key'
+      ETCD_KEY_FILE: /etc/ssl/certs/client.key
+      ETCD_CERT_FILE: /etc/ssl/certs/client.crt
+      ETCD_TRUSTED_CA_FILE: /etc/ssl/certs/server.crt
     volumes:
       - /tmp/certs:/etc/ssl/certs
     network_mode: host
