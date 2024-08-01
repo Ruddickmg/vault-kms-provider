@@ -304,11 +304,6 @@ jobs:
           name: Run etcd
           command: docker compose -f ./helm_test_files/docker-compose.etcd.yml up -d
       - run:
-          name: Check that etcd is working
-          command: |
-            etcdctl put greeting "Hello, etcd"
-            etcdctl get greeting
-      - run:
           name: Install k3s
           command: curl -sfL https://get.k3s.io | sh -
       - helm/install_helm_client:
@@ -338,6 +333,12 @@ jobs:
           name: Run e2e tests
           command: |
             helm test vault-kms-provider -n vault --logs
+      - run:
+          name: Create secret
+          command: kubectl create secret generic testing123 --from-literal=hello=world -n default
+      - run:
+          name: Get secret from etcd
+          command: etcdctl get /kubernetes.io/secrets/default/testing123 | hexdump -C
 
   publish-amd:
     executor: ubuntu
