@@ -270,13 +270,14 @@ jobs:
     executor: ubuntu
     environment:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      K3S_DEBUG: true
 #      K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
       K3S_CERTS: '/var/lib/rancher/k3s/server/tls/etcd'
-      K3S_DEBUG: true
+      ETCDCTL_CERTS: '/tmp/certs'
       ETCDCTL_ENDPOINTS: https://127.0.0.1:2379
-      ETCDCTL_CACERT: '/var/lib/rancher/k3s/server/tls/etcd/server-ca.crt'
-      ETCDCTL_CERT: '/var/lib/rancher/k3s/server/tls/etcd/server-client.crt'
-      ETCDCTL_KEY: '/var/lib/rancher/k3s/server/tls/etcd/server-client.key'
+      ETCDCTL_CACERT: '/tmp/certs/server-ca.crt'
+      ETCDCTL_CERT: '/tmp/certs/server-client.crt'
+      ETCDCTL_KEY: '/tmp/certs/server-client.key'
       ETCDCTL_API: 3
       ETCD_HOST_IP: 127.0.0.1
     steps:
@@ -300,11 +301,18 @@ jobs:
           command: etcdctl version
       - run:
           name: Grant permissions on certificates
-          command: |
-            sudo chown $USER:$USER -R /var/lib/rancher
+          command: sudo chown $USER:$USER -R /var/lib/rancher
+      - run:
+          name: Copy certificates
+          command: cp $K3S_CERTS $ETCDCTL_CERTS
       - run:
           name: Run etcd
           command: docker compose -f ./helm_test_files/docker-compose.etcd.yml up -d
+      - run:
+          name: Check that etcd is working
+          command: |
+            etcdctl put greeting "Hello, etcd"
+            etcdctl get greeting
       - run:
           name: Install k3s
           command: curl -sfL https://get.k3s.io | sh -
@@ -313,11 +321,6 @@ jobs:
       - run:
           name: Grant permissions on kube config
           command: sudo chown $USER:$USER $KUBECONFIG
-      - run:
-          name: Check that etcd is working
-          command: |
-            etcdctl put greeting "Hello, etcd"
-            etcdctl get greeting
       - run:
           name: Deploy vault
           command: |
