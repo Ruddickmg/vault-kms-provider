@@ -8,17 +8,17 @@ services:
     environment:
       ETCD_NAME: etcd0
       ETCD_INITIAL_CLUSTER: etcd0=http://127.0.0.1:2380
-      ETCDCTL_ENDPOINTS: https://0.0.0.0:2379
       ETCD_INITIAL_ADVERTISE_PEER_URLS: http://127.0.0.1:2380
       ETCD_ADVERTISE_CLIENT_URLS: http://127.0.0.1:2379,http://127.0.0.1:4001
       ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379,http://0.0.0.0:4001
       ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
       ETCD_INITIAL_CLUSTER_TOKEN: etcd-cluster-1
       ETCD_INITIAL_CLUSTER_STATE: new
+      ETCDCTL_ENDPOINTS: https://0.0.0.0:2379
       ETCDCTL_API: 3
-      ETCDCTL_CACERT: '/etc/ssl/certs/server-ca.crt'
-      ETCDCTL_CERT: '/etc/ssl/certs/client-ca.crt'
-      ETCDCTL_KEY: '/etc/ssl/certs/client-ca.key'
+      ETCDCTL_CACERT: '/etc/ssl/certs/server.crt'
+      ETCDCTL_CERT: '/etc/ssl/certs/client.crt'
+      ETCDCTL_KEY: '/etc/ssl/certs/client.key'
     volumes:
       - /tmp/certs:/etc/ssl/certs
     network_mode: host

@@ -270,23 +270,22 @@ jobs:
     executor: ubuntu
     environment:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-      K3S_DEBUG: true
-#      K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
-      K3S_CERTS: '/var/lib/rancher/k3s/server/tls'
-      ETCD_CTL_CERTS: '/tmp/certs'
-      ETCD_HOST_IP: 127.0.0.1
+      K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
+      K3S_DATASTORE_CAFILE: /tmp/certs/server.crt
+      K3S_DATASTORE_CERTFILE: /tmp/certs/client.crt
+      K3S_DATASTORE_KEYFILE: /tmp/certs/client.key
       ETCDCTL_ENDPOINTS: https://127.0.0.1:2379
-      ETCDCTL_CACERT: '/tmp/certs/server-ca.crt'
-      ETCDCTL_CERT: '/tmp/certs/client-ca.crt'
-      ETCDCTL_KEY: '/tmp/certs/client-ca.key'
+      ETCDCTL_CACERT: /tmp/certs/server.crt
+      ETCDCTL_CERT: /tmp/certs/client.crt
+      ETCDCTL_KEY: /tmp/certs/client.key
       ETCDCTL_API: 3
+      CERTS: /tmp/certs
+      ETCD_HOST_IP: 127.0.0.1
     steps:
       - checkout
       - run:
-          name: Generate certificates
-          command: |
-            sudo chmod +x ./helm_test_files/generate-custom-ca-certs.sh
-            sudo helm_test_files/generate-custom-ca-certs.sh
+          name: Set up certificates
+          command: cp -r ./helm_test_files/certs $CERTS
       - run:
           name: Install brew
           command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -299,13 +298,6 @@ jobs:
       - run:
           name: Verify etcdctl installation
           command: etcdctl version
-      - run:
-          name: Grant permissions on certificates
-          command: sudo chown $USER:$USER -R /var/lib/rancher
-      - run:
-          name: Copy certificates
-          command: |
-            cp -r $K3S_CERTS $ETCD_CTL_CERTS
       - run:
           name: Run etcd
           command: docker compose -f ./helm_test_files/docker-compose.etcd.yml up -d
