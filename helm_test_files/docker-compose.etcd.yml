@@ -20,7 +20,7 @@ services:
       ETCDCTL_CERT: '/etc/ssl/certs/server-client.crt'
       ETCDCTL_KEY: '/etc/ssl/certs/server-client.key'
     volumes:
-      - /var/lib/rancher/k3s/server/tls/etcd/certs:/etc/ssl/certs
+      - /var/lib/rancher/k3s/server/tls:/etc/ssl/certs
     network_mode: host
     expose:
       - 4001:4001
