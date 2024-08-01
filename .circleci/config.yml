@@ -272,7 +272,7 @@ jobs:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       K3S_DEBUG: true
 #      K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
-      K3S_CERTS: '/var/lib/rancher/k3s/server/tls/etcd'
+      K3S_CERTS: '/var/lib/rancher/k3s/server/tls'
       ETCD_CTL_CERTS: '/tmp/certs'
       ETCD_HOST_IP: 127.0.0.1
       ETCDCTL_ENDPOINTS: https://127.0.0.1:2379
