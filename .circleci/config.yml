@@ -333,12 +333,6 @@ jobs:
           name: Run e2e tests
           command: |
             helm test vault-kms-provider -n vault --logs
-      - run:
-          name: Create secret
-          command: kubectl create secret generic testing123 --from-literal=hello=world -n default
-      - run:
-          name: Get secret from etcd
-          command: etcdctl get /registry/secrets/default/testing123 | hexdump -C
 
   publish-amd:
     executor: ubuntu
