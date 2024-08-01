@@ -299,6 +299,11 @@ jobs:
           name: Verify etcdctl installation
           command: etcdctl version
       - run:
+          name: Check that etcd is working
+          command: |
+            etcdctl put greeting "Hello, etcd"
+            etcdctl get greeting
+      - run:
           name: Run etcd
           command: docker compose -f ./helm_test_files/docker-compose.etcd.yml up -d
       - run:
