@@ -300,7 +300,9 @@ jobs:
           command: etcdctl version
       - run:
           name: Grant permissions on certificates
-          command: sudo chown $USER:$USER -R $K3S_CERTS/*
+          command: |
+            sudo chown $USER:$USER -R $K3S_CERTS
+            sudo chown $USER:$USER -R $K3S_CERTS/*
       - run:
           name: Check that etcd is working
           command: |
