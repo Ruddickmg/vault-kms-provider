@@ -305,7 +305,6 @@ jobs:
       - run:
           name: Copy certificates
           command: |
-            ls $ETCD_CTL_CERTS
             cp -r $K3S_CERTS $ETCD_CTL_CERTS
       - run:
           name: Run etcd
@@ -313,6 +312,7 @@ jobs:
       - run:
           name: Check that etcd is working
           command: |
+            ls $ETCD_CTL_CERTS
             etcdctl put greeting "Hello, etcd"
             etcdctl get greeting
       - run:
