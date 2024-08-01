@@ -303,11 +303,6 @@ jobs:
           command: |
             sudo chown $USER:$USER -R /var/lib/rancher
       - run:
-          name: Check that etcd is working
-          command: |
-            etcdctl put greeting "Hello, etcd"
-            etcdctl get greeting
-      - run:
           name: Run etcd
           command: docker compose -f ./helm_test_files/docker-compose.etcd.yml up -d
       - run:
@@ -318,6 +313,11 @@ jobs:
       - run:
           name: Grant permissions on kube config
           command: sudo chown $USER:$USER $KUBECONFIG
+      - run:
+          name: Check that etcd is working
+          command: |
+            etcdctl put greeting "Hello, etcd"
+            etcdctl get greeting
       - run:
           name: Deploy vault
           command: |
