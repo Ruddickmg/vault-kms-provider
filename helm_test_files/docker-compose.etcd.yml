@@ -17,6 +17,7 @@ services:
       ETCD_KEY_FILE: /etc/ssl/certs/client.key
       ETCD_CERT_FILE: /etc/ssl/certs/client.crt
       ETCD_TRUSTED_CA_FILE: /etc/ssl/certs/server.crt
+      ETCD_PEER_AUTO_TLS: true
     volumes:
       - /tmp/certs:/etc/ssl/certs
     network_mode: host
