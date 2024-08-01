@@ -288,18 +288,6 @@ jobs:
             cp -r ./helm_test_files/certs $CERTS
             ls $CERTS
       - run:
-          name: Install brew
-          command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      - run:
-          name: Add brew to path
-          command: echo 'export PATH=/home/linuxbrew/.linuxbrew/bin/:${PATH}' >> $BASH_ENV
-      - run:
-          name: Install etcdctl
-          command: brew install etcd
-      - run:
-          name: Verify etcdctl installation
-          command: etcdctl version
-      - run:
           name: Run etcd
           command: docker compose -f ./helm_test_files/docker-compose.etcd.yml up -d
       - run:
