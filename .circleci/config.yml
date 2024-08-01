@@ -285,7 +285,9 @@ jobs:
       - checkout
       - run:
           name: Set up certificates
-          command: cp -r ./helm_test_files/certs $CERTS
+          command: |
+            cp -r ./helm_test_files/certs $CERTS
+            ls $CERTS
       - run:
           name: Install brew
           command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
