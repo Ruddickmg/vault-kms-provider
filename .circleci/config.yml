@@ -280,7 +280,6 @@ jobs:
       ETCDCTL_KEY: /tmp/certs/client.key
       ETCDCTL_API: 3
       CERTS: /tmp/certs
-      ETCD_HOST_IP: 127.0.0.1
     steps:
       - checkout
       - run:
