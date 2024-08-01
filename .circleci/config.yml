@@ -273,7 +273,7 @@ jobs:
       K3S_DEBUG: true
 #      K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
       K3S_CERTS: '/var/lib/rancher/k3s/server/tls/etcd'
-      ETCDCTL_CERTS: '/tmp/certs'
+      ETCD_CTL_CERTS: '/tmp/certs'
       ETCDCTL_ENDPOINTS: https://127.0.0.1:2379
       ETCDCTL_CACERT: '/tmp/certs/server-ca.crt'
       ETCDCTL_CERT: '/tmp/certs/server-client.crt'
@@ -304,7 +304,9 @@ jobs:
           command: sudo chown $USER:$USER -R /var/lib/rancher
       - run:
           name: Copy certificates
-          command: cp -r $K3S_CERTS $ETCDCTL_CERTS
+          command: |
+            ls $ETCD_CTL_CERTS
+            cp -r $K3S_CERTS $ETCD_CTL_CERTS
       - run:
           name: Run etcd
           command: docker compose -f ./helm_test_files/docker-compose.etcd.yml up -d
