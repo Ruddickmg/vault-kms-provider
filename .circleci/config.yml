@@ -285,11 +285,11 @@ jobs:
       - run:
           name: Set up certificates
           command: |
-            cp -r ./helm_test_files/certs $CERTS
+            cp -r ./helm/test_files/certs $CERTS
             ls $CERTS
       - run:
           name: Run etcd
-          command: docker compose -f ./helm_test_files/docker-compose.etcd.yml up -d
+          command: docker compose -f ./helm/test_files/docker-compose.etcd.yml up -d
       - run:
           name: Install k3s
           command: curl -sfL https://get.k3s.io | sh -
