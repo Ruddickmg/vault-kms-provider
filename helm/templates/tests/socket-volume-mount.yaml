@@ -3,6 +3,7 @@ kind: Pod
 metadata:
   name: "socket-volume-mount"
   annotations:
+    "helm.sh/resource-policy": keep
     "helm.sh/hook": test
 spec:
   restartPolicy: Never
