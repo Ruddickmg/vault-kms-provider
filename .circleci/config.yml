@@ -328,7 +328,7 @@ jobs:
       - run:
           name: Run e2e tests
           command: |
-            helm test vault-kms-provider -n vault --logs --debug
+            helm test vault-kms-provider -n vault --logs
 
   publish-amd:
     executor: ubuntu
