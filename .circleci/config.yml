@@ -321,7 +321,13 @@ jobs:
       - run:
           name: Check for socket file
           command: |
-            [ -e  "$SOCKET_FILE" ] && exit 0 || exit 1
+            if [ -S  "$SOCKET_FILE" ]; then
+              echo "found socket file"
+              exit 0
+            else
+              echo "file not found"
+              exit 1
+            fi
       - run:
           name: Configure k3s encryption
           command: |
@@ -329,6 +335,9 @@ jobs:
             helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "socket.output=true" > $ENCRYPTION_CONFIG
             cat $ENCRYPTION_CONFIGURATION
             curl -sfL https://get.k3s.io | sh - --encryption-provider-config=$ENCRYPTION_CONFIG
+      - run:
+          name: Restart k3s with encryption configuration
+          command: curl -sfL https://get.k3s.io | sh - --encryption-provider-config=$ENCRYPTION_CONFIG
       - run:
           name: Wait for startup
           command: sleep 5
