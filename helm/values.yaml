@@ -13,8 +13,8 @@ nodeLabel:
   value: &labelValue "true"
 
 socket:
-  name: &socketName vault-kms-provider.sock
-  path: &mountPath /etc
+  name: vault-kms-provider.sock
+  path: &mountPath /mnt
   permissions: any
   output: false
 
@@ -49,7 +49,6 @@ volumes:
 
 volumeMounts:
   - mountPath: *mountPath
-    subPath: *socketName
     name: *volumeName
 
 priorityClassName: system-cluster-critical
