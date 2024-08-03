@@ -22,7 +22,7 @@ spec:
         - -c
         - >
           echo "starting";
-          ls $SOCKET_PATH
+          ls $SOCKET_PATH;
           export SOCKET_FILE_PATH="$SOCKET_PATH/$SOCKET_NAME";
           echo "file path: $SOCKET_FILE_PATH";
           [ -f $SOCKET_FILE_PATH ] && exit 0 || exit 1;
