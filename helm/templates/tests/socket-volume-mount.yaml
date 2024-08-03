@@ -26,5 +26,5 @@ spec:
         - >
           echo "starting";
           export SOCKET_FILE_PATH=/run/vault-kms-provider.sock;
-          echo "file path: $FILE_PATH";
-          [ -f $FILE_PATH ] && exit 0 || exit 1;
+          echo "file path: $SOCKET_FILE_PATH";
+          [ -f $SOCKET_FILE_PATH ] && exit 0 || exit 1;
