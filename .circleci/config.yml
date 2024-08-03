@@ -314,6 +314,17 @@ jobs:
               --set "role.rules[0].apiGroups={}" \
               --set "role.rules[0].resources={secrets}" \
               --set "role.rules[0].verbs={get,create}"
+      - run:
+          name: Wait for installation
+          command: sleep 5
+      - run:
+          name: Check for socket file
+          command: |
+            if [ -f "/run/vault-kms-provider.sock" ]; then
+              exit 0
+            else
+              exit 1
+            fi
 #      - run:
 #          name: Create encryption configuration
 #          command: |
