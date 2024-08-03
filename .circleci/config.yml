@@ -316,7 +316,7 @@ jobs:
               --set "role.rules[0].verbs={get,create}"
       - run:
           name: Wait for installation
-          command: sleep 5
+          command: sleep 15
       - run:
           name: Check for socket file
           command: |
