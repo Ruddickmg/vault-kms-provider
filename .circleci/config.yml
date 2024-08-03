@@ -321,14 +321,7 @@ jobs:
       - run:
           name: Check for socket file
           command: |
-            ls /etc
-            if [ -e  "$SOCKET_FILE" ]; then
-              echo "found socket file"
-              exit 0
-            else
-              echo "file not found"
-              exit 1
-            fi
+            [ -S  "$SOCKET_FILE" ] && exit 0 || exit 1
       - run:
           name: Create encryption configuration
           command: |
