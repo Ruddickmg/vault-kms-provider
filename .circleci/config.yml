@@ -270,7 +270,7 @@ jobs:
     executor: ubuntu
     environment:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-      SOCKET_FILE: /etc/vault-kms-provider.sock
+      SOCKET_FILE: /mnt/vault-kms-provider.sock
       ENCRYPTION_CONFIG: /tmp/encryption/configuration.yaml
       K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
       K3S_DATASTORE_CAFILE: /tmp/certs/server.crt
