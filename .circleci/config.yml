@@ -320,19 +320,20 @@ jobs:
       - run:
           name: Check for socket file
           command: |
+            ls /run
             if [ -f "/run/vault-kms-provider.sock" ]; then
               exit 0
             else
               exit 1
             fi
-#      - run:
-#          name: Create encryption configuration
-#          command: |
-#            mkdir /tmp/encryption
-#            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "socket.output=true" > $ENCRYPTION_CONFIG
-#      - run:
-#          name: Restart k3s with encryption configuration
-#          command: curl -sfL https://get.k3s.io | sh - --encryption-provider-config=$ENCRYPTION_CONFIG
+      - run:
+          name: Create encryption configuration
+          command: |
+            mkdir /tmp/encryption
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "socket.output=true" > $ENCRYPTION_CONFIG
+      - run:
+          name: Restart k3s with encryption configuration
+          command: curl -sfL https://get.k3s.io | sh - --encryption-provider-config=$ENCRYPTION_CONFIG
       - run:
           name: Wait for startup
           command: sleep 5
