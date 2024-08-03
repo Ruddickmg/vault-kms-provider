@@ -19,13 +19,19 @@ spec:
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: {{ .Values.socket.path }}
+          subPath: {{ .Values.socket.name }}
           name: socket-file-volume
           readOnly: true
+      env:
+        - name: SOCKET_PATH
+          value: {{ .Values.socket.path }}
+        - name: SOCKET_NAME
+          value: {{ .Values.socket.name }}
       command:
         - /bin/sh
         - -c
         - >
           echo "starting";
-          export SOCKET_FILE_PATH=/run/vault-kms-provider.sock;
+          export SOCKET_FILE_PATH="$SOCKET_PATH/$SOCKET_NAME";
           echo "file path: $SOCKET_FILE_PATH";
           [ -f $SOCKET_FILE_PATH ] && exit 0 || exit 1;
