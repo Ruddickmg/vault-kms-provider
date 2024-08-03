@@ -8,18 +8,18 @@ spec:
   serviceAccountName: {{ .Values.serviceAccount.name }}
   restartPolicy: Never
   volumes:
-    - name: socket-file-volume
-      hostPath:
-        path: {{ .Values.socket.path }}
-        type: Directory
+{{/*    - name: socket-file-volume*/}}
+{{/*      hostPath:*/}}
+{{/*        path: {{ .Values.socket.path }}*/}}
+{{/*        type: Directory*/}}
   containers:
     - name: kubectl-etcd
       image: "docker.io/ruddickmg/kubectl-etcd:latest"
       imagePullPolicy: "IfNotPresent"
-      volumeMounts:
-        - mountPath: {{ .Values.socket.path }}
-          name: socket-file-volume
-          readOnly: true
+{{/*      volumeMounts:*/}}
+{{/*        - mountPath: {{ .Values.socket.path }}*/}}
+{{/*          name: socket-file-volume*/}}
+{{/*          readOnly: true*/}}
       command:
         - /bin/sh
         - -c
