@@ -323,13 +323,12 @@ jobs:
           command: |
             [ -S  "$SOCKET_FILE" ] && exit 0 || exit 1
       - run:
-          name: Create encryption configuration
+          name: Configure k3s encryption
           command: |
             mkdir /tmp/encryption
             helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "socket.output=true" > $ENCRYPTION_CONFIG
-      - run:
-          name: Restart k3s with encryption configuration
-          command: curl -sfL https://get.k3s.io | sh - --encryption-provider-config=$ENCRYPTION_CONFIG
+            cat $ENCRYPTION_CONFIGURATION
+            curl -sfL https://get.k3s.io | sh - --encryption-provider-config=$ENCRYPTION_CONFIG
       - run:
           name: Wait for startup
           command: sleep 5
