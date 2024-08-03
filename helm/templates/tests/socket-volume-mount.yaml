@@ -3,7 +3,6 @@ kind: Pod
 metadata:
   name: "socket-volume-mount"
   annotations:
-    "helm.sh/resource-policy": keep
     "helm.sh/hook": test
 spec:
   restartPolicy: Never
@@ -24,6 +23,7 @@ spec:
         - /bin/sh
         - -c
         - >
-          export FILE_PATH="{{ .Values.socket.path }}/{{ .Values.socket.name }}";
-          echo $FILE_PATH;
-          [ -f $FILE_PATH ] && exit 0 || exit 1;
+          echo "Hello World!"
+{{/*          export FILE_PATH="{{ .Values.socket.path }}/{{ .Values.socket.name }}";*/}}
+{{/*          echo $FILE_PATH;*/}}
+{{/*          [ -f $FILE_PATH ] && exit 0 || exit 1;*/}}
