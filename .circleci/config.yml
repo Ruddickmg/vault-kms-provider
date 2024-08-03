@@ -322,7 +322,7 @@ jobs:
           name: Check for socket file
           command: |
             ls /etc
-            if [ -f  "$SOCKET_FILE" ]; then
+            if [ -e  "$SOCKET_FILE" ]; then
               echo "found socket file"
               exit 0
             else
