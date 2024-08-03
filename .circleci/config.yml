@@ -334,7 +334,7 @@ jobs:
             mkdir /tmp/encryption
             helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "socket.output=true" > $ENCRYPTION_CONFIG
             cat $ENCRYPTION_CONFIGURATION
-            curl -sfL https://get.k3s.io | sh - --encryption-provider-config=$ENCRYPTION_CONFIG
+            curl -sfL https://get.k3s.io | sh - --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG
       - run:
           name: Restart k3s with encryption configuration
           command: curl -sfL https://get.k3s.io | sh - --encryption-provider-config=$ENCRYPTION_CONFIG
