@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "socket-volume-mount"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  hostNetwork: true
+  serviceAccountName: {{ .Values.serviceAccount.name }}
+  restartPolicy: Never
+  volumes:
+    - name: socket-test-volume
+      hostPath:
+        path: {{ .Values.socket.path }}
+        type: Directory
+  containers:
+    - name: kubectl
+      image: "bash:latest"
+      imagePullPolicy: "IfNotPresent"
+      volumeMounts:
+        - mountPath: {{ .Values.socket.path }}
+          name: socket-test-volume
+          readOnly: true
+      command:
+        - /bin/sh
+        - -c
+        - >
+          export FILE_PATH="{{ .Values.socket.path }}/{{ .Values.socket.name }}";
+          echo $FILE_PATH;
+          [ -f $FILE_PATH ] && exit 0 || exit 1;

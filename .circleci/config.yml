@@ -270,6 +270,7 @@ jobs:
     executor: ubuntu
     environment:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      ENCRYPTION_CONFIG: /tmp/encryption/configuration.yaml
       K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
       K3S_DATASTORE_CAFILE: /tmp/certs/server.crt
       K3S_DATASTORE_CERTFILE: /tmp/certs/client.crt
@@ -313,6 +314,14 @@ jobs:
               --set "role.rules[0].apiGroups={}" \
               --set "role.rules[0].resources={secrets}" \
               --set "role.rules[0].verbs={get,create}"
+#      - run:
+#          name: Create encryption configuration
+#          command: |
+#            mkdir /tmp/encryption
+#            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "socket.output=true" > $ENCRYPTION_CONFIG
+#      - run:
+#          name: Restart k3s with encryption configuration
+#          command: curl -sfL https://get.k3s.io | sh - --encryption-provider-config=$ENCRYPTION_CONFIG
       - run:
           name: Wait for startup
           command: sleep 5
