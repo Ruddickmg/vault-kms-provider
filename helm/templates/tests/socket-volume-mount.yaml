@@ -6,24 +6,12 @@ metadata:
     "helm.sh/hook": test
 spec:
   restartPolicy: Never
-  volumes:
-    - name: socket-test-volume
-      hostPath:
-        path: {{ .Values.socket.path }}
-        type: Directory
   containers:
     - name: kubectl
       image: "docker.io/ruddickmg/kubectl-etcd:latest"
       imagePullPolicy: "IfNotPresent"
-      volumeMounts:
-        - mountPath: {{ .Values.socket.path }}
-          name: socket-test-volume
-          readOnly: true
       command:
         - /bin/sh
         - -c
         - >
           echo "Hello World!"
-{{/*          export FILE_PATH="{{ .Values.socket.path }}/{{ .Values.socket.name }}";*/}}
-{{/*          echo $FILE_PATH;*/}}
-{{/*          [ -f $FILE_PATH ] && exit 0 || exit 1;*/}}
