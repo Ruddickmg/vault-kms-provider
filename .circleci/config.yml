@@ -321,7 +321,7 @@ jobs:
           name: Check for socket file
           command: |
             ls /etc
-            if [ -f "/etc/vault-kms-provider.sock" ]; then
+            if [ -f /etc/vault-kms-provider.sock ]; then
               exit 0
             else
               exit 1
