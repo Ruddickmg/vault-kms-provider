@@ -8,7 +8,7 @@ spec:
   serviceAccountName: {{ .Values.serviceAccount.name }}
   restartPolicy: Never
   containers:
-    - name: kubectl
+    - name: bash
       image: "docker.io/ruddickmg/kubectl-etcd:latest"
       imagePullPolicy: "IfNotPresent"
       command:
@@ -17,4 +17,4 @@ spec:
         - >
           export FILE_PATH = "{{ .Values.socket.path }}/{{ .Values.socket.name }}"
           echo $FILE_PATH
-          [[ -f $FILE_PATH ]] && exit 0 || exit 1
+          [ -f $FILE_PATH ] && exit 0 || exit 1
