@@ -1,13 +1,14 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "socket-volume-mount"
+  name: "secret-creation-and-retrieval"
   annotations:
     "helm.sh/hook": test
 spec:
+  serviceAccountName: {{ .Values.serviceAccount.name }}
   restartPolicy: Never
   containers:
-    - name: bash-test
+    - name: kubectl
       image: "docker.io/ruddickmg/kubectl-etcd:latest"
       imagePullPolicy: "IfNotPresent"
       command:
