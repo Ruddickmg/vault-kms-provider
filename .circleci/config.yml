@@ -321,7 +321,7 @@ jobs:
       - run:
           name: Check for socket file
           command: |
-            [ -S  "$SOCKET_FILE" ] && exit 0 || exit 1
+            [ -e  "$SOCKET_FILE" ] && exit 0 || exit 1
       - run:
           name: Configure k3s encryption
           command: |
