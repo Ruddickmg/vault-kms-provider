@@ -321,19 +321,14 @@ jobs:
       - run:
           name: Check for socket file
           command: |
-            if [ -e  "$SOCKET_FILE" ]; then
-              echo "found socket file"
-              exit 0
-            else
-              echo "file not found"
-              exit 1
-            fi
+            [ -e  "$SOCKET_FILE" ] && exit 0 || exit 1
       - run:
           name: Configure k3s encryption
           command: |
             mkdir /tmp/encryption
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "socket.output=true"
             helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "socket.output=true" > $ENCRYPTION_CONFIG
-            cat $ENCRYPTION_CONFIGURATION
+            cat /tmp/encryption/configuration.yaml
             curl -sfL https://get.k3s.io | sh - --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG
       - run:
           name: Restart k3s with encryption configuration
