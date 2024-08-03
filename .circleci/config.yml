@@ -321,7 +321,7 @@ jobs:
       - run:
           name: Check for socket file
           command: |
-            if [ -S  "$SOCKET_FILE" ]; then
+            if [ -e  "$SOCKET_FILE" ]; then
               echo "found socket file"
               exit 0
             else
