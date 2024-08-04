@@ -48,6 +48,7 @@ WORKDIR /user/local/bin/
 COPY --from=0 /etc/passwd /etc/passwd
 COPY --from=builder /usr/src/$PKG_NAME/target/release/$BIN_NAME ./app
 USER $UID:$GID
+RUN mkdir /run
 RUN mkdir /run/sockets
 EXPOSE 8080
 
