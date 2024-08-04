@@ -23,6 +23,7 @@ RUN if [ "$TARGETPLATFORM" = "$AMD_64" ]; then rustup target add $AMD_64_TARGET;
 RUN if [ "$TARGETPLATFORM" != "$ARM_64" ] && [ "$TARGETPLATFORM" != "$AMD_64" ]; then rustup target add $TARGET; fi
 
 RUN mkdir /usr/src/$PKG_NAME
+RUN mkdir /run/sockets
 
 WORKDIR /usr/src/$PKG_NAME
 
@@ -47,9 +48,8 @@ ARG BIN_NAME="server"
 WORKDIR /user/local/bin/
 COPY --from=0 /etc/passwd /etc/passwd
 COPY --from=builder /usr/src/$PKG_NAME/target/release/$BIN_NAME ./app
+COPY --from=builder /run/sockets /run/sockets
 USER $UID:$GID
-RUN mkdir /run
-RUN mkdir /run/sockets
 EXPOSE 8080
 
 CMD ["./app"]
