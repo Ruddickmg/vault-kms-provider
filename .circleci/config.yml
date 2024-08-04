@@ -331,9 +331,7 @@ jobs:
           name: Create encryption configuration file
           command: |
             mkdir /tmp/encryption
-            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "socket.output=true"
             helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "socket.output=true" > $ENCRYPTION_CONFIG
-            cat /tmp/encryption/configuration.yaml
       - run:
           name: Configure k3s encryption
           command: |

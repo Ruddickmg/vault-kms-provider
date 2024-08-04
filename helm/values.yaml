@@ -14,7 +14,7 @@ nodeLabel:
 
 socket:
   name: vault-kms-provider.sock
-  path: &mountPath /mnt
+  path: &socketPath /run/sockets
   permissions: any
   output: false
 
@@ -42,13 +42,16 @@ tolerations:
     value: *labelValue
     effect: "NoSchedule"
 
+local:
+  path: /mnt
+
 volumes:
   - name: *volumeName
     persistentVolumeClaim:
       claimName: *volumeClaimName
 
 volumeMounts:
-  - mountPath: *mountPath
+  - mountPath: *socketPath
     name: *volumeName
 
 priorityClassName: system-cluster-critical
