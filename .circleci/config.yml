@@ -321,7 +321,7 @@ jobs:
       - run:
           name: Check for socket file
           command: |
-            ls $SOCKET_FILE
+            ls /mnt
 #            if [ -e  "$SOCKET_FILE" ]; then
 #              exit 0
 #            else
