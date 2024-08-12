@@ -335,7 +335,9 @@ jobs:
       - run:
           name: Configure k3s encryption
           command: |
-            curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG" sh -
+            curl -sfL https://get.k3s.io | CONTAINERD_LOG_LEVEL=debug \
+              INSTALL_K3S_EXEC="server --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG" \
+              sh - --debug --v=9
       - run:
           name: Restart k3s with encryption configuration
           command: curl -sfL https://get.k3s.io | sh - --encryption-provider-config=$ENCRYPTION_CONFIG
