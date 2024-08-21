@@ -322,11 +322,11 @@ jobs:
           name: Check for socket file
           command: |
             ls /mnt
-#            if [ -e  "$SOCKET_FILE" ]; then
-#              exit 0
-#            else
-#              exit 1
-#            fi
+            if [ -e  "$SOCKET_FILE" ]; then
+              exit 0
+            else
+              exit 1
+            fi
       - run:
           name: Create encryption configuration file
           command: |
