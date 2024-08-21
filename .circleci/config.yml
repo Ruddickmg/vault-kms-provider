@@ -319,6 +319,9 @@ jobs:
           name: Wait for installation
           command: sleep 30
       - run:
+          name: Print vault logs
+          command: kubectl -n vault logs -f vault-0
+      - run:
           name: Check for socket file
           command: |
             ls /mnt
