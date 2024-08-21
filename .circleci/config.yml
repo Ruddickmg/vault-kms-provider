@@ -339,9 +339,6 @@ jobs:
               --write-kubeconfig-mode 777 \
               --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG
       - run:
-          name: Restart k3s with encryption configuration
-          command: curl -sfL https://get.k3s.io | sh - --encryption-provider-config=$ENCRYPTION_CONFIG
-      - run:
           name: Wait for startup
           command: sleep 5
       - run:

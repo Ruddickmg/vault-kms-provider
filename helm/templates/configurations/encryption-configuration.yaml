@@ -5,10 +5,14 @@ resources:
   - resources:
       - secrets
     providers:
-      - kms:
-          apiVersion: v2
-          name: vault-kms-provider
-          endpoint: unix://{{ .Values.socket.path }}/{{ .Values.socket.name }}
-          timeout: 3s
+      - aesgcm:
+          keys:
+            - name: key1
+              secret: DoOdl1a6BtizC2kYDyGJprSQuKcefB9TTcdePGMmb3k=
+{{/*      - kms:*/}}
+{{/*          apiVersion: v2*/}}
+{{/*          name: vault-kms-provider*/}}
+{{/*          endpoint: unix://{{ .Values.socket.path }}/{{ .Values.socket.name }}*/}}
+{{/*          timeout: 3s*/}}
       - identity: {}
 {{- end }}
