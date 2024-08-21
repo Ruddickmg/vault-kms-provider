@@ -5,10 +5,12 @@ resources:
   - resources:
       - secrets
     providers:
+{{/* TODO: remove this when kms authentication/communication is implemented via service account */}}
       - aesgcm:
           keys:
             - name: key1
               secret: DoOdl1a6BtizC2kYDyGJprSQuKcefB9TTcdePGMmb3k=
+{{/* TODO: uncomment this when kms authentication/communication is implemented via service account */}}
 {{/*      - kms:*/}}
 {{/*          apiVersion: v2*/}}
 {{/*          name: vault-kms-provider*/}}
