@@ -317,6 +317,9 @@ jobs:
           name: Wait for installation
           command: sleep 30
       - run:
+          name: enable transit
+          command: kubectl -n vault exec vault-0 -- vault secrets enable transit
+      - run:
           name: Check that socket file was created/mounted
           command: |
             ls /mnt
@@ -325,10 +328,6 @@ jobs:
             else
               exit 1
             fi
-      - run:
-          name: Print vault logs
-          command: |
-            kubectl logs vault-0 -n vault
       - run:
           name: Create encryption configuration file
           command: |
