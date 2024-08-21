@@ -18,7 +18,7 @@ services:
     environment:
       VAULT_TOKEN: SiQOECxwSDCeQt1r0n5kqQCr
       VAULT_ADDRESS: http://vault:8200
-      SOCKET_PATH: /sockets/vault-kms-provider.socket
+      SOCKET_PATH: /sockets/vault-kms-provider.sock
     build:
       args:
         UID: 0

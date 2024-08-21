@@ -14,6 +14,9 @@ executors:
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
+  chart-test:
+    docker:
+      - image: 'quay.io/helmpack/chart-testing:latest'
   release:
     docker:
       - image: 'quay.io/helmpack/chart-releaser:latest'
@@ -50,62 +53,52 @@ executors:
 workflows:
   ci-cd:
     jobs:
+      - chart_formatting
+      - generate_tag
       - check_formatting
       - build
-      - unit-tests
-      - integration-tests
+      - unit_tests
+      - integration_tests
+      - e2e_tests:
+          requires:
+            - publish-manifest
       - check_version:
           filters:
             branches:
               ignore:
                 - main
-      - generate_tag:
-          filters:
-            branches:
-              only:
-                - main
       - publish-arm:
-          filters:
-            branches:
-              only:
-                - main
           requires:
             - generate_tag
-            - check_version
+            - chart_formatting
             - check_formatting
             - build
-            - unit-tests
-            - integration-tests
+            - unit_tests
+            - integration_tests
           context:
             - dockerhub
 
       - publish-amd:
-          filters:
-            branches:
-              only:
-                - main
           requires:
             - generate_tag
-            - check_version
             - check_formatting
+            - chart_formatting
             - build
-            - unit-tests
-            - integration-tests
+            - unit_tests
+            - integration_tests
           context:
             - dockerhub
 
       - publish-manifest:
-          filters:
-            branches:
-              only:
-                - main
           context:
             - dockerhub
           requires:
             - publish-amd
             - publish-arm
 
-      - publish-latest-manifest:
+      - publish-manifest:
+          name: publish-latest-manifest
+          tag: latest
           filters:
             branches:
               only:
@@ -123,6 +116,7 @@ workflows:
                 - main
           requires:
             - publish-latest-manifest
+            - chart_formatting
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -196,8 +190,20 @@ jobs:
           name: Check that version has changed
           command: |
             export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export MAIN_CHART_VERSION="$(cat ./vault-kms-provider/helm/Chart.yaml | grep '^version:' | awk '{print $2}')"
             export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            if [ "$MAIN_VERSION" = "$BRANCH_VERSION" ]; then exit 1; else exit 0; fi
+            export BRANCH_CHART_VERSION="$(cat helm/Chart.yaml | grep '^version:' | awk '{print $2}')"
+            if [ "$MAIN_VERSION" = "$BRANCH_VERSION" ]; then
+              if [ "$MAIN_CHART_VERSION" = "$BRANCH_CHART_VERSION" ]; then exit 1; else exit 0; fi
+            else
+              exit 0;
+            fi
+      - run:
+          name: Check matching app versions
+          command: |
+            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export CHART_APP_VERSION="$(cat helm/Chart.yaml | grep -oP '^appVersion: "\K[^"]+')"
+            if [ "$BRANCH_VERSION" = "$CHART_APP_VERSION" ]; then exit 0; else exit 1; fi
 
   generate_tag:
     executor: ubuntu
@@ -226,7 +232,15 @@ jobs:
           name: Check formatting
           command: cargo fmt -- --check
 
-  unit-tests:
+  chart_formatting:
+    executor: chart-test
+    steps:
+      - checkout
+      - run:
+          name: Lint helm chart
+          command: ct lint --all --chart-dirs .
+
+  unit_tests:
     executor: ubuntu
     steps:
       - checkout
@@ -235,7 +249,7 @@ jobs:
           name: Run unit tests
           command: cargo test --bins --lib
 
-  integration-tests:
+  integration_tests:
     executor: ubuntu
     steps:
       - checkout
@@ -249,6 +263,89 @@ jobs:
       - run:
           name: Run integration tests
           command: cargo test --test '*'
+
+  e2e_tests:
+    executor: ubuntu
+    environment:
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      SOCKET_FILE: /mnt/vault-kms-provider.sock
+      ENCRYPTION_CONFIG: /tmp/encryption/configuration.yaml
+      K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
+      K3S_DATASTORE_CAFILE: /tmp/certs/server.crt
+      K3S_DATASTORE_CERTFILE: /tmp/certs/client.crt
+      K3S_DATASTORE_KEYFILE: /tmp/certs/client.key
+      ETCDCTL_ENDPOINTS: https://127.0.0.1:2379
+      ETCDCTL_CACERT: /tmp/certs/server.crt
+      ETCDCTL_CERT: /tmp/certs/client.crt
+      ETCDCTL_KEY: /tmp/certs/client.key
+      ETCDCTL_API: 3
+      CERTS: /tmp/certs
+    steps:
+      - checkout
+      - run:
+          name: Set up certificates
+          command: |
+            cp -r ./helm/test_files/certs $CERTS
+            ls $CERTS
+      - run:
+          name: Run etcd
+          command: docker compose -f ./helm/test_files/docker-compose.etcd.yml up -d
+      - run:
+          name: Install k3s
+          command: curl -sfL https://get.k3s.io | sh -
+      - helm/install_helm_client:
+          version: v3.15.1
+      - run:
+          name: Grant permissions on kube config
+          command: sudo chown $USER:$USER $KUBECONFIG
+      - run:
+          name: Deploy vault
+          command: |
+            helm repo add hashicorp https://helm.releases.hashicorp.com
+            helm install vault hashicorp/vault -n vault --create-namespace --set "server.dev.enabled=true"
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Deploy vault-kms-provider
+          command: |
+            helm install vault-kms-provider ./helm -n vault \
+              --set "image.tag=$(cat /tmp/workspace/docker_tag)" \
+              --set "role.rules[0].apiGroups={}" \
+              --set "role.rules[0].resources={secrets}" \
+              --set "role.rules[0].verbs={get,create}"
+      - run:
+          name: Wait for installation
+          command: sleep 30
+      - run:
+          name: enable transit
+          command: kubectl -n vault exec vault-0 -- vault secrets enable transit
+      - run:
+          name: Check that socket file was created/mounted
+          command: |
+            ls /mnt
+            if [ -e  "$SOCKET_FILE" ]; then
+              exit 0
+            else
+              exit 1
+            fi
+      - run:
+          name: Create encryption configuration file
+          command: |
+            mkdir /tmp/encryption
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "socket.output=true" > $ENCRYPTION_CONFIG
+      - run:
+          name: Configure k3s encryption
+          command: |
+            curl -sfL https://get.k3s.io | sh -s - \
+              --write-kubeconfig-mode 777 \
+              --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG
+      - run:
+          name: Wait for startup
+          command: sleep 5
+      - run:
+          name: Run e2e tests
+          command: |
+            helm test vault-kms-provider -n vault --logs
 
   publish-amd:
     executor: ubuntu
@@ -306,17 +403,26 @@ jobs:
     executor: ubuntu
     environment:
       DOCKER_CLI_EXPERIMENTAL: enabled
+    parameters:
+      tag:
+        default: ""
+        description: "Tag for the manifest"
+        type: string
     steps:
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
           name: Log in to Docker
           command: |
             echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-      - attach_workspace:
-          at: /tmp/workspace
       - run:
           name: Create Manifest
           command: |
-            TAG="$(cat /tmp/workspace/docker_tag)"
+            if [[ -z "<< parameters.tag >>" ]]; then
+              export TAG="$(cat /tmp/workspace/docker_tag)"
+            else
+              export TAG="<< parameters.tag >>"
+            fi
             REPO="$DOCKERHUB_REPOSITORY:$TAG"
             docker manifest create $REPO \
               --amend "${REPO}-arm64" \
@@ -324,38 +430,18 @@ jobs:
       - run:
           name: Show Manifest
           command: |
-            TAG="$(cat /tmp/workspace/docker_tag)"
+            if [[ -z "<< parameters.tag >>" ]]; then
+              export TAG="$(cat /tmp/workspace/docker_tag)"
+            else
+              export TAG="<< parameters.tag >>"
+            fi
             docker manifest inspect "${DOCKERHUB_REPOSITORY}:${TAG}"
       - run:
           name: Publish Manifest
           command: |
-            TAG="$(cat /tmp/workspace/docker_tag)"
+            if [[ -z "<< parameters.tag >>" ]]; then
+              export TAG="$(cat /tmp/workspace/docker_tag)"
+            else
+              export TAG="<< parameters.tag >>"
+            fi
             docker manifest push "${DOCKERHUB_REPOSITORY}:${TAG}"
-
-  publish-latest-manifest:
-    executor: ubuntu
-    environment:
-      DOCKER_CLI_EXPERIMENTAL: enabled
-    steps:
-      - run:
-          name: Log in to Docker
-          command: |
-            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-      - attach_workspace:
-          at: /tmp/workspace
-      - run:
-          name: Create Manifest
-          command: |
-            TAG="$(cat /tmp/workspace/docker_tag)"
-            REPO="$DOCKERHUB_REPOSITORY:$TAG"
-            docker manifest create "$DOCKERHUB_REPOSITORY:latest" \
-              --amend "${REPO}-arm64" \
-              --amend "${REPO}-amd64"
-      - run:
-          name: Show Manifest
-          command: |
-            docker manifest inspect "${DOCKERHUB_REPOSITORY}:latest"
-      - run:
-          name: Publish Manifest
-          command: |
-            docker manifest push "${DOCKERHUB_REPOSITORY}:latest"

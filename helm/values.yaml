@@ -1,63 +1,109 @@
-# Default values for vault-kms-provider.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 replicaCount: 1
 
 image:
   repository: ruddickmg/vault-kms-provider
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1.0"
+  tag: latest
 
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+configuration:
+  name: vault-kms-provider-configuration
+
+nodeLabel:
+  key: &labelKey node-role.kubernetes.io/control-plane
+  value: &labelValue "true"
+
+socket:
+  name: vault-kms-provider.sock
+  path: &socketPath /run/sockets
+  permissions: any
+  output: false
+
+service:
+  port: &healthCheckPort 8080
+  host: 0.0.0.0
+
+socketVolume:
+  name: &volumeName vault-kms-provider-socket-volume
+  claim: &volumeClaimName socket-volume
+  storageClass: unix-socket-storage
+  size: 300mi
+
+vault:
+  token: "placeholder"
+  address: https://vault.vault.cluster.svc.local:8200
+  transitKey: vault-kms-provider
+
+nodeSelector:
+  *labelKey: *labelValue
+
+tolerations:
+  - key: *labelKey
+    operator: "Equal"
+    value: *labelValue
+    effect: "NoSchedule"
+
+local:
+  path: /mnt
+
+volumes:
+  - name: *volumeName
+    persistentVolumeClaim:
+      claimName: *volumeClaimName
+
+volumeMounts:
+  - mountPath: *socketPath
+    name: *volumeName
+
+priorityClassName: system-cluster-critical
+
+podSecurityContext:
+  fsGroup: 1001
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroupChangePolicy: "OnRootMismatch"
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
+livenessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  httpGet:
+    path: /health
+    port: *healthCheckPort
+
+startupProbe:
+  initialDelaySeconds: 5
+  failureThreshold: 30
+  periodSeconds: 5
+  httpGet:
+    path: /health
+    port: *healthCheckPort
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 3
+  httpGet:
+    path: /ready
+    port: *healthCheckPort
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  name: vault-kms-provider-service-account
   create: true
-  # Automatically mount a ServiceAccount's API credentials?
   automount: true
-  # Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
+
+role:
+  name: vault-kms-access
+  rules: []
 
 podAnnotations: {}
 podLabels: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-service:
-  type: ClusterIP
-  port: 80
-
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
+affinity: {}
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -69,38 +115,3 @@ resources: {}
   # requests:
   #   cpu: 100m
   #   memory: 128Mi
-
-livenessProbe:
-  httpGet:
-    path: /
-    port: http
-readinessProbe:
-  httpGet:
-    path: /
-    port: http
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 3
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
-
-# Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
-
-# Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}

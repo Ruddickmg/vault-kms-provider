@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.socketVolume.claim }}
+spec:
+  resources:
+    requests:
+      storage: 300Mi
+  volumeName: {{ .Values.socketVolume.name }}
+  storageClassName: {{ .Values.socketVolume.storageClass }}
+  accessModes:
+    - ReadWriteOnce

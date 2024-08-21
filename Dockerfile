@@ -23,6 +23,7 @@ RUN if [ "$TARGETPLATFORM" = "$AMD_64" ]; then rustup target add $AMD_64_TARGET;
 RUN if [ "$TARGETPLATFORM" != "$ARM_64" ] && [ "$TARGETPLATFORM" != "$AMD_64" ]; then rustup target add $TARGET; fi
 
 RUN mkdir /usr/src/$PKG_NAME
+RUN mkdir /run/sockets
 
 WORKDIR /usr/src/$PKG_NAME
 
@@ -39,7 +40,7 @@ RUN if [ "$TARGETPLATFORM" != "$ARM_64" ] && [ "$TARGETPLATFORM" != "$AMD_64" ];
 # ------------------------------------------------------------------------------
 
 FROM scratch
-LABEL authors="grant"
+LABEL authors="ruddickmg"
 ARG UID=10001
 ARG GID=10001
 ARG PKG_NAME="vault-kms-provider"
@@ -47,6 +48,8 @@ ARG BIN_NAME="server"
 WORKDIR /user/local/bin/
 COPY --from=0 /etc/passwd /etc/passwd
 COPY --from=builder /usr/src/$PKG_NAME/target/release/$BIN_NAME ./app
+COPY --from=builder /run/sockets /run/sockets
 USER $UID:$GID
+EXPOSE 8080
 
 CMD ["./app"]

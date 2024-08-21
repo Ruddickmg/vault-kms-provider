@@ -1,3 +1,4 @@
+use hyper_util::rt::TokioIo;
 use std::fs::Permissions;
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
@@ -38,6 +39,9 @@ pub fn create_unix_socket(
     permissions: UnixSocketPermissions,
 ) -> Result<UnixListenerStream, Box<dyn std::error::Error>> {
     let file_path = Path::new(path);
+    if file_path.exists() {
+        std::fs::remove_file(file_path)?;
+    }
     let directory_path = file_path.parent().unwrap();
     std::fs::create_dir_all(directory_path)?;
     let uds = UnixListener::bind(path)?;
@@ -51,7 +55,9 @@ pub async fn connect_to_unix_socket(path: &str) -> Result<Channel, tonic::transp
     // this url doesn't matter since we are replacing it with the unix stream connection
     Endpoint::try_from("http://[::]:50051")?
         .connect_with_connector(service_fn(|_| async {
-            Ok::<_, std::io::Error>(UnixStream::connect(UNIX_SOCKET_PATH.get().unwrap()).await?)
+            Ok::<_, std::io::Error>(TokioIo::new(
+                UnixStream::connect(UNIX_SOCKET_PATH.get().unwrap()).await?,
+            ))
         }))
         .await
 }

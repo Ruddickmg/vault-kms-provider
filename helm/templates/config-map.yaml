@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.configuration.name }}"
+data:
+  SOCKET_PATH: "{{ .Values.socket.path }}/{{ .Values.socket.name }}"
+  SOCKET_PERMISSIONS: "{{ .Values.socket.permissions }}"
+  VAULT_TOKEN: "{{ .Values.vault.token }}"
+  VAULT_ADDRESS: "{{ .Values.vault.address }}"
+  VAULT_TRANSIT_KEY: "{{ .Values.vault.transitKey }}"
+  HTTP_ADDRESS: "{{ .Values.service.host }}:{{ .Values.service.port }}"
