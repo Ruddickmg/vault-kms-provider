@@ -317,12 +317,9 @@ jobs:
               --set "role.rules[0].verbs={get,create}"
       - run:
           name: Wait for installation
-          command: sleep 30
+          command: sleep 10
       - run:
-          name: Print vault logs
-          command: kubectl -n vault logs -f vault-0
-      - run:
-          name: Check for socket file
+          name: Check that socket file was created/mounted
           command: |
             ls /mnt
             if [ -e  "$SOCKET_FILE" ]; then
@@ -330,6 +327,10 @@ jobs:
             else
               exit 1
             fi
+      - run:
+          name: Print vault logs
+          command: |
+            kubectl logs vault-0 -n vault
       - run:
           name: Create encryption configuration file
           command: |
