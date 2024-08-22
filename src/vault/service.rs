@@ -86,6 +86,7 @@ impl VaultKmsServer {
 #[tonic::async_trait]
 impl KeyManagementService for VaultKmsServer {
     async fn status(&self, _: Request<StatusRequest>) -> Result<Response<StatusResponse>, Status> {
+        println!("getting status");
         let key = self.request_key().await?;
         Ok(Response::new(StatusResponse {
             version: key.version,
@@ -98,6 +99,7 @@ impl KeyManagementService for VaultKmsServer {
         &self,
         request: Request<DecryptRequest>,
     ) -> Result<Response<DecryptResponse>, Status> {
+        println!("decrypting");
         let encrypted = String::from_utf8(request.get_ref().ciphertext.to_vec())
             .map_err(|error| Status::new(Code::Internal, error.to_string()))?;
         let plaintext = self.request_decryption(&encrypted).await?;
@@ -112,6 +114,7 @@ impl KeyManagementService for VaultKmsServer {
         &self,
         request: Request<EncryptRequest>,
     ) -> Result<Response<EncryptResponse>, Status> {
+        println!("encrypting");
         let encoded = BASE64_STANDARD.encode(&request.get_ref().plaintext);
         let ciphertext = self.request_encryption(&encoded).await?;
         let key = self.request_key().await?;
