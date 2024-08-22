@@ -320,6 +320,9 @@ jobs:
           name: enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
       - run:
+          name: configure authentication
+          command: vault write auth/kubernetes/config kubernetes_host=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
+      - run:
           name: Check that socket file was created/mounted
           command: |
             ls /mnt
