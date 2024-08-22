@@ -37,21 +37,83 @@ Official documentation on kubernetes authentication can be found
 - here in the vault docs 
 - and here in the Kubernetes docs.
 
-In order to access vault the kms provider will need to authenticate with it. In order for authentication to work via kubernetes, you will need a few things:
-1. The CA used by kubernetes, this can be retrieved using the following command, which will output a file `ca.crt` containing the kubernetes CA certificate
-```shell
-kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 --decode > ca.crt
-```
-
 ### Service accounts
 
 #### Local:
-You can enable the use of local kubernetes authentication in vault using the following command. [source](https://developer.hashicorp.com/vault/docs/auth/kubernetes#use-local-service-account-token-as-the-reviewer-jwt)
+
+You can enable the use of local kubernetes authentication in vault using the following commands. [docs](https://developer.hashicorp.com/vault/docs/auth/kubernetes#use-local-service-account-token-as-the-reviewer-jwt)
 ```shell
+vault auth enable kubernetes
 vault write auth/kubernetes/config kubernetes_host=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
 ```
 
 Then you will need to enable the service account, this is done via the values.yaml file for helm configuration. You can pass a custom values.yaml file with the service account property set to true, or use the `--set` flag
 ```shell
 helm install vault-kms-provider --set "serviceAccount.enabled=true"
+```
+
+## Testing
+
+### Unit
+Unit tests should be colocated with the code they test, you can run unit tests using the following command
+```shell
+cargo test --bins --lib
+```
+
+### Integration
+Integration tests will be located in the `tests` directory at the root of the project, they require some set up locally.
+
+First you will need to run the vault service and the vault-kms-provider using docker compose by running the following command in the root directory:
+```shell
+docker compose up
+```
+
+Second you will need to enable transit in vault
+```shell
+docker compose exec vault vault secrets enable transit
+```
+
+Then finally you can run the integration tests with the following command
+```shell
+cargo test --test *
+```
+
+### End to end
+End to end tests are implemented using helm's testing library, you can find the tests themselves in the `helm/templates/tests` directory. There are also some files used for testing located in the `helm/test_files` directory.
+
+In order to run the tests you will need to deploy a vault server and the helm chart for this repository, you can do this using their respective helm charts
+
+#### Vault installation
+
+```shell
+helm repo add hashicorp https://helm.releases.hashicorp.com
+helm install vault hashicorp/vault -n vault --create-namespace --set "server.dev.enabled=true"
+```
+
+After vault is installed to k8s you will need to enable transit and kubernetes (or whatever type you want to use) authentication, you can do this with the following command, substituting the environment variables with the actual host and port of your k8s api.
+
+```shell
+kubectl -n vault exec vault-0 -- vault enable transit
+kubectl -n vault exec vault-0 -- vault auth enable kubernetes
+kubectl -n vault exec vault-0 -- vault write auth/kubernetes/config kubernetes_host=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
+```
+
+#### KMS provider chart installation
+```shell
+helm install vault-kms-provider ./helm -n vault \
+  --set "image.tag=$IMAGE_TAG" \
+  --set "role.rules[0].apiGroups={}" \
+  --set "role.rules[0].resources={secrets}" \
+  --set "role.rules[0].verbs={get,create}"
+```
+The parameters we set here are giving the tests the ability to create and modify secrets (so that we can check that they are encrypted/decrypted as expected). The image tag is self-explanatory, but keep in mind that if you are testing new changes, you will need to push them to a repository and specify the image you wish to pull and test in the `IMAGE_TAG` declaration.
+
+#### Etcd
+The tests expect there to be an etcd backend for them to access in order to confirm the stored data (secrets) is encrypted. There are too many potential k8s tools to cover how to make this work, but you may look to this repositories circleci config for examples on how to set one up if your brand of k8s does not use etcd. Either way, you will need to be sure the tests have access to an etcd backend to retrieve the data stored by k8s.
+
+#### Running helm test
+
+Once all this has been set up, you can run the tests with the following command:
+```shell
+helm test vault-kms-provider -n vault
 ```
