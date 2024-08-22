@@ -20,12 +20,16 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
   - [x] Set up ci for deployment
   - [ ] Set up Authentication
     - [ ] ServiceAccount
-    - [ ] Jwt
-    - [ ] Test authentication methods
+      - [x] Local
+      - [ ] Client
+      - [ ] Jwt
+    - [ ] Tls certs
+    - [x] Token
   - [ ] Allow Tls for http communication
   - [ ] Document manual integration steps
   - [ ] Create Helm Chart for easy deployment
   - [x] Set up helm char repository via GitHub pages
+  - [ ] Logging
 
 ## Kubernetes authentication
 
@@ -37,4 +41,17 @@ In order to access vault the kms provider will need to authenticate with it. In 
 1. The CA used by kubernetes, this can be retrieved using the following command, which will output a file `ca.crt` containing the kubernetes CA certificate
 ```shell
 kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 --decode > ca.crt
+```
+
+### Service accounts
+
+#### Local:
+You can enable the use of local kubernetes authentication in vault using the following command. [source](https://developer.hashicorp.com/vault/docs/auth/kubernetes#use-local-service-account-token-as-the-reviewer-jwt)
+```shell
+vault write auth/kubernetes/config kubernetes_host=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
+```
+
+Then you will need to enable the service account, this is done via the values.yaml file for helm configuration. You can pass a custom values.yaml file with the service account property set to true, or use the `--set` flag
+```shell
+helm install vault-kms-provider --set "serviceAccount.enabled=true"
 ```

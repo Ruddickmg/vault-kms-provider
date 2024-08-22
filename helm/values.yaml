@@ -95,7 +95,10 @@ serviceAccount:
   name: vault-kms-provider-service-account
   create: true
   automount: true
+  tokenPath: /var/run/secrets/kubernetes.io/serviceaccount/token
   annotations: {}
+
+authToken: ""
 
 role:
   name: vault-kms-access

@@ -6,6 +6,7 @@ const DEFAULT_SOCKET_PATH: &str = "./sockets/vault-kms-provider.sock";
 const DEFAULT_SOCKET_PERMISSIONS: &str = "any";
 const DEFAULT_VAULT_TRANSIT_KEY: &str = "vault-kms-provider";
 const DEFAULT_VAULT_TOKEN: &str = "";
+const DEFAULT_VAULT_TOKEN_PATH: &str = "";
 const DEFAULT_HEALTH_ENDPOINT: &str = "0.0.0.0:8080";
 
 pub struct HealthCheckConfiguration {
@@ -14,6 +15,7 @@ pub struct HealthCheckConfiguration {
 
 pub struct VaultConfiguration {
     pub vault_address: String,
+    pub vault_token_path: String,
     pub vault_token: String,
     pub vault_transit_key: String,
 }
@@ -39,6 +41,7 @@ pub fn socket() -> SocketConfiguration {
 pub fn vault() -> VaultConfiguration {
     VaultConfiguration {
         vault_token: get_env("VAULT_TOKEN", DEFAULT_VAULT_TOKEN),
+        vault_token_path: get_env("VAULT_TOKEN_PATH", DEFAULT_VAULT_TOKEN_PATH),
         vault_address: get_env("VAULT_ADDRESS", DEFAULT_VAULT_ADDRESS),
         vault_transit_key: get_env("VAULT_TRANSIT_KEY", DEFAULT_VAULT_TRANSIT_KEY),
     }
