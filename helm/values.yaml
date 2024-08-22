@@ -15,6 +15,7 @@ nodeLabel:
 socket:
   name: vault-kms-provider.sock
   path: &socketPath /run/sockets
+  hostPath: /mnt
   permissions: any
   output: false
 
