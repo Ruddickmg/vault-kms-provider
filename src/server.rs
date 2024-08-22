@@ -18,8 +18,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let vault_kms_server =
         vault::VaultKmsServer::new(&vault_config.vault_transit_key, &vault_config.vault_address);
     let token = token::auth_token();
-    println!("Auth token: {:?}", token);
     let paths = fs::read_dir("/var/run/secrets/kubernetes.io/serviceaccount").unwrap();
+    println!("Auth token: {:?}", token.unwrap());
     for path in paths {
         println!("Name: {}", path.unwrap().path().display())
     }
