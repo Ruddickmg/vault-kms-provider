@@ -5,7 +5,7 @@ metadata:
 data:
   SOCKET_PATH: "{{ .Values.socket.path }}/{{ .Values.socket.name }}"
   SOCKET_PERMISSIONS: "{{ .Values.socket.permissions }}"
-  VAULT_TOKEN: {{ .Values.authToken | "" }}
+  VAULT_TOKEN: {{ .Values.authToken }}
   {{- if  .Values.serviceAccount.tokenPath }}
   VAULT_TOKEN_PATH: {{ .Values.serviceAccount.tokenPath }}
   {{ end }}

@@ -2,6 +2,7 @@ use crate::kms::{
     key_management_service_server::KeyManagementService, DecryptRequest, DecryptResponse,
     EncryptRequest, EncryptResponse, StatusRequest, StatusResponse,
 };
+use crate::utilities::token;
 use crate::vault::keys::KeyInfo;
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
@@ -9,7 +10,6 @@ use std::collections::HashMap;
 use std::string::ToString;
 use tonic::{Code, Request, Response, Status};
 use vaultrs::{client, error::ClientError, transit};
-use crate::utilities::token;
 
 const OKAY_RESPONSE: &str = "ok";
 const TRANSIT_MOUNT: &str = "transit";
@@ -37,10 +37,10 @@ impl VaultKmsServer {
     fn get_client(&self) -> client::VaultClient {
         let token = token::auth_token().unwrap();
         let vault_settings = client::VaultClientSettingsBuilder::default()
-          .address(&self.address)
-          .token(token)
-          .build()
-          .unwrap();
+            .address(&self.address)
+            .token(token)
+            .build()
+            .unwrap();
         client::VaultClient::new(vault_settings).unwrap()
     }
 
@@ -60,18 +60,26 @@ impl VaultKmsServer {
     }
 
     async fn request_encryption(&self, data: &str) -> Result<String, VaultError> {
-        Ok(
-            transit::data::encrypt(&self.get_client(), TRANSIT_MOUNT, &self.key_name, data, None)
-                .await?
-                .ciphertext,
+        Ok(transit::data::encrypt(
+            &self.get_client(),
+            TRANSIT_MOUNT,
+            &self.key_name,
+            data,
+            None,
         )
+        .await?
+        .ciphertext)
     }
     async fn request_decryption(&self, data: &str) -> Result<String, VaultError> {
-        Ok(
-            transit::data::decrypt(&self.get_client(), TRANSIT_MOUNT, &self.key_name, data, None)
-                .await?
-                .plaintext,
+        Ok(transit::data::decrypt(
+            &self.get_client(),
+            TRANSIT_MOUNT,
+            &self.key_name,
+            data,
+            None,
         )
+        .await?
+        .plaintext)
     }
 }
 

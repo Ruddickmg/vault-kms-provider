@@ -13,10 +13,8 @@ mod checks;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let vault_config = configuration::vault();
     let socket_config = configuration::socket();
-    let vault_kms_server = vault::VaultKmsServer::new(
-        &vault_config.vault_transit_key,
-        &vault_config.vault_address,
-    );
+    let vault_kms_server =
+        vault::VaultKmsServer::new(&vault_config.vault_transit_key, &vault_config.vault_address);
     println!(
         "Server listening to socket @\"{}\", connecting to vault @\"{}\"",
         socket_config.socket_path, vault_config.vault_address
