@@ -6,7 +6,6 @@ use lib::{
 };
 use tokio::join;
 use tonic::transport::Server;
-use lib::utilities::token;
 
 mod checks;
 
@@ -17,7 +16,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let vault_kms_server = vault::VaultKmsServer::new(
         &vault_config.vault_transit_key,
         &vault_config.vault_address,
-        &token::auth_token(),
     );
     println!(
         "Server listening to socket @\"{}\", connecting to vault @\"{}\"",

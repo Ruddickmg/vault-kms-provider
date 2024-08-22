@@ -44,7 +44,7 @@ impl VaultKmsServer {
         client::VaultClient::new(vault_settings).unwrap()
     }
 
-    pub fn new(name: &str, address: &str, token: &str) -> Self {
+    pub fn new(name: &str, address: &str) -> Self {
         VaultKmsServer {
             address: address.to_string(),
             key_name: name.to_string(),
