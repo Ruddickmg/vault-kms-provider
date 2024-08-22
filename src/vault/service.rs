@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use std::string::ToString;
 use tonic::{Code, Request, Response, Status};
 use vaultrs::{client, error::ClientError, transit};
+use crate::utilities::token;
 
 const OKAY_RESPONSE: &str = "ok";
 const TRANSIT_MOUNT: &str = "transit";
@@ -28,25 +29,30 @@ impl From<ClientError> for VaultError {
 }
 
 pub struct VaultKmsServer {
-    client: client::VaultClient,
+    address: String,
     key_name: String,
 }
 
 impl VaultKmsServer {
-    pub fn new(name: &str, address: &str, token: &str) -> Self {
+    fn get_client(&self) -> client::VaultClient {
+        let token = token::auth_token().unwrap();
         let vault_settings = client::VaultClientSettingsBuilder::default()
-            .address(address)
-            .token(token)
-            .build()
-            .unwrap();
+          .address(&self.address)
+          .token(token)
+          .build()
+          .unwrap();
+        client::VaultClient::new(vault_settings).unwrap()
+    }
+
+    pub fn new(name: &str, address: &str, token: &str) -> Self {
         VaultKmsServer {
-            client: client::VaultClient::new(vault_settings).unwrap(),
+            address: address.to_string(),
             key_name: name.to_string(),
         }
     }
     async fn request_key(&self) -> Result<KeyInfo, VaultError> {
         Ok(
-            transit::key::read(&self.client, TRANSIT_MOUNT, &self.key_name)
+            transit::key::read(&self.get_client(), TRANSIT_MOUNT, &self.key_name)
                 .await?
                 .keys
                 .into(),
@@ -55,14 +61,14 @@ impl VaultKmsServer {
 
     async fn request_encryption(&self, data: &str) -> Result<String, VaultError> {
         Ok(
-            transit::data::encrypt(&self.client, TRANSIT_MOUNT, &self.key_name, data, None)
+            transit::data::encrypt(&self.get_client(), TRANSIT_MOUNT, &self.key_name, data, None)
                 .await?
                 .ciphertext,
         )
     }
     async fn request_decryption(&self, data: &str) -> Result<String, VaultError> {
         Ok(
-            transit::data::decrypt(&self.client, TRANSIT_MOUNT, &self.key_name, data, None)
+            transit::data::decrypt(&self.get_client(), TRANSIT_MOUNT, &self.key_name, data, None)
                 .await?
                 .plaintext,
         )

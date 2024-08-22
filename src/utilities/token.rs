@@ -1,7 +1,7 @@
 use crate::configuration;
 use std::{fs, io};
 
-pub async fn auth_token() -> io::Result<String> {
+pub fn auth_token() -> io::Result<String> {
   let config = configuration::vault();
   let token = config.vault_token;
   let path = config.vault_token_path;
