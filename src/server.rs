@@ -1,13 +1,13 @@
 extern crate lib;
 
-use std::fs;
+use lib::utilities::token;
 use lib::{
     configuration, kms::key_management_service_server::KeyManagementServiceServer,
     utilities::socket::create_unix_socket, vault,
 };
+use std::fs;
 use tokio::join;
 use tonic::transport::Server;
-use lib::utilities::token;
 
 mod checks;
 
