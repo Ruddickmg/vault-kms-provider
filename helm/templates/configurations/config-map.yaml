@@ -3,11 +3,13 @@ kind: ConfigMap
 metadata:
   name: "{{ .Values.configuration.name }}"
 data:
+  LOG_LEVEL: "{{ .Values.logging.level }}"
+  LOG_FORMAT: "{{ .Values.logging.format }}"
   SOCKET_PATH: "{{ .Values.socket.path }}/{{ .Values.socket.name }}"
   SOCKET_PERMISSIONS: "{{ .Values.socket.permissions }}"
-  VAULT_TOKEN: {{ .Values.authToken }}
+  VAULT_TOKEN: "{{ .Values.authToken }}"
   {{- if  .Values.serviceAccount.tokenPath }}
-  VAULT_TOKEN_PATH: {{ .Values.serviceAccount.tokenPath }}
+  VAULT_TOKEN_PATH: "{{ .Values.serviceAccount.tokenPath }}"
   {{ end }}
   VAULT_ADDRESS: "{{ .Values.vault.address }}"
   VAULT_TRANSIT_KEY: "{{ .Values.vault.transitKey }}"

@@ -5,6 +5,10 @@ image:
   pullPolicy: IfNotPresent
   tag: latest
 
+logging:
+  level: "info"
+  format: "json"
+
 configuration:
   name: vault-kms-provider-configuration
 
