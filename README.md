@@ -27,9 +27,9 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
     - [x] Token
   - [ ] Allow Tls for http communication
   - [ ] Document manual integration steps
-  - [ ] Create Helm Chart for easy deployment
+  - [x] Create Helm Chart for easy deployment
   - [x] Set up helm char repository via GitHub pages
-  - [ ] Logging
+  - [x] Set up logging
 
 ## Kubernetes authentication
 
