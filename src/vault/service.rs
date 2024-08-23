@@ -38,7 +38,7 @@ pub struct VaultKmsServer {
 }
 
 impl VaultKmsServer {
-    #[instrument]
+    #[instrument(skip(self))]
     fn get_client(&self) -> client::VaultClient {
         let token = token::auth_token().unwrap();
         let vault_settings = client::VaultClientSettingsBuilder::default()
@@ -51,14 +51,13 @@ impl VaultKmsServer {
 
     #[instrument]
     pub fn new(name: &str, address: &str) -> Self {
-        debug!("Connecting to vault at: \"{}\"", address);
         VaultKmsServer {
             address: address.to_string(),
             key_name: name.to_string(),
         }
     }
 
-    #[instrument]
+    #[instrument(skip(self))]
     pub async fn initialize(&self) -> Result<(), std::io::Error> {
         self.request_encryption(&BASE64_STANDARD.encode("initialize".as_bytes()))
             .await
@@ -73,7 +72,7 @@ impl VaultKmsServer {
         Ok(())
     }
 
-    #[instrument]
+    #[instrument(skip(self))]
     async fn request_key(&self) -> Result<KeyInfo, VaultError> {
         Ok(
             transit::key::read(&self.get_client(), TRANSIT_MOUNT, &self.key_name)
@@ -83,8 +82,9 @@ impl VaultKmsServer {
         )
     }
 
-    #[instrument]
+    #[instrument(skip(self, data))]
     async fn request_encryption(&self, data: &str) -> Result<String, VaultError> {
+        debug!("Requesting encryption, data: {}", data);
         Ok(transit::data::encrypt(
             &self.get_client(),
             TRANSIT_MOUNT,
@@ -96,8 +96,9 @@ impl VaultKmsServer {
         .ciphertext)
     }
 
-    #[instrument]
+    #[instrument(skip(self, data))]
     async fn request_decryption(&self, data: &str) -> Result<String, VaultError> {
+        debug!("Requesting decryption, data: {}", data);
         Ok(transit::data::decrypt(
             &self.get_client(),
             TRANSIT_MOUNT,
@@ -126,7 +127,7 @@ impl KeyManagementService for VaultKmsServer {
         }))
     }
 
-    #[instrument]
+    #[instrument(skip(self, request))]
     async fn decrypt(
         &self,
         request: Request<DecryptRequest>,
@@ -142,7 +143,7 @@ impl KeyManagementService for VaultKmsServer {
         }))
     }
 
-    #[instrument]
+    #[instrument(skip(self, request))]
     async fn encrypt(
         &self,
         request: Request<EncryptRequest>,

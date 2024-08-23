@@ -1,7 +1,9 @@
 use crate::configuration::vault::VaultConfiguration;
 use std::io::ErrorKind;
 use std::{fs, io};
+use tracing::instrument;
 
+#[instrument]
 pub fn auth_token() -> io::Result<String> {
     let config = VaultConfiguration::new();
     let token = config.vault_token;
