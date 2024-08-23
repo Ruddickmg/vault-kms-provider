@@ -254,12 +254,15 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Start vault and kms provider
-          command: docker compose up -d
+          name: Start vault
+          command: docker compose up vault -d
       - rust/install
       - run:
           name: Enable transit
           command: docker compose exec vault vault secrets enable transit
+      - run:
+          name: Start KMS provider
+          command: docker compose up vault-kms-provider -d
       - run:
           name: Run integration tests
           command: cargo test --test '*'
