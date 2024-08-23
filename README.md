@@ -101,6 +101,13 @@ After vault is installed to k8s you will need to enable transit and kubernetes (
 kubectl -n vault exec vault-0 -- vault enable transit
 kubectl -n vault exec vault-0 -- vault auth enable kubernetes
 kubectl -n vault exec vault-0 -- vault write auth/kubernetes/config kubernetes_host=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
+
+# create role for k8s access via service account
+kubectl -n vault exec vault-0 -- vault write auth/kubernetes/role/vault-kms-provider \
+    bound_service_account_names=vault-kms-provider-service-account \
+    bound_service_account_namespaces=vault \
+    policies=default \
+    ttl=1h
 ```
 
 #### KMS provider chart installation
