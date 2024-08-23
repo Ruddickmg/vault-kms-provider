@@ -7,6 +7,7 @@ use crate::vault::keys::KeyInfo;
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
 use std::collections::HashMap;
+use std::io::ErrorKind;
 use std::string::ToString;
 use tonic::{Code, Request, Response, Status};
 use vaultrs::{client, error::ClientError, transit};
@@ -50,6 +51,17 @@ impl VaultKmsServer {
             key_name: name.to_string(),
         }
     }
+
+    pub async fn initialize(&self) -> Result<(), std::io::Error> {
+        self.request_encryption(&BASE64_STANDARD.encode("initialize".as_bytes()))
+            .await
+            .map_err(|error| {
+                let error = format!("Failed to initialize: {}", error.0.to_string());
+                std::io::Error::new(ErrorKind::Other, error.as_str())
+            })?;
+        Ok(())
+    }
+
     async fn request_key(&self) -> Result<KeyInfo, VaultError> {
         Ok(
             transit::key::read(&self.get_client(), TRANSIT_MOUNT, &self.key_name)
@@ -70,6 +82,7 @@ impl VaultKmsServer {
         .await?
         .ciphertext)
     }
+
     async fn request_decryption(&self, data: &str) -> Result<String, VaultError> {
         Ok(transit::data::decrypt(
             &self.get_client(),

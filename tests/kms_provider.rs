@@ -33,20 +33,12 @@ mod encryption_and_decryption {
 
 #[cfg(test)]
 mod status {
-    use lib::kms::{EncryptRequest, StatusRequest};
+    use lib::kms::StatusRequest;
     use tonic::Request;
 
     #[tokio::test]
-    async fn returns_ok_status_when_key_exists() -> Result<(), Box<dyn std::error::Error>> {
+    async fn returns_ok_status_when_queried() -> Result<(), Box<dyn std::error::Error>> {
         let mut client = lib::client().await?;
-        let text = "hello world!";
-        let uid = "123";
-        client
-            .encrypt(Request::new(EncryptRequest {
-                plaintext: text.as_bytes().to_vec(),
-                uid: uid.to_string(),
-            }))
-            .await?;
         let status_resp = client.status(Request::new(StatusRequest {})).await?;
 
         assert_eq!(status_resp.into_inner().healthz, "ok");

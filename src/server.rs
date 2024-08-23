@@ -19,6 +19,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Server listening to socket @\"{}\", connecting to vault @\"{}\"",
         socket_config.socket_path, vault_config.vault_address
     );
+    vault_kms_server.initialize().await?;
     let (server, health_checks) = join!(
         Server::builder()
             .add_service(KeyManagementServiceServer::new(vault_kms_server))
