@@ -10,11 +10,13 @@ use std::collections::HashMap;
 use std::io::ErrorKind;
 use std::string::ToString;
 use tonic::{Code, Request, Response, Status};
+use tracing::{debug, info, instrument};
 use vaultrs::{client, error::ClientError, transit};
 
 const OKAY_RESPONSE: &str = "ok";
 const TRANSIT_MOUNT: &str = "transit";
 
+#[derive(Debug)]
 struct VaultError(ClientError);
 
 impl From<VaultError> for Status {
@@ -29,12 +31,14 @@ impl From<ClientError> for VaultError {
     }
 }
 
+#[derive(Debug)]
 pub struct VaultKmsServer {
     address: String,
     key_name: String,
 }
 
 impl VaultKmsServer {
+    #[instrument]
     fn get_client(&self) -> client::VaultClient {
         let token = token::auth_token().unwrap();
         let vault_settings = client::VaultClientSettingsBuilder::default()
@@ -45,13 +49,16 @@ impl VaultKmsServer {
         client::VaultClient::new(vault_settings).unwrap()
     }
 
+    #[instrument]
     pub fn new(name: &str, address: &str) -> Self {
+        debug!("Connecting to vault at: \"{}\"", address);
         VaultKmsServer {
             address: address.to_string(),
             key_name: name.to_string(),
         }
     }
 
+    #[instrument]
     pub async fn initialize(&self) -> Result<(), std::io::Error> {
         self.request_encryption(&BASE64_STANDARD.encode("initialize".as_bytes()))
             .await
@@ -59,9 +66,14 @@ impl VaultKmsServer {
                 let error = format!("Failed to initialize: {}", error.0.to_string());
                 std::io::Error::new(ErrorKind::Other, error.as_str())
             })?;
+        info!(
+            "Encryption key: \"{}\" has been initialized in vault",
+            self.key_name
+        );
         Ok(())
     }
 
+    #[instrument]
     async fn request_key(&self) -> Result<KeyInfo, VaultError> {
         Ok(
             transit::key::read(&self.get_client(), TRANSIT_MOUNT, &self.key_name)
@@ -71,6 +83,7 @@ impl VaultKmsServer {
         )
     }
 
+    #[instrument]
     async fn request_encryption(&self, data: &str) -> Result<String, VaultError> {
         Ok(transit::data::encrypt(
             &self.get_client(),
@@ -83,6 +96,7 @@ impl VaultKmsServer {
         .ciphertext)
     }
 
+    #[instrument]
     async fn request_decryption(&self, data: &str) -> Result<String, VaultError> {
         Ok(transit::data::decrypt(
             &self.get_client(),
@@ -98,8 +112,12 @@ impl VaultKmsServer {
 
 #[tonic::async_trait]
 impl KeyManagementService for VaultKmsServer {
-    async fn status(&self, _: Request<StatusRequest>) -> Result<Response<StatusResponse>, Status> {
-        println!("getting status");
+    #[instrument]
+    async fn status(
+        &self,
+        request: Request<StatusRequest>,
+    ) -> Result<Response<StatusResponse>, Status> {
+        debug!("Status request: {:#?}", request);
         let key = self.request_key().await?;
         Ok(Response::new(StatusResponse {
             version: key.version,
@@ -108,11 +126,12 @@ impl KeyManagementService for VaultKmsServer {
         }))
     }
 
+    #[instrument]
     async fn decrypt(
         &self,
         request: Request<DecryptRequest>,
     ) -> Result<Response<DecryptResponse>, Status> {
-        println!("decrypting");
+        debug!("Decryption request: {:?}", request);
         let encrypted = String::from_utf8(request.get_ref().ciphertext.to_vec())
             .map_err(|error| Status::new(Code::Internal, error.to_string()))?;
         let plaintext = self.request_decryption(&encrypted).await?;
@@ -123,11 +142,12 @@ impl KeyManagementService for VaultKmsServer {
         }))
     }
 
+    #[instrument]
     async fn encrypt(
         &self,
         request: Request<EncryptRequest>,
     ) -> Result<Response<EncryptResponse>, Status> {
-        println!("encrypting");
+        debug!("Encryption request: {:?}", request);
         let encoded = BASE64_STANDARD.encode(&request.get_ref().plaintext);
         let ciphertext = self.request_encryption(&encoded).await?;
         let key = self.request_key().await?;

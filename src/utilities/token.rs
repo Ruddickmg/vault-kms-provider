@@ -1,6 +1,6 @@
 use crate::configuration::vault::VaultConfiguration;
-use std::{fs, io};
 use std::io::ErrorKind;
+use std::{fs, io};
 
 pub fn auth_token() -> io::Result<String> {
     let config = VaultConfiguration::new();

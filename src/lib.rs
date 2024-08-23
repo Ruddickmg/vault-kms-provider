@@ -1,6 +1,6 @@
+use crate::configuration::socket::SocketConfiguration;
 use crate::kms::key_management_service_client::KeyManagementServiceClient;
 use crate::utilities::socket;
-use crate::configuration::socket::SocketConfiguration;
 use tonic::transport::Channel;
 
 pub mod configuration;

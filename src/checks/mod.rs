@@ -9,6 +9,7 @@ use std::net::SocketAddr;
 use std::str::FromStr;
 use tokio::io::Error;
 use tokio::net::TcpListener;
+use tracing::{error, info, instrument};
 
 extern crate lib;
 
@@ -31,6 +32,7 @@ async fn checks(
     }
 }
 
+#[instrument]
 pub async fn serve() -> Result<(), Error> {
     let http_address = lib::configuration::health::HealthCheckConfiguration::new();
     let addr = SocketAddr::from_str(&http_address.endpoint).expect(&format!(
@@ -38,7 +40,7 @@ pub async fn serve() -> Result<(), Error> {
         http_address.endpoint
     ));
     let listener = TcpListener::bind(addr).await?;
-    println!(
+    info!(
         "Health and liveness checks listening at: {:?}",
         addr.to_string()
     );
@@ -51,7 +53,7 @@ pub async fn serve() -> Result<(), Error> {
                 .serve_connection(io, service_fn(checks))
                 .await
             {
-                eprintln!("Error serving connection: {:?}", err);
+                error!("Error serving connection: {:?}", err);
             }
         });
     }

@@ -1,4 +1,4 @@
-pub mod socket;
-pub mod logging;
-pub mod vault;
 pub mod health;
+pub mod logging;
+pub mod socket;
+pub mod vault;
