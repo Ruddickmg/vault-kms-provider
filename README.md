@@ -65,7 +65,7 @@ Integration tests will be located in the `tests` directory at the root of the pr
 
 First you will need to run the vault service using docker compose by running the following command in the root directory:
 ```shell
-docker compose up
+docker compose up vault -d
 ```
 
 Second you will need to enable transit in vault
