@@ -32,7 +32,7 @@ async fn checks(
 }
 
 pub async fn serve() -> Result<(), Error> {
-    let http_address = lib::configuration::health_check_endpoint();
+    let http_address = lib::configuration::health::HealthCheckConfiguration::new();
     let addr = SocketAddr::from_str(&http_address.endpoint).expect(&format!(
         "Invalid http address: {:?}",
         http_address.endpoint

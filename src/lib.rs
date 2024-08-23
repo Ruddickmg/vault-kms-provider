@@ -1,5 +1,6 @@
 use crate::kms::key_management_service_client::KeyManagementServiceClient;
 use crate::utilities::socket;
+use crate::configuration::socket::SocketConfiguration;
 use tonic::transport::Channel;
 
 pub mod configuration;
@@ -10,7 +11,7 @@ pub mod kms {
 }
 
 pub async fn client() -> Result<KeyManagementServiceClient<Channel>, tonic::transport::Error> {
-    let config = configuration::socket();
+    let config = SocketConfiguration::new();
     let channel = socket::connect_to_unix_socket(&config.socket_path).await?;
     Ok(KeyManagementServiceClient::new(channel))
 }
