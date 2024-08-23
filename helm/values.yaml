@@ -35,7 +35,7 @@ socketVolume:
 
 vault:
   token: "placeholder"
-  address: https://vault.vault.cluster.svc.local:8200
+  address: http://vault.vault.cluster.svc.local:8200
   transitKey: vault-kms-provider
 
 nodeSelector:
