@@ -264,9 +264,6 @@ jobs:
           name: Start KMS provider
           command: docker compose up vault-kms-provider -d
       - run:
-          name: Wait for startup
-          command: sleep 15
-      - run:
           name: Run integration tests
           command: cargo test --test '*'
 
