@@ -329,10 +329,18 @@ jobs:
           name: Log requests
           command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
       - run:
-          name: Enable/Configure authentication
+          name: Enable authentication
           command: |
             kubectl -n vault exec vault-0 -- vault auth enable kubernetes
-            kubectl -n vault exec vault-0 -- vault write auth/kubernetes/config kubernetes_host=https://127.0.0.1:6443
+      - run:
+          name: Configure authentication
+          command: |
+            kubectl -n vault exec vault-0 -- vault write auth/kubernetes/config \
+              kubernetes_host=https://127.0.0.1:6443 \
+              disable_local_ca_jwt=true
+      - run:
+          name: Configure auth role
+          command: |
             kubectl -n vault exec vault-0 -- vault write auth/kubernetes/role/vault-kms-provider \
                 bound_service_account_names=vault-kms-provider \
                 bound_service_account_namespaces=vault \
