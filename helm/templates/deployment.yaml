@@ -14,7 +14,6 @@ spec:
       labels:
         app: {{ .Chart.Name }}
     spec:
-      automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -29,6 +28,7 @@ spec:
       {{- end }}
       {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
