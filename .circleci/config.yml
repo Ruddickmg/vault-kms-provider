@@ -327,6 +327,9 @@ jobs:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
       - run:
+          name: Log requests
+          command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
+      - run:
           name: Enable/Configure authentication
           command: |
             kubectl -n vault exec vault-0 -- vault auth enable kubernetes
