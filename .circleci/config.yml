@@ -326,12 +326,15 @@ jobs:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
       - run:
+          name: Enable audit logs
+          command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=/vault/audit/vault_audit.log
+      - run:
           name: Enable/Configure authentication
           command: |
             kubectl -n vault exec vault-0 -- vault auth enable kubernetes
             kubectl -n vault exec vault-0 -- vault write auth/kubernetes/config kubernetes_host=https://127.0.0.1:6443
             kubectl -n vault exec vault-0 -- vault write auth/kubernetes/role/vault-kms-provider \
-                bound_service_account_names=vault-kms-provider-service-account \
+                bound_service_account_names=vault-kms-provider \
                 bound_service_account_namespaces=vault \
                 policies=default \
                 ttl=1h

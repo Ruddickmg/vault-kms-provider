@@ -97,7 +97,7 @@ readinessProbe:
     port: *healthCheckPort
 
 serviceAccount:
-  name: vault-kms-provider-service-account
+  name: vault-kms-provider
   create: true
   automount: true
   tokenPath: /var/run/secrets/kubernetes.io/serviceaccount/token

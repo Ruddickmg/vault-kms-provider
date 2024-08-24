@@ -2,19 +2,21 @@ use crate::kms::{
     key_management_service_server::KeyManagementService, DecryptRequest, DecryptResponse,
     EncryptRequest, EncryptResponse, StatusRequest, StatusResponse,
 };
-use crate::utilities::token;
 use crate::vault::keys::KeyInfo;
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
 use std::collections::HashMap;
+use std::fs;
 use std::io::ErrorKind;
 use std::string::ToString;
 use tonic::{Code, Request, Response, Status};
 use tracing::{debug, info, instrument};
 use vaultrs::{client, error::ClientError, transit};
+use crate::configuration::vault::VaultConfiguration;
 
 const OKAY_RESPONSE: &str = "ok";
 const TRANSIT_MOUNT: &str = "transit";
+const KUBERNETES_AUTH_MOUNT: &str = "kubernetes";
 
 #[derive(Debug)]
 struct VaultError(ClientError);
@@ -33,25 +35,59 @@ impl From<ClientError> for VaultError {
 
 #[derive(Debug)]
 pub struct VaultKmsServer {
+    role: String,
     address: String,
     key_name: String,
 }
 
 impl VaultKmsServer {
     #[instrument(skip(self))]
-    fn get_client(&self) -> client::VaultClient {
-        let token = token::auth_token().unwrap();
+    async fn get_token(&self) -> Result<String, ClientError> {
+        let config = VaultConfiguration::new();
+        let token = config.vault_token;
+        let path = config.vault_token_path;
+        if token != "" {
+            debug!("Using raw token of length: {}", token.len());
+            Ok(token.to_string())
+        } else if path != "" {
+            let jwt = fs::read_to_string(path.clone()).map_err(|error| {
+                debug!("An error occurred attempting to read from \"{}\": {}", path, error.to_string());
+                ClientError::FileNotFoundError {
+                    path: path.to_string(),
+                }
+            })?;
+            debug!("Using mounted jwt of length: {}", jwt.len());
+            let vault_settings = client::VaultClientSettingsBuilder::default()
+              .address(&self.address)
+              .build()
+              .unwrap();
+            let client = client::VaultClient::new(vault_settings).unwrap();
+            debug!("Logging in to vault as: {}", self.role);
+            Ok(vaultrs::auth::kubernetes::login(&client, KUBERNETES_AUTH_MOUNT, &self.role, &jwt).await?.client_token)
+        } else {
+            debug!("No auth token found");
+            Err(ClientError::APIError {
+                code: 500,
+                errors: vec!["No auth token found".to_string()],
+            })
+        }
+    }
+
+    #[instrument(skip(self))]
+    async fn get_client(&self) -> Result<client::VaultClient, ClientError> {
+        let token = self.get_token().await?;
         let vault_settings = client::VaultClientSettingsBuilder::default()
             .address(&self.address)
             .token(token)
             .build()
             .unwrap();
-        client::VaultClient::new(vault_settings).unwrap()
+        Ok(client::VaultClient::new(vault_settings).unwrap())
     }
 
     #[instrument]
-    pub fn new(name: &str, address: &str) -> Self {
+    pub fn new(name: &str, address: &str, role: &str) -> Self {
         VaultKmsServer {
+            role: role.to_string(),
             address: address.to_string(),
             key_name: name.to_string(),
         }
@@ -75,7 +111,7 @@ impl VaultKmsServer {
     #[instrument(skip(self))]
     async fn request_key(&self) -> Result<KeyInfo, VaultError> {
         Ok(
-            transit::key::read(&self.get_client(), TRANSIT_MOUNT, &self.key_name)
+            transit::key::read(&self.get_client().await?, TRANSIT_MOUNT, &self.key_name)
                 .await?
                 .keys
                 .into(),
@@ -86,7 +122,7 @@ impl VaultKmsServer {
     async fn request_encryption(&self, data: &str) -> Result<String, VaultError> {
         debug!("Requesting encryption, data: {}", data);
         Ok(transit::data::encrypt(
-            &self.get_client(),
+            &self.get_client().await?,
             TRANSIT_MOUNT,
             &self.key_name,
             data,
@@ -100,7 +136,7 @@ impl VaultKmsServer {
     async fn request_decryption(&self, data: &str) -> Result<String, VaultError> {
         debug!("Requesting decryption, data: {}", data);
         Ok(transit::data::decrypt(
-            &self.get_client(),
+            &self.get_client().await?,
             TRANSIT_MOUNT,
             &self.key_name,
             data,
