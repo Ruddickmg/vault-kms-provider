@@ -306,6 +306,7 @@ jobs:
           command: |
             helm repo add hashicorp https://helm.releases.hashicorp.com
             helm install vault hashicorp/vault -n vault --create-namespace \
+              --set "injector.enabled=false" \
               --set "server.dev.enabled=true"
       - attach_workspace:
           at: /tmp/workspace
