@@ -8,7 +8,7 @@ data:
   SOCKET_PATH: "{{ .Values.socket.path }}/{{ .Values.socket.name }}"
   SOCKET_PERMISSIONS: "{{ .Values.socket.permissions }}"
   VAULT_TOKEN: "{{ .Values.authToken }}"
-  {{- if  .Values.serviceAccount.token.path and .Values.serviceAccount.token.name }}
+  {{- if and .Values.serviceAccount.token.path .Values.serviceAccount.token.name }}
   VAULT_TOKEN_PATH: "{{ .Values.serviceAccount.token.path }}/{{ .Values.serviceAccount.token.name }}"
   {{- end }}
   VAULT_ADDRESS: "{{ .Values.vault.address }}"
