@@ -306,8 +306,7 @@ jobs:
           command: |
             helm repo add hashicorp https://helm.releases.hashicorp.com
             helm install vault hashicorp/vault -n vault --create-namespace \
-              --set "server.dev.enabled=true" \
-              --set "auditStorage.enabled=true"
+              --set "server.dev.enabled=true"
       - attach_workspace:
           at: /tmp/workspace
       - run:
@@ -325,9 +324,9 @@ jobs:
       - run:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
-      - run:
-          name: Enable audit logs
-          command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=/vault/audit/vault_audit.log
+#      - run:
+#          name: Enable audit logs
+#          command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=/vault/audit/vault_audit.log
       - run:
           name: Enable/Configure authentication
           command: |
