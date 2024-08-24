@@ -306,7 +306,10 @@ jobs:
           command: |
             helm repo add hashicorp https://helm.releases.hashicorp.com
             helm install vault hashicorp/vault -n vault --create-namespace \
-              --set "server.dev.enabled=true"
+              --set "server.dev.enabled=true" \
+              --set "global.securityContext.pod.runAsNonRoot=false"
+              --set "server.uid=0"
+              --set "server.gid=0"
       - attach_workspace:
           at: /tmp/workspace
       - run:
