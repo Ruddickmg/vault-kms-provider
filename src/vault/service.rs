@@ -1,3 +1,4 @@
+use crate::configuration::vault::VaultConfiguration;
 use crate::kms::{
     key_management_service_server::KeyManagementService, DecryptRequest, DecryptResponse,
     EncryptRequest, EncryptResponse, StatusRequest, StatusResponse,
@@ -12,7 +13,6 @@ use std::string::ToString;
 use tonic::{Code, Request, Response, Status};
 use tracing::{debug, info, instrument};
 use vaultrs::{client, error::ClientError, transit};
-use crate::configuration::vault::VaultConfiguration;
 
 const OKAY_RESPONSE: &str = "ok";
 const TRANSIT_MOUNT: &str = "transit";
@@ -51,19 +51,27 @@ impl VaultKmsServer {
             Ok(token.to_string())
         } else if path != "" {
             let jwt = fs::read_to_string(path.clone()).map_err(|error| {
-                debug!("An error occurred attempting to read from \"{}\": {}", path, error.to_string());
+                debug!(
+                    "An error occurred attempting to read from \"{}\": {}",
+                    path,
+                    error.to_string()
+                );
                 ClientError::FileNotFoundError {
                     path: path.to_string(),
                 }
             })?;
             debug!("Using mounted jwt of length: {}", jwt.len());
             let vault_settings = client::VaultClientSettingsBuilder::default()
-              .address(&self.address)
-              .build()
-              .unwrap();
+                .address(&self.address)
+                .build()
+                .unwrap();
             let client = client::VaultClient::new(vault_settings).unwrap();
             debug!("Logging in to vault as: {}", self.role);
-            Ok(vaultrs::auth::kubernetes::login(&client, KUBERNETES_AUTH_MOUNT, &self.role, &jwt).await?.client_token)
+            Ok(
+                vaultrs::auth::kubernetes::login(&client, KUBERNETES_AUTH_MOUNT, &self.role, &jwt)
+                    .await?
+                    .client_token,
+            )
         } else {
             debug!("No auth token found");
             Err(ClientError::APIError {
