@@ -335,8 +335,10 @@ jobs:
       - run:
           name: Configure authentication
           command: |
+            export K8s_HOST=kubectl exec vault-0 -n vault -- env | grep "KUBERNETES_SERVICE_HOST" | cut -d "=" -f2
+            export K8s_PORT=kubectl exec vault-0 -n vault -- env | grep "KUBERNETES_SERVICE_PORT_HTTPS" | cut -d "=" -f2
             kubectl -n vault exec vault-0 -- vault write auth/kubernetes/config \
-              kubernetes_host=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT_HTTPS \
+              kubernetes_host=https://$K8s_HOST:$K8S_PORT \
               disable_local_ca_jwt=true
       - run:
           name: Configure auth role
