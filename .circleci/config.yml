@@ -336,7 +336,7 @@ jobs:
           name: Configure authentication
           command: |
             kubectl -n vault exec vault-0 -- vault write auth/kubernetes/config \
-              kubernetes_host=https://127.0.0.1:6443 \
+              kubernetes_host=http://127.0.0.1:6443 \
               disable_local_ca_jwt=true
       - run:
           name: Configure auth role
