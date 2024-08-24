@@ -99,9 +99,11 @@ readinessProbe:
 serviceAccount:
   name: vault-kms-provider
   create: true
-  automount: true
-  tokenPath: /var/run/secrets/kubernetes.io/serviceaccount/token
+  automount: false
   annotations: {}
+  token:
+    name: vault-token
+    path: /var/run/secrets/tokens
 
 authToken: ""
 

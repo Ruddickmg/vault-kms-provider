@@ -27,6 +27,18 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.serviceAccount.create }}
+        {{- if .Values.serviceAccount.token.name and .Values.serviceAccount.token.path }}
+          {{- if not .Values.volumes }}
+      volumes:
+          {{- end  }}
+        - name: {{ .Values.serviceAccount.token.name }}
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: {{ .Values.serviceAccount.token.name }}
+                  expirationSeconds: 3600
+                  audience: vault
+        {{- end }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
       {{- end }}
@@ -51,4 +63,11 @@ spec:
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.serviceAccount.create and .Values.serviceAccount.token.name and .Values.serviceAccount.token.path }}
+            {{- if not .Values.volumeMounts }}
+          volumeMounts:
+            {{- end }}
+            - mountPath: {{ .Values.serviceAccount.token.path }}
+              name: {{ .Values.serviceAccount.token.name }}
           {{- end }}
