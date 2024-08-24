@@ -337,7 +337,6 @@ jobs:
                 bound_service_account_namespaces=vault \
                 alias_name_source=serviceaccount_name \
                 token_policies=root \
-#                audience=vault \
                 ttl=1h
       - run:
           name: Check that socket file was created/mounted
