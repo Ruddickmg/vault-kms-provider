@@ -346,7 +346,7 @@ jobs:
                 bound_service_account_namespaces=vault \
                 alias_name_source=serviceaccount_name \
                 audience=vault \
-                token_policies=root \
+                token_policies=default \
                 ttl=1h
             kubectl -n vault exec vault-0 -- vault read auth/kubernetes/role/vault-kms-provider
       - run:
