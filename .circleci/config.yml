@@ -328,7 +328,9 @@ jobs:
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
       - run:
           name: Create policy for transit access
-          command: cat ./policies/transit.hcl | kubectl -n vault exec vault-0 -- vault write policy $TRANSIT_POLICY -
+          command: |
+            cat ./policies/transit.hcl 
+            cat ./policies/transit.hcl | kubectl -n vault exec vault-0 -- vault write policy $TRANSIT_POLICY -
       - run:
           name: Log requests
           command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
