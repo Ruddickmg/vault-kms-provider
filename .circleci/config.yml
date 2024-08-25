@@ -336,8 +336,9 @@ jobs:
           name: Configure authentication
           command: |
             kubectl -n vault exec vault-0 -- vault write auth/kubernetes/config \
-              kubernetes_host=https://kubernetes.default.svc.cluster.local \
+              kubernetes_host=kubernetes.default.svc.cluster.local \
               disable_local_ca_jwt=true
+            kubectl -n vault exec vault-0 -- vault read auth/kubernetes/config
       - run:
           name: Configure auth role
           command: |
@@ -345,8 +346,10 @@ jobs:
                 bound_service_account_names=vault-kms-provider \
                 bound_service_account_namespaces=vault \
                 alias_name_source=serviceaccount_name \
+                audience=vault \
                 token_policies=root \
                 ttl=1h
+            kubectl -n vault exec vault-0 -- vault read auth/kubernetes/role/vault-kms-provider
       - run:
           name: Check that socket file was created/mounted
           command: |
