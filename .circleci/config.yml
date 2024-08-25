@@ -270,6 +270,7 @@ jobs:
   e2e_tests:
     executor: ubuntu
     environment:
+      TRANSIT_POLICY: vault-kms-provider-transit-access
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       SOCKET_FILE: /mnt/vault-kms-provider.sock
       ENCRYPTION_CONFIG: /tmp/encryption/configuration.yaml
@@ -326,6 +327,9 @@ jobs:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
       - run:
+          name: Create policy for transit access
+          command: cat ./policies/transit.hcl | kubectl -n vault exec vault-0 -- vault write policy $TRANSIT_POLICY -
+      - run:
           name: Log requests
           command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
       - run:
@@ -346,7 +350,7 @@ jobs:
                 bound_service_account_namespaces=vault \
                 alias_name_source=serviceaccount_name \
                 audience=vault \
-                token_policies=default \
+                token_policies=$TRANSIT_POLICY \
                 ttl=1h
             kubectl -n vault exec vault-0 -- vault read auth/kubernetes/role/vault-kms-provider
       - run:
