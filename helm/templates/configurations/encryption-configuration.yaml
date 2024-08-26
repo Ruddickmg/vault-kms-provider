@@ -5,10 +5,5 @@ resources:
   - resources:
       - secrets
     providers:
-      - kms:
-          apiVersion: v2
-          name: vault-kms-provider
-          endpoint: unix://{{ .Values.socket.hostPath }}/{{ .Values.socket.name }}
-          timeout: 3s
       - identity: {}
 {{- end }}
