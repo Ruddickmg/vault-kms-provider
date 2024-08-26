@@ -57,7 +57,7 @@ pub async fn connect_to_unix_socket(path: &str) -> Result<Channel, tonic::transp
     info!("Server listening to unix socket: \"{}\"", path);
     UNIX_SOCKET_PATH.get_or_init(|| path.to_string());
     // this url doesn't matter since we are replacing it with the unix stream connection
-    Endpoint::try_from("http://[::]:50051")?
+    Endpoint::try_from(format!("unix:///{}", path.replace("./", "")))?
         .connect_with_connector(service_fn(|_| async {
             Ok::<_, std::io::Error>(TokioIo::new(
                 UnixStream::connect(UNIX_SOCKET_PATH.get().unwrap()).await?,

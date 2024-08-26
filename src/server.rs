@@ -25,7 +25,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     vault_kms_server.initialize().await?;
     let (server, health_checks) = join!(
         Server::builder()
-            .accept_http1(true)
             .add_service(KeyManagementServiceServer::new(vault_kms_server))
             .serve_with_incoming(socket),
         checks::serve()
