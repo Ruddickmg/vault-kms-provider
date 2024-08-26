@@ -332,6 +332,7 @@ jobs:
             kubectl -n vault exec -i vault-0 -- vault policy write $TRANSIT_POLICY - \<< EOF
                 $(cat ./policies/transit.hcl)
             EOF
+            kubectl -n vault exec vault-0 -- vault policy read $TRANSIT_POLICY
       - run:
           name: Log requests
           command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
