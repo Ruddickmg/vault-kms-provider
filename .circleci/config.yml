@@ -329,7 +329,7 @@ jobs:
       - run:
           name: Create policy for transit access
           command: |
-            kubectl -n vault exec vault-0 -- bash -c "echo $(cat ./policies/transit.hcl) | vault write policy $TRANSIT_POLICY -"
+            cat ./policies/transit.hcl | kubectl -n vault exec vault-0 -- vault write policy $TRANSIT_POLICY - -
       - run:
           name: Log requests
           command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
