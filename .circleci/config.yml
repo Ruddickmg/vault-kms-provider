@@ -70,6 +70,7 @@ workflows:
       - publish-arm:
           requires:
             - generate_tag
+            - check_version
             - chart_formatting
             - check_formatting
             - build
@@ -81,6 +82,7 @@ workflows:
       - publish-amd:
           requires:
             - generate_tag
+            - check_version
             - check_formatting
             - chart_formatting
             - build
