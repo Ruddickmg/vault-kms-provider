@@ -1,9 +1,9 @@
-path "/transit/decrypt/*" {
+path "/transit/decrypt/vault-kms-provider" {
   capabilities = ["update", "create"]
 }
-path "/transit/encrypt/*" {
+path "/transit/encrypt/vault-kms-provider" {
   capabilities = ["update", "create"]
 }
-path "/transit/keys/*" {
+path "/transit/keys/vault-kms-provider" {
   capabilities = ["read"]
 }

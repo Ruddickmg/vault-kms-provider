@@ -329,7 +329,17 @@ jobs:
       - run:
           name: Create policy for transit access
           command: |
-            kubectl -n vault exec vault-0 -- /bin/sh -c "echo \"$(cat ./policies/transit.hcl)\" | vault policy write $TRANSIT_POLICY -"
+            kubectl -n default exec -i vault-0 -- vault policy write $TRANSIT_POLICY - << EOF
+                path "/transit/decrypt/vault-kms-provider" {
+                  capabilities = ["update", "create"]
+                }
+                path "/transit/encrypt/vault-kms-provider" {
+                  capabilities = ["update", "create"]
+                }
+                path "/transit/keys/vault-kms-provider" {
+                  capabilities = ["read"]
+                }
+            EOF
       - run:
           name: Log requests
           command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
