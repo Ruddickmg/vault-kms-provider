@@ -160,9 +160,9 @@ impl KeyManagementService for VaultKmsServer {
     #[instrument]
     async fn status(
         &self,
-        request: Request<StatusRequest>,
+        _request: Request<StatusRequest>,
     ) -> Result<Response<StatusResponse>, Status> {
-        debug!("Status request: {:#?}", request);
+        debug!("Status request");
         let key = self.request_key().await?;
         Ok(Response::new(StatusResponse {
             version: key.version,
@@ -176,15 +176,17 @@ impl KeyManagementService for VaultKmsServer {
         &self,
         request: Request<DecryptRequest>,
     ) -> Result<Response<DecryptResponse>, Status> {
-        debug!("Decryption request: {:?}", request);
+        info!("Decryption request");
         let encrypted = String::from_utf8(request.get_ref().ciphertext.to_vec())
             .map_err(|error| Status::new(Code::Internal, error.to_string()))?;
         let plaintext = self.request_decryption(&encrypted).await?;
-        Ok(Response::new(DecryptResponse {
+        let response = Ok(Response::new(DecryptResponse {
             plaintext: BASE64_STANDARD
                 .decode(plaintext.as_bytes())
                 .map_err(|error| Status::new(Code::Internal, error.to_string()))?,
-        }))
+        }));
+        info!("Decryption successful");
+        response
     }
 
     #[instrument(skip(self, request))]
@@ -192,14 +194,16 @@ impl KeyManagementService for VaultKmsServer {
         &self,
         request: Request<EncryptRequest>,
     ) -> Result<Response<EncryptResponse>, Status> {
-        debug!("Encryption request: {:?}", request);
+        info!("Encryption request");
         let encoded = BASE64_STANDARD.encode(&request.get_ref().plaintext);
         let ciphertext = self.request_encryption(&encoded).await?;
         let key = self.request_key().await?;
-        Ok(Response::new(EncryptResponse {
+        let response = Ok(Response::new(EncryptResponse {
             key_id: key.id,
             ciphertext: ciphertext.as_bytes().to_vec(),
             annotations: HashMap::new(),
-        }))
+        }));
+        info!("Encryption successful");
+        response
     }
 }
