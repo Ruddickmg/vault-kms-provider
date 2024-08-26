@@ -359,7 +359,7 @@ jobs:
               --set "logging.level=debug"
       - run:
           name: Wait for vault-kms-provider startup
-          command: sleep 15
+          command: sleep 30
       - run:
           name: Check that socket file was created/mounted
           command: |
