@@ -313,7 +313,7 @@ jobs:
               --set "server.dev.enabled=true"
       - run:
           name: Wait for vault startup
-          command: sleep 10
+          command: sleep 20
       - run:
           name: Log requests
           command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
