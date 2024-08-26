@@ -14,8 +14,12 @@ mod checks;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     logging::initialize();
-    let vault_config = VaultConfiguration::new();
     let socket_config = SocketConfiguration::new();
+    let socket = create_unix_socket(
+        &socket_config.socket_path,
+        socket_config.permissions,
+    )?;
+    let vault_config = VaultConfiguration::new();
     let vault_kms_server = vault::VaultKmsServer::new(
         &vault_config.vault_transit_key,
         &vault_config.vault_address,
@@ -25,10 +29,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (server, health_checks) = join!(
         Server::builder()
             .add_service(KeyManagementServiceServer::new(vault_kms_server))
-            .serve_with_incoming(create_unix_socket(
-                &socket_config.socket_path,
-                socket_config.permissions,
-            )?),
+            .serve_with_incoming(socket),
         checks::serve()
     );
     server?;
