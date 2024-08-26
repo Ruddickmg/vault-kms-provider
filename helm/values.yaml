@@ -110,8 +110,9 @@ role:
   name: vault-kms-access
   rules: []
 
+# for use in templating an encryption file, "output" should be always be false unless the intention is to generate a compatible encryption configuration
 encryption:
-  output: true
+  output: false
   fallback: true
   enabled: true
 
