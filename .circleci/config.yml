@@ -288,6 +288,8 @@ jobs:
       - checkout
       - attach_workspace:
           at: /tmp/workspace
+      - helm/install_helm_client:
+          version: v3.15.1
       - run:
           name: Set up certificates
           command: |
@@ -308,8 +310,6 @@ jobs:
               --write-kubeconfig-mode 777 \
               --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG \
               --kube-apiserver-arg=encryption-provider-config-automatic-reload=true \
-      - helm/install_helm_client:
-          version: v3.15.1
       - run:
           name: Grant permissions on kube config
           command: sudo chown $USER:$USER $KUBECONFIG
