@@ -383,7 +383,6 @@ jobs:
       - run:
           name: Update encryption configuration file
           command: |
-            mkdir /tmp/encryption
             helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
       - run:
           name: Wait for startup
