@@ -286,6 +286,8 @@ jobs:
       CERTS: /tmp/certs
     steps:
       - checkout
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
           name: Set up certificates
           command: |
@@ -309,20 +311,12 @@ jobs:
             helm install vault hashicorp/vault -n vault --create-namespace \
               --set "injector.enabled=false" \
               --set "server.dev.enabled=true"
-      - attach_workspace:
-          at: /tmp/workspace
       - run:
-          name: Deploy vault-kms-provider
-          command: |
-            helm install vault-kms-provider ./helm -n vault \
-              --set "image.tag=$(cat /tmp/workspace/docker_tag)" \
-              --set "role.rules[0].apiGroups={}" \
-              --set "role.rules[0].resources={secrets}" \
-              --set "role.rules[0].verbs={get,create}" \
-              --set "logging.level=debug"
+          name: Wait for vault startup
+          command: sleep 5
       - run:
-          name: Wait for installation
-          command: sleep 30
+          name: Log requests
+          command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
       - run:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
@@ -333,9 +327,6 @@ jobs:
                 $(cat ./policies/transit.hcl)
             EOF
             kubectl -n vault exec vault-0 -- vault policy read $TRANSIT_POLICY
-      - run:
-          name: Log requests
-          command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
       - run:
           name: Enable authentication
           command: |
@@ -358,6 +349,18 @@ jobs:
                 ttl=1h
             kubectl -n vault exec vault-0 -- vault read auth/kubernetes/role/vault-kms-provider
       - run:
+          name: Deploy vault-kms-provider
+          command: |
+            helm install vault-kms-provider ./helm -n vault \
+              --set "image.tag=$(cat /tmp/workspace/docker_tag)" \
+              --set "role.rules[0].apiGroups={}" \
+              --set "role.rules[0].resources={secrets}" \
+              --set "role.rules[0].verbs={get,create}" \
+              --set "logging.level=debug"
+      - run:
+          name: Wait for vault-kms-provider startup
+          command: sleep 15
+      - run:
           name: Check that socket file was created/mounted
           command: |
             ls /mnt
@@ -379,7 +382,7 @@ jobs:
               --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG
       - run:
           name: Wait for startup
-          command: sleep 5
+          command: sleep 10
       - run:
           name: Run e2e tests
           command: |
