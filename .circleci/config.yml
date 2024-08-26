@@ -366,8 +366,7 @@ jobs:
               --set "image.tag=$(cat /tmp/workspace/docker_tag)" \
               --set "role.rules[0].apiGroups={}" \
               --set "role.rules[0].resources={secrets}" \
-              --set "role.rules[0].verbs={get,create}" \
-              --set "logging.level=debug"
+              --set "role.rules[0].verbs={get,create}"
       - run:
           name: Wait for vault-kms-provider startup
           command: sleep 30
