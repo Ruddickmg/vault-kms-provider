@@ -329,7 +329,7 @@ jobs:
       - run:
           name: Create policy for transit access
           command: |
-            kubectl -n default exec -i vault-0 -- vault policy write $TRANSIT_POLICY - \<< EOF
+            kubectl -n vault exec -i vault-0 -- vault policy write $TRANSIT_POLICY - \<< EOF
                 path "/transit/decrypt/vault-kms-provider" {
                   capabilities = ["update", "create"]
                 }
