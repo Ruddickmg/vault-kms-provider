@@ -1,9 +1,18 @@
-{{- if .Values.socket.output -}}
+{{- if .Values.encryption.output -}}
 apiVersion: apiserver.config.k8s.io/v1
 kind: EncryptionConfiguration
 resources:
   - resources:
       - secrets
     providers:
+      {{- if .Values.encryption.enabled }}
+      - kms:
+          apiVersion: v2
+          name: vault-kms-provider
+          endpoint: unix://{{ .Values.socket.hostPath }}/{{ .Values.socket.name }}
+          timeout: 3s
+      {{- end }}
+      {{- if .Values.encryption.fallback }}
       - identity: {}
+      {{- end }}
 {{- end }}

@@ -21,7 +21,6 @@ socket:
   path: &socketPath /run/sockets
   hostPath: /mnt
   permissions: any
-  output: false
 
 service:
   port: &healthCheckPort 8080
@@ -110,6 +109,11 @@ authToken: ""
 role:
   name: vault-kms-access
   rules: []
+
+encryption:
+  output: true
+  fallback: true
+  enabled: true
 
 podAnnotations: {}
 podLabels: {}
