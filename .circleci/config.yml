@@ -297,6 +297,13 @@ jobs:
           name: Run etcd
           command: docker compose -f ./helm/test_files/docker-compose.etcd.yml up -d
       - run:
+          name: Create encryption configuration file
+          command: |
+            mkdir /tmp/encryption
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm \
+               --set "encryption.output=true" \
+               --set "encryption.enabled=false" > $ENCRYPTION_CONFIG
+      - run:
           name: Install k3s
           command: |
             curl -sfL https://get.k3s.io | sh -s - \
@@ -308,13 +315,6 @@ jobs:
       - run:
           name: Grant permissions on kube config
           command: sudo chown $USER:$USER $KUBECONFIG
-      - run:
-          name: Create encryption configuration file
-          command: |
-            mkdir /tmp/encryption
-            helm template -s templates/configurations/encryption-configuration.yaml ./helm \
-               --set "encryption.output=true" \
-               --set "encryption.enabled=false" > $ENCRYPTION_CONFIG
       - run:
           name: Deploy vault
           command: |
