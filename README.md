@@ -25,6 +25,8 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
       - [ ] Jwt
     - [ ] Tls certs
     - [x] Token
+  - [ ] Cache vault token
+  - [ ] Create page on github pages using [jekyll](https://jekyllrb.com/)
   - [ ] Allow Tls for http communication
   - [ ] Document manual integration steps
   - [x] Create Helm Chart for easy deployment
