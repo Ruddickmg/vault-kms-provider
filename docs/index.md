@@ -27,7 +27,7 @@ vault secrets enable transit
 
 Once you have enabled the transit gateway you will need to create a policy granting the permissions required for the KMS provider to encrypt and decrypt data. This can be done by creating a policy file
 
-transit.hcl
+`./transit.hcl`
 ```hcl
 path "/transit/decrypt/vault-kms-provider" {
   capabilities = ["update", "create"]
@@ -75,7 +75,21 @@ With vault configured you should be able to deploy the vault-kms-provider to kub
 
 ### Kubernetes
 
+Setting up kubernetes to use a KMS provider is different for each Kubernetes distro but documentation for kubernetes can be [found here](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file). The following configuration is based on this documentation. 
 
+You can generate a configuration with the default values to connect to the kms provider with the following command
+```shell
+helm template -s templates/configurations/encryption-configuration.yaml vault-kms-provider --set "encryption.output=true" > /etc/kubernetes/enc/enc.yaml
+```
+
+Or if you prefer to create one yourself, it looks like this
+```yaml
+
+```
+
+Then update the kubectl api server configuration to use this configuration.
+
+`/etc/kubernetes/manifests/kube-apiserver.yaml`
 
 ### KMS Provider
 
