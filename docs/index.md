@@ -84,16 +84,60 @@ helm template -s templates/configurations/encryption-configuration.yaml vault-km
 
 Or if you prefer to create one yourself, it looks like this
 ```yaml
-
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+    providers:
+      - kms:
+          apiVersion: v2
+          name: vault-kms-provider
+          endpoint: unix:///mnt/vault-kms-provider.sock
+          timeout: 3s
+      - identity: {}
 ```
 
 Then update the kubectl api server configuration to use this configuration.
 
 `/etc/kubernetes/manifests/kube-apiserver.yaml`
 
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubeadm.kubernetes.io/kube-apiserver.advertise-address.endpoint: 10.20.30.40:443
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: kube-apiserver
+    tier: control-plane
+  name: kube-apiserver
+  namespace: kube-system
+spec:
+  containers:
+    - command:
+        - kube-apiserver
+        - --config-automatic-reload=true
+        - --encryption-provider-config=/etc/kubernetes/enc/enc.yaml
+      volumeMounts:
+        - name: enc                          
+          mountPath: /etc/kubernetes/enc
+          readOnly: true
+  volumes:
+    - name: enc
+      hostPath:
+        path: /etc/kubernetes/enc
+        type: DirectoryOrCreate
+```
+
+The parameters from the above configuration should be added to the existing configuration (not override it).
+
+If you are using a different distro for kubernetes, consult their documentation on how to point to the `EncryptionConfiguration`. In K3s for example, you pass an argument to the installation like this
+```shell
+curl -sfL https://get.k3s.io | sh -s - --kube-apiserver-arg=encryption-provider-config=/path/to/encryption-config.yaml
+```
+
 ### KMS Provider
 
 You can reference the helm [values.yaml](https://github.com/Ruddickmg/vault-kms-provider/blob/main/helm/values.yaml) for a full list of configurations
-
-
-
