@@ -2,29 +2,27 @@
 
 #### Encryption
 
-You will need to enable the transit gateway in Vault in order to use it to encrypt and decrypt data for Kubernetes. You can do so with the following command:
+You will need to enable the transit gateway in Vault in order to use it to encrypt/decrypt data for Kubernetes.
 ```shell
 vault secrets enable transit
 ```
 
-Once you have enabled the transit gateway you will need to create a policy granting the permissions required for the KMS provider to encrypt and decrypt data. This can be done by creating a policy file
+Then create a policy granting the permissions to the KMS provider to encrypt/decrypt data.
 
 `./transit.hcl`
 ```hcl
 path "/transit/decrypt/vault-kms-provider" {
   capabilities = ["update", "create"]
 }
-
 path "/transit/encrypt/vault-kms-provider" {
   capabilities = ["update", "create"]
 }
-
 path "/transit/keys/vault-kms-provider" {
   capabilities = ["read"]
 }
 ```
 
-Create the policy in vault with the following command
+Create the policy in vault
 ```shell
 vault policy write vault-kms-provider transit.hcl
 ```

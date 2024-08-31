@@ -2,10 +2,6 @@
 layout: "layout.liquid"
 ---
 
-{% for doc in collections.documentation %}
-    <div style="background-color: #364041">
-        <span>
-            {{ doc.content }}
-        </span>
-    </div>
+{% for documentation in collections.documentation %}
+    {{ documentation.content }}
 {% endfor %}
