@@ -13,8 +13,10 @@
   "dependencies": {
     "@11ty/eleventy": "^2.0.1",
     "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
-    "liquidjs": "^10.16.5",
-    "markdown-it": "^14.1.0"
+    "markdown-it": "^14.1.0",
+    "markdown-it-prism": "^2.3.0",
+    "nunjucks": "^3.2.4",
+    "nunjucks-markdown": "^2.0.1"
   },
   "private": true
 }

@@ -1,4 +1,8 @@
-### Kubernetes
+---
+title: Kubernetes
+---
+
+### {{ title }}
 
 Setting up kubernetes to use a KMS provider is different for each Kubernetes distro but documentation for kubernetes can be [found here](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file). The following configuration is based on this documentation.
 

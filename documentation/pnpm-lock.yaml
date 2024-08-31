@@ -11,12 +11,18 @@ dependencies:
   '@11ty/eleventy-plugin-syntaxhighlight':
     specifier: ^5.0.0
     version: 5.0.0
-  liquidjs:
-    specifier: ^10.16.5
-    version: 10.16.5
   markdown-it:
     specifier: ^14.1.0
     version: 14.1.0
+  markdown-it-prism:
+    specifier: ^2.3.0
+    version: 2.3.0
+  nunjucks:
+    specifier: ^3.2.4
+    version: 3.2.4(chokidar@3.6.0)
+  nunjucks-markdown:
+    specifier: ^2.0.1
+    version: 2.0.1(nunjucks@3.2.4)
 
 packages:
 
@@ -910,6 +916,13 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
+  /markdown-it-prism@2.3.0:
+    resolution: {integrity: sha512-ePtHY80gZyeje4bn3R3SL0jpd1C9HFaYffJW2Ma0YD+tspqa2v9TuVwUyFwboFu4jnFNcO8oPQROgbcYJbmBvw==}
+    engines: {node: '>=6.0.0'}
+    dependencies:
+      prismjs: 1.29.0
+    dev: false
+
   /markdown-it@13.0.2:
     resolution: {integrity: sha512-FtwnEuuK+2yVU7goGn/MJ0WBZMM9ZPgU9spqlFs7/A/pDIUNSOQZhUgOqYCficIuR2QaFnrt8LHqBWsbTAoI5w==}
     hasBin: true
@@ -1040,6 +1053,14 @@ packages:
   /normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
+    dev: false
+
+  /nunjucks-markdown@2.0.1(nunjucks@3.2.4):
+    resolution: {integrity: sha512-Vj85erGVoSlASDukl0JjaHSlJUH9BbKz8mQx0WiCj2P8a9DOM3cVwi5s0uVvPwR0RrwTjYO2dAuPMTZwGgUHeg==}
+    peerDependencies:
+      nunjucks: ^2.3.0 || ^3.0.0
+    dependencies:
+      nunjucks: 3.2.4(chokidar@3.6.0)
     dev: false
 
   /nunjucks@3.2.4(chokidar@3.6.0):
