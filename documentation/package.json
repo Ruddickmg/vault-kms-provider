@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Documentation for the Vault KMS Provider",
   "scripts": {
-    "serve": "eleventy --serve",
-    "build": "eleventy"
+    "watch:eleventy": "eleventy --serve",
+    "watch:sass": "sass src/styles:docs/css --watch --load-path=node_modules",
+    "start": "pnpm run watch:eleventy & pnpm run watch:sass"
   },
   "repository": {
     "type": "git",
@@ -13,7 +14,10 @@
   "dependencies": {
     "@11ty/eleventy": "^2.0.1",
     "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
+    "liquidjs": "^10.16.7",
     "markdown-it": "^14.1.0",
+    "markdown-it-attrs": "^4.2.0",
+    "markdown-it-github-alerts": "^0.3.0",
     "markdown-it-prism": "^2.3.0",
     "nunjucks": "^3.2.4",
     "nunjucks-markdown": "^2.0.1"

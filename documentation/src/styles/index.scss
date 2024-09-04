@@ -1,0 +1,18 @@
+@use 'markdown-it-github-alerts/styles/github-base.css';
+@use 'markdown-it-github-alerts/styles/github-colors-light.css';
+
+.homepage {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.sidebar {
+  flex-grow: 1;
+}
+
+.content {
+  overflow: auto;
+  flex-grow: 5;
+}

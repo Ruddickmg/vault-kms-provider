@@ -11,9 +11,18 @@ dependencies:
   '@11ty/eleventy-plugin-syntaxhighlight':
     specifier: ^5.0.0
     version: 5.0.0
+  liquidjs:
+    specifier: ^10.16.7
+    version: 10.16.7
   markdown-it:
     specifier: ^14.1.0
     version: 14.1.0
+  markdown-it-attrs:
+    specifier: ^4.2.0
+    version: 4.2.0(markdown-it@14.1.0)
+  markdown-it-github-alerts:
+    specifier: ^0.3.0
+    version: 0.3.0(markdown-it@14.1.0)
   markdown-it-prism:
     specifier: ^2.3.0
     version: 2.3.0
@@ -90,7 +99,7 @@ packages:
       is-glob: 4.0.3
       iso-639-1: 2.1.15
       kleur: 4.1.5
-      liquidjs: 10.16.5
+      liquidjs: 10.16.7
       luxon: 3.5.0
       markdown-it: 13.0.2
       micromatch: 4.0.8
@@ -895,8 +904,8 @@ packages:
       uc.micro: 2.1.0
     dev: false
 
-  /liquidjs@10.16.5:
-    resolution: {integrity: sha512-vg/B5/QdqdlCL8r4MztWvt8/rK8hrW+H/sDKxg0VYTWRV6kRqU1lSA2oj2kRwDBqerjuG1wm4jx+xgynmYffKw==}
+  /liquidjs@10.16.7:
+    resolution: {integrity: sha512-vjlBDyPxFgUc6vJB+TbAMcxKKKcm4Ee0rj9Je9lcG1I0lr9xvtHgB/ZdNMNAgsPUvJLkLfdrKRd+KzQ5opPfNg==}
     engines: {node: '>=14'}
     hasBin: true
     dependencies:
@@ -914,6 +923,23 @@ packages:
   /luxon@3.5.0:
     resolution: {integrity: sha512-rh+Zjr6DNfUYR3bPwJEnuwDdqMbxZW7LOQfUN4B54+Cl+0o5zaU9RJ6bcidfDtC1cWCZXQ+nvX8bf6bAji37QQ==}
     engines: {node: '>=12'}
+    dev: false
+
+  /markdown-it-attrs@4.2.0(markdown-it@14.1.0):
+    resolution: {integrity: sha512-m7svtUBythvcGFFZAv9VjMEvs8UbHri2sojJ3juJumoOzv8sdkx9a7W3KxiHbXxAbvL3Xauak8TMwCnvigVPKw==}
+    engines: {node: '>=6'}
+    peerDependencies:
+      markdown-it: '>= 9.0.0'
+    dependencies:
+      markdown-it: 14.1.0
+    dev: false
+
+  /markdown-it-github-alerts@0.3.0(markdown-it@14.1.0):
+    resolution: {integrity: sha512-qyIuDyfdrVGHhY+E/44yMyNA3ZnayaT/KKT2VgkIz1nmrgiuPkdgPUh4YBZwgJ9VKEGJvGd82Ndrc4oGftrJWg==}
+    peerDependencies:
+      markdown-it: ^14.0.0
+    dependencies:
+      markdown-it: 14.1.0
     dev: false
 
   /markdown-it-prism@2.3.0:

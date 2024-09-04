@@ -1,0 +1,26 @@
+---
+layout: base.liquid
+---
+
+<div class="homepage">
+    <div class="sidebar">
+       <div class="navbar">
+           <a href="/"><h1>Home</h1></a>
+           {% for category, categories in collections %}
+               {% if category !== "all" %}
+               <div>
+                 <h2>{{ category }}</h2>
+                 <ul>
+                   {% for page in categories %}
+                       <li><a href={{ page.url }}>{{ page.data.title }}</a></li>
+                   {% endfor %}
+                 </ul>
+               </div>
+               {% endif %}
+           {% endfor %}
+       </div>
+    </div>
+    <div class="content">
+        {{ content | safe }}
+    </div>
+</div>

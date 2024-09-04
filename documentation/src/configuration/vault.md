@@ -1,3 +1,7 @@
+---
+title: Vault
+---
+
 ### Vault
 
 #### Encryption

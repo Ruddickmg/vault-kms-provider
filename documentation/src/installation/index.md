@@ -2,6 +2,8 @@
 tags:
   - documentation
 override:tags: ["documentation"]
+eleventyExcludeFromCollections:
+  - installation
 ---
 
 # Installation

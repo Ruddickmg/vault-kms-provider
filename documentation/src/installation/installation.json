@@ -1,4 +1,4 @@
 {
-  "layout": "layout.liquid",
-  "tags": ["installation"]
+  "layout": "nav.njk",
+  "tags": ["Installation"]
 }

@@ -2,9 +2,9 @@
 title: Kubernetes
 ---
 
-### {{ title }}
+### Kubernetes
 
-Setting up kubernetes to use a KMS provider is different for each Kubernetes distro but documentation for kubernetes can be [found here](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file). The following configuration is based on this documentation.
+[!NOTE] The following documentation is based on the  [official Kubernetes documentation](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file).
 
 You can generate a configuration with the default values to connect to the kms provider with the following command
 ```shell
@@ -62,7 +62,4 @@ spec:
 
 The parameters from the above configuration should be added to the existing configuration (not override it).
 
-If you are using a different distro for kubernetes, consult their documentation on how to point to the `EncryptionConfiguration`. In K3s for example, you pass an argument to the installation like this
-```shell
-curl -sfL https://get.k3s.io | sh -s - --kube-apiserver-arg=encryption-provider-config=/path/to/encryption-config.yaml
-```
+Setting up kubernetes to use a KMS provider is different for each Kubernetes distro. See your distros docs for specifics if this documentation does not apply.

@@ -1,7 +1,13 @@
 ---
-layout: "layout.liquid"
+layout: "nav.njk"
 ---
 
-{% for documentation in collections.documentation %}
-    {{ documentation.content }}
-{% endfor %}
+<div class="content-header">
+    <h1>Content header</h1>
+</div>
+<div class="content-body">
+    <h1>Content Body</h1>
+    {% for documentation in collections.documentation %}
+        {{ documentation.content }}
+    {% endfor %}
+</div>
