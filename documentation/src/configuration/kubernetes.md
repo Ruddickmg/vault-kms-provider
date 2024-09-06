@@ -4,7 +4,8 @@ title: Kubernetes
 
 ### Kubernetes
 
-[!NOTE] The following documentation is based on the  [official Kubernetes documentation](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file).
+[!WARNING]
+The following documentation is based on the  [official Kubernetes documentation](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file).
 
 You can generate a configuration with the default values to connect to the kms provider with the following command
 ```shell

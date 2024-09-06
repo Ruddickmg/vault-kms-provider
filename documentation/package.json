@@ -1,6 +1,7 @@
 {
   "name": "vault-kms-provider-documentation",
   "version": "1.0.0",
+  "type": "module",
   "description": "Documentation for the Vault KMS Provider",
   "scripts": {
     "watch:eleventy": "eleventy --serve",
@@ -12,7 +13,7 @@
     "url": "https://github.com/Ruddickmg/vault-kms-provider.git"
   },
   "dependencies": {
-    "@11ty/eleventy": "^2.0.1",
+    "@11ty/eleventy": "^3.0.0-alpha.19",
     "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
     "liquidjs": "^10.16.7",
     "markdown-it": "^14.1.0",

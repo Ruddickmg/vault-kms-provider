@@ -1,19 +1,19 @@
-const syntaxHighlight = require('@11ty/eleventy-plugin-syntaxhighlight');
-const markdown = require('markdown-it');
-const prism = require('markdown-it-prism');
-const markdownItAttrs = require('markdown-it-attrs');
-const githubAlerts = require('markdown-it-github-alerts');
-const { Liquid } = require('liquidjs');
+import syntaxHighlight from '@11ty/eleventy-plugin-syntaxhighlight';
+import markdown from 'markdown-it';
+import prism from 'markdown-it-prism';
+import markdownItGitHubAlerts from 'markdown-it-github-alerts';
+import { Liquid } from 'liquidjs';
 
-module.exports = function (config) {
+export default function (config) {
   const md = markdown({
     html: true,
     breaks: true,
     linkify: true,
-  });
-  md.use(prism);
-  md.use(markdownItAttrs);
-  md.use(githubAlerts);
+  })
+    .use(markdownItGitHubAlerts, {
+      markers: "*"
+    })
+    .use(prism);
   config.addPlugin(syntaxHighlight);
   config.setBrowserSyncConfig({
     files: './docs/css/**/*.css'
