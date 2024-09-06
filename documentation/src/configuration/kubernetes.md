@@ -4,8 +4,8 @@ title: Kubernetes
 
 ### Kubernetes
 
-[!WARNING]
-The following documentation is based on the  [official Kubernetes documentation](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file).
+> [!NOTE]
+> This documentation is based on the  [official Kubernetes documentation](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file).
 
 You can generate a configuration with the default values to connect to the kms provider with the following command
 ```shell
@@ -61,6 +61,7 @@ spec:
         type: DirectoryOrCreate
 ```
 
-The parameters from the above configuration should be added to the existing configuration (not override it).
+> [!IMPORTANT]
+> The parameters from the above configuration should be added to the existing configuration (not override it).
 
 Setting up kubernetes to use a KMS provider is different for each Kubernetes distro. See your distros docs for specifics if this documentation does not apply.
