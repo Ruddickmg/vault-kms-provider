@@ -1,18 +1,18 @@
 @use 'markdown-it-github-alerts/styles/github-base.css';
 @use 'markdown-it-github-alerts/styles/github-colors-light.css';
+@use 'sidebar';
+@use 'content';
 
 .homepage {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: stretch;
-}
-
-.sidebar {
-  flex-grow: 1;
-}
-
-.content {
-  overflow: auto;
-  flex-grow: 5;
+  font-family: 'Roboto', sans-serif;
+  a:link {
+    text-decoration: none;
+  }
+  a:visited {
+    text-decoration: none;
+  }
 }
