@@ -2,6 +2,10 @@
 
 A plugin for kubernetes encryption that allows the use of vault as a KMS provider
 
+### Usage:
+
+See usage [documentation here](https://vault-kms-provider.io/)
+
 ### RoadMap:
 - [x] Create grpc server from the [kubernetes proto file](https://kubernetes.io/docs/tasks/administer-cluster/kms-provider/#developing-a-kms-plugin-gRPC-server-kms-v2)
     - [x] Generate rust code from k8s proto
@@ -26,9 +30,9 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
     - [ ] Tls certs
     - [x] Token
 - [ ] Cache vault token
-- [ ] Create a docs page on github pages
+- [x] Create a docs page on github pages
 - [ ] Allow Tls for http communication
-- [ ] Document manual integration steps
+- [x] Document manual integration steps
 - [x] Create Helm Chart for easy deployment
 - [x] Set up helm char repository via GitHub pages
 - [x] Set up logging
@@ -90,28 +94,6 @@ End to end tests are implemented using helm's testing library, you can find the 
 
 In order to run the tests you will need to deploy a vault server and the helm chart for this repository, you can do this using their respective helm charts
 
-#### Vault installation
-
-```shell
-helm repo add hashicorp https://helm.releases.hashicorp.com
-helm install vault hashicorp/vault -n vault --create-namespace --set "server.dev.enabled=true"
-```
-
-After vault is installed to k8s you will need to enable transit and kubernetes (or whatever type you want to use) authentication, you can do this with the following command, substituting the environment variables with the actual host and port of your k8s api.
-
-```shell
-kubectl -n vault exec vault-0 -- vault enable transit
-kubectl -n vault exec vault-0 -- vault auth enable kubernetes
-kubectl -n vault exec vault-0 -- vault write auth/kubernetes/config kubernetes_host=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
-
-# create role for k8s access via service account
-kubectl -n vault exec vault-0 -- vault write auth/kubernetes/role/vault-kms-provider \
-    bound_service_account_names=vault-kms-provider-service-account \
-    bound_service_account_namespaces=vault \
-    policies=default \
-    ttl=1h
-```
-
 #### KMS provider chart installation
 ```shell
 helm install vault-kms-provider ./helm -n vault \
@@ -127,7 +109,7 @@ The tests expect there to be an etcd backend for them to access in order to conf
 
 #### Running helm test
 
-Once all this has been set up, you can run the tests with the following command:
+Once the vault KMS provider has been set up, you can run the tests with the following command:
 ```shell
-helm test vault-kms-provider -n vault
+helm test vault-kms-provider
 ```
