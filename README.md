@@ -45,8 +45,6 @@ See usage [documentation here](https://vault-kms-provider.io/)
 
 ### Service accounts
 
-#### Local:
-
 You can enable the use of local kubernetes authentication in vault using the following commands. [docs](https://developer.hashicorp.com/vault/docs/auth/kubernetes#use-local-service-account-token-as-the-reviewer-jwt)
 ```shell
 vault auth enable kubernetes
