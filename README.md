@@ -39,9 +39,9 @@ See usage [documentation here](https://vault-kms-provider.io/)
 
 ## Kubernetes authentication
 
-Official documentation on kubernetes authentication can be found
-- [here in the vault docs](https://developer.hashicorp.com/vault/docs/auth/kubernetes)
-- and [here in the Kubernetes docs](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens).
+> Official documentation on kubernetes authentication can be found
+> - [here in the vault docs](https://developer.hashicorp.com/vault/docs/auth/kubernetes)
+> - [here in the Kubernetes docs](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens).
 
 ### Service accounts
 
