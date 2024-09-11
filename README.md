@@ -53,11 +53,6 @@ vault auth enable kubernetes
 vault write auth/kubernetes/config kubernetes_host=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
 ```
 
-Then you will need to enable the service account, this is done via the values.yaml file for helm configuration. You can pass a custom values.yaml file with the service account property set to true, or use the `--set` flag
-```shell
-helm install vault-kms-provider --set "serviceAccount.enabled=true"
-```
-
 ## Testing
 
 ### Unit
