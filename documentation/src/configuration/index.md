@@ -1,9 +1,6 @@
 ---
-eleventyExcludeFromCollections:
-  - configuration
+eleventyExcludeFromCollections: true
 ---
-
-# Configuration
 
 {% for configuration in collections.configuration %}
 {{ configuration.content }}

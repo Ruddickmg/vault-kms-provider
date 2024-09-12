@@ -14,7 +14,7 @@ links: ["configuration", "installation"]
            {% for category, categories in collections %}
                {% if category !== "all" and category !== "quick-start" %}
                <div>
-                 <h2>{{ category }}</h2>
+                 <a href="/{{ category }}"><h2>{{ category | capitalize }}</h2></a>
                  <ul>
                    {% for page in categories %}
                      {% if page.data.title %}
