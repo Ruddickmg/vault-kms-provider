@@ -14,7 +14,6 @@ spec:
       labels:
         app: {{ .Chart.Name }}
     spec:
-{{/*      automountServiceAccountToken: false*/}}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -26,6 +25,22 @@ spec:
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serviceAccount.create }}
+        {{- if and .Values.serviceAccount.token.name .Values.serviceAccount.token.path }}
+          {{- if not .Values.volumes }}
+      volumes:
+          {{- end  }}
+        - name: {{ .Values.serviceAccount.token.name }}
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: {{ .Values.serviceAccount.token.name }}
+                  expirationSeconds: 3600
+                  audience: vault
+        {{- end }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -48,4 +63,11 @@ spec:
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if and .Values.serviceAccount.token.name .Values.serviceAccount.token.path }}
+            {{- if not .Values.volumeMounts }}
+          volumeMounts:
+            {{- end }}
+            - mountPath: {{ .Values.serviceAccount.token.path }}
+              name: {{ .Values.serviceAccount.token.name }}
           {{- end }}

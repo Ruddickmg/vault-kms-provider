@@ -1,22 +1,24 @@
 [package]
 name = "vault_kms_provider"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
 
 [dependencies]
 base64 = "0.22.1"
-tonic = "0.12.1"
 bytes = "1.6.1"
-prost-derive = "0.13.1"
-prost = "0.13.1"
-tokio = { version = "1.39.2", features = ["macros", "rt-multi-thread"] }
-hyper-util = {  version = "0.1.6", features = ["tokio"] }
-hyper = { version = "1.4.1", features = ["http1", "server"] }
-tower = "0.4.13"
-vaultrs = "0.7.2"
-tokio-stream = { version = "0.1.15", features = ["net"]}
 http = "1.1.0"
 http-body-util = "0.1.2"
+hyper-util = {  version = "0.1.6", features = ["tokio"] }
+hyper = { version = "1.4.1", features = ["http1", "server"] }
+prost = "0.13.1"
+prost-derive = "0.13.1"
+tokio = { version = "1.39.2", features = ["macros", "rt-multi-thread"] }
+tokio-stream = { version = "0.1.15", features = ["net"]}
+tonic = "0.12.1"
+tower = "0.4.13"
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["json", "ansi"] }
+vaultrs = "0.7.2"
 
 [build-dependencies]
 tonic-build = "0.12.1"

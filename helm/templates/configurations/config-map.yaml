@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.configMap.name }}"
+data:
+  LOG_LEVEL: "{{ .Values.logging.level }}"
+  LOG_FORMAT: "{{ .Values.logging.format }}"
+  SOCKET_PATH: "{{ .Values.socket.path }}/{{ .Values.socket.name }}"
+  SOCKET_PERMISSIONS: "{{ .Values.socket.permissions }}"
+  VAULT_TOKEN: "{{ .Values.authToken }}"
+  {{- if and .Values.serviceAccount.token.path .Values.serviceAccount.token.name }}
+  VAULT_TOKEN_PATH: "{{ .Values.serviceAccount.token.path }}/{{ .Values.serviceAccount.token.name }}"
+  {{- end }}
+  VAULT_ADDRESS: "{{ .Values.vault.address }}"
+  VAULT_TRANSIT_KEY: "{{ .Values.vault.transitKey }}"
+  HTTP_ADDRESS: "{{ .Values.service.host }}:{{ .Values.service.port }}"

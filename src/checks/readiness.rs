@@ -9,7 +9,7 @@ extern crate lib;
 pub async fn readiness_check(
     _: Request<hyper::body::Incoming>,
 ) -> Result<Response<Full<Bytes>>, Infallible> {
-    let socket_path = lib::configuration::socket().socket_path;
+    let socket_path = lib::configuration::socket::SocketConfiguration::new().socket_path;
     let status = if Path::new(&socket_path).exists() {
         StatusCode::OK
     } else {
