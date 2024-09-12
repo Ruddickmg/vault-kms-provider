@@ -3,9 +3,7 @@ eleventyExcludeFromCollections: true
 ---
 
 {% for installation in collections.installation %}
-    <div class="content-section">
-      {{ installation.content }}
-    </div>
+    {{ installation.content }}
 {% endfor %}
 
 

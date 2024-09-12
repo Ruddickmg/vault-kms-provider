@@ -12,7 +12,7 @@ links: ["configuration", "installation"]
              </a>
            </div>
            {% for category, categories in collections %}
-               {% if category !== "all" and category !== "quick-start" %}
+               {% if category == "installation" or category == "configuration" %}
                <div>
                  <a href="/{{ category }}"><h2>{{ category | capitalize }}</h2></a>
                  <ul>
