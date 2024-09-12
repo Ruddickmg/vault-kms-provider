@@ -142,6 +142,12 @@ jobs:
           name: Build documentation
           command: cd documentation & pnpm run build
       - run:
+          name: Configure git
+          command: |
+            git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
+            git config --global user.email "ruddickmg@gmail.com"
+            git config --global user.name "Marcus Ruddick"
+      - run:
           name: Release documentation
           command: cd documentation & pnpm run gh-pages -a -d dist -m "update documentation"
   release:
