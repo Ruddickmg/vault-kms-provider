@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Vault KMS Provider</title>
+        <link rel="stylesheet" href="css/index.css">
+        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <link href="https://unpkg.com/prismjs@1.20.0/themes/prism-solarizedlight.css" rel="stylesheet"/>
+    </head>
+    <body style="background-color: #ffffff">
+        
+<div class="homepage">
+    <div class="sidebar">
+       <div class="navbar">
+           <div>
+             <a href="/">
+               <h2>Quick Start</h2>
+             </a>
+           </div>
+           
+               
+           
+               
+               <div>
+                 <a href="/configuration"><h2>Configuration</h2></a>
+                 <ul>
+                   
+                     
+                       <li><a href=/configuration/kubernetes/>Kubernetes</a></li>
+                     
+                   
+                     
+                       <li><a href=/configuration/provider/>Provider</a></li>
+                     
+                   
+                     
+                       <li><a href=/configuration/vault/>Vault</a></li>
+                     
+                   
+                 </ul>
+               </div>
+               
+           
+               
+           
+               
+               <div>
+                 <a href="/installation"><h2>Installation</h2></a>
+                 <ul>
+                   
+                     
+                       <li><a href=/installation/docker/>Docker</a></li>
+                     
+                   
+                     
+                       <li><a href=/installation/helm/>Helm</a></li>
+                     
+                   
+                     
+                       <li><a href=/installation/source/>Source</a></li>
+                     
+                   
+                 </ul>
+               </div>
+               
+           
+       </div>
+    </div>
+    <div class="content">
+        
+<div class="content-header">
+    <h1>Configuration</h1>
+</div>
+<div class="content-body">
+    <h2>Provider</h2>
+<h3>Helm values</h3>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>You can reference the helm <a href="https://github.com/Ruddickmg/vault-kms-provider/blob/main/helm/values.yaml">values.yaml</a> for a full list of configurations</p>
+</div>
+<p>When deploying via helm, it is important to ensure that the <code>vault.address</code> is set correctly.</p>
+<pre class="language-shell"><code class="language-shell">helm <span class="token function">install</span> vault-kms-provider <span class="token parameter variable">--set</span> <span class="token string">"vault.address=https://vault.default.cluster.svc.local:8200"</span></code></pre>
+<p>Depending on the type of authentication you require you may want to disable the service account.</p>
+<pre class="language-shell"><code class="language-shell">helm <span class="token function">install</span> vault-kms-provider <span class="token parameter variable">--set</span> <span class="token string">"serviceAccount.create=false"</span></code></pre>
+<h3>Environment variables</h3>
+<p>Below are all the environment variables and their defaults for configuration of the KMS provider</p>
+<pre class="language-hcl"><code class="language-hcl"><span class="token comment"># Url of the vault service</span>
+<span class="token property">VAULT_ADDRESS</span> <span class="token punctuation">=</span> <span class="token string">"https://vault.vault.cluster.svc.local:8200"</span>
+
+<span class="token comment"># Path to the socket used for communication with the Kubernetes API server</span>
+<span class="token property">SOCKET_PATH</span> <span class="token punctuation">=</span> <span class="token string">"./sockets/vault-kms-provider.sock"</span>
+
+<span class="token comment"># The level of permissions granted to the socket, choices are:</span>
+<span class="token comment">#   - any: equivalent to 666</span>
+<span class="token comment">#   - user: equivalent to 600</span>
+<span class="token comment">#   - group: equivalent to 660</span>
+<span class="token property">SOCKET_PERMISSIONS</span> <span class="token punctuation">=</span> <span class="token string">"any"</span>
+
+<span class="token comment"># The string identifier used to store the encryption keys in the vault transit gateway</span>
+<span class="token property">VAULT_TRANSIT_KEY</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
+
+<span class="token comment"># Used for authenticating with vault, only use if token authentication is desired.</span>
+<span class="token property">VAULT_TOKEN</span> <span class="token punctuation">=</span> <span class="token string">""</span>
+
+<span class="token comment"># The endpoint that the health checks will listen on</span>
+<span class="token property">HEALTH_ENDPOINT</span> <span class="token punctuation">=</span> <span class="token string">"0.0.0.0:8080"</span></code></pre>
+
+</div>
+
+    </div>
+</div>
+    </body>
+</html>

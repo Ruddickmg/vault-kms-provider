@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Vault KMS Provider</title>
+        <link rel="stylesheet" href="css/index.css">
+        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <link href="https://unpkg.com/prismjs@1.20.0/themes/prism-solarizedlight.css" rel="stylesheet"/>
+    </head>
+    <body style="background-color: #ffffff">
+        
+<div class="homepage">
+    <div class="sidebar">
+       <div class="navbar">
+           <div>
+             <a href="/">
+               <h2>Quick Start</h2>
+             </a>
+           </div>
+           
+               
+           
+               
+               <div>
+                 <a href="/configuration"><h2>Configuration</h2></a>
+                 <ul>
+                   
+                     
+                       <li><a href=/configuration/kubernetes/>Kubernetes</a></li>
+                     
+                   
+                     
+                       <li><a href=/configuration/provider/>Provider</a></li>
+                     
+                   
+                     
+                       <li><a href=/configuration/vault/>Vault</a></li>
+                     
+                   
+                 </ul>
+               </div>
+               
+           
+               
+           
+               
+               <div>
+                 <a href="/installation"><h2>Installation</h2></a>
+                 <ul>
+                   
+                     
+                       <li><a href=/installation/docker/>Docker</a></li>
+                     
+                   
+                     
+                       <li><a href=/installation/helm/>Helm</a></li>
+                     
+                   
+                     
+                       <li><a href=/installation/source/>Source</a></li>
+                     
+                   
+                 </ul>
+               </div>
+               
+           
+       </div>
+    </div>
+    <div class="content">
+        
+<div class="content-header">
+    <h1>Configuration</h1>
+</div>
+<div class="content-body">
+    <h2>Configure Kubernetes</h2>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>Kubernetes documentation on setting up encryption can be found <a href="https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file">here</a></p>
+</div>
+<p>Create an encryption configuration for the Kubernetes api server</p>
+<p><code>./encryption-configuration.yaml</code></p>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> apiserver.config.k8s.io/v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> EncryptionConfiguration
+<span class="token key atrule">resources</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">resources</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> secrets
+    <span class="token key atrule">providers</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token key atrule">kms</span><span class="token punctuation">:</span>
+          <span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v2
+          <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider
+          <span class="token key atrule">endpoint</span><span class="token punctuation">:</span> unix<span class="token punctuation">:</span>///mnt/vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider.sock
+          <span class="token key atrule">timeout</span><span class="token punctuation">:</span> 3s
+      <span class="token punctuation">-</span> <span class="token key atrule">identity</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
+<p>Point the api server to your encryption configuration</p>
+<p><code>/etc/kubernetes/manifests/kube-apiserver.yaml</code></p>
+<pre class="language-yaml"><code class="language-yaml"><span class="token comment"># add these commands to your Kubernetes api server configuration</span>
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">command</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> kube<span class="token punctuation">-</span>apiserver
+        <span class="token comment"># Point to your encryption file</span>
+        <span class="token punctuation">-</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>encryption<span class="token punctuation">-</span>provider<span class="token punctuation">-</span>config="/path/to/your/encryption<span class="token punctuation">-</span>configuration.yaml"</code></pre>
+<p>This is done in differently in some flavors of kubernetes, if yours is different, consult the documentation of your Kubernetes distro for instructions on how to point Kubernetes to your configuration file.</p>
+
+</div>
+
+    </div>
+</div>
+    </body>
+</html>

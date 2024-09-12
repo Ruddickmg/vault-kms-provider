@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Vault KMS Provider</title>
+        <link rel="stylesheet" href="css/index.css">
+        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <link href="https://unpkg.com/prismjs@1.20.0/themes/prism-solarizedlight.css" rel="stylesheet"/>
+    </head>
+    <body style="background-color: #ffffff">
+        
+<div class="homepage">
+    <div class="sidebar">
+       <div class="navbar">
+           <div>
+             <a href="/">
+               <h2>Quick Start</h2>
+             </a>
+           </div>
+           
+               
+           
+               
+               <div>
+                 <a href="/configuration"><h2>Configuration</h2></a>
+                 <ul>
+                   
+                     
+                       <li><a href=/configuration/kubernetes/>Kubernetes</a></li>
+                     
+                   
+                     
+                       <li><a href=/configuration/provider/>Provider</a></li>
+                     
+                   
+                     
+                       <li><a href=/configuration/vault/>Vault</a></li>
+                     
+                   
+                 </ul>
+               </div>
+               
+           
+               
+           
+               
+               <div>
+                 <a href="/installation"><h2>Installation</h2></a>
+                 <ul>
+                   
+                     
+                       <li><a href=/installation/docker/>Docker</a></li>
+                     
+                   
+                     
+                       <li><a href=/installation/helm/>Helm</a></li>
+                     
+                   
+                     
+                       <li><a href=/installation/source/>Source</a></li>
+                     
+                   
+                 </ul>
+               </div>
+               
+           
+       </div>
+    </div>
+    <div class="content">
+        
+<div class="content-header">
+    <h1>Configuration</h1>
+</div>
+<div class="content-body">
+    <h2>Set up Vault</h2>
+<h3>Encryption</h3>
+<p>Enable the transit gateway in Vault for encryption/decryption of data for Kubernetes.</p>
+<pre class="language-shell"><code class="language-shell">vault secrets <span class="token builtin class-name">enable</span> transit</code></pre>
+<p>Create a policy granting the permissions to the KMS provider to encrypt/decrypt data.</p>
+<p><code>./transit.hcl</code></p>
+<pre class="language-hcl"><code class="language-hcl">path <span class="token string">"/transit/decrypt/vault-kms-provider"</span> <span class="token punctuation">{</span>
+  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"update"</span>, <span class="token string">"create"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+path <span class="token string">"/transit/encrypt/vault-kms-provider"</span> <span class="token punctuation">{</span>
+  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"update"</span>, <span class="token string">"create"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+path <span class="token string">"/transit/keys/vault-kms-provider"</span> <span class="token punctuation">{</span>
+  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"read"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Add the policy to vault</p>
+<pre class="language-shell"><code class="language-shell">vault policy <span class="token function">write</span> vault-kms-provider transit.hcl</code></pre>
+<h3>Authentication</h3>
+<p>Enable authentication via kubernetes</p>
+<pre class="language-shell"><code class="language-shell">vault auth <span class="token builtin class-name">enable</span> kubernetes</code></pre>
+<p>Set the host URL to the kubernetes API</p>
+<pre class="language-shell"><code class="language-shell">vault <span class="token function">write</span> auth/kubernetes/config <span class="token assign-left variable">kubernetes_host</span><span class="token operator">=</span><span class="token string">"https://kubernetes.default.svc/"</span></code></pre>
+<p>Create a role for the KMS provider's service account so that it can authenticate with vault.</p>
+<pre class="language-shell"><code class="language-shell">vault <span class="token function">write</span> auth/kubernetes/role/vault-kms-provider <span class="token punctuation">\</span>
+    <span class="token assign-left variable">bound_service_account_names</span><span class="token operator">=</span>vault-kms-provider <span class="token punctuation">\</span>
+    <span class="token assign-left variable">bound_service_account_namespaces</span><span class="token operator">=</span>default <span class="token punctuation">\</span>
+    <span class="token assign-left variable">audience</span><span class="token operator">=</span>vault <span class="token punctuation">\</span>
+    <span class="token assign-left variable">token_policies</span><span class="token operator">=</span>vault-kms-provider <span class="token punctuation">\</span>
+    <span class="token assign-left variable">ttl</span><span class="token operator">=</span>1h</code></pre>
+<p>With vault configured you should be able to deploy the vault-kms-provider to kubernetes without error.</p>
+
+</div>
+
+    </div>
+</div>
+    </body>
+</html>
