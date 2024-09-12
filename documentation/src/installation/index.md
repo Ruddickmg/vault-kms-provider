@@ -1,6 +1,6 @@
 ---
-eleventyExcludeFromCollections:
-  - installation
+eleventyExcludeFromCollections: true
+title: Installation
 ---
 
 # Installation

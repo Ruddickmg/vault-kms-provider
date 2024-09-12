@@ -3,4 +3,4 @@
 .idea
 sockets
 node_modules
-documentation/docs
+documentation/dist

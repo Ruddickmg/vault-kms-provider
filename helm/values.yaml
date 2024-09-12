@@ -5,7 +5,7 @@ image:
   pullPolicy: IfNotPresent
   tag: latest
 
-configuration:
+configMap:
   name: vault-kms-provider-configuration
 
 nodeLabel:
@@ -29,7 +29,7 @@ socketVolume:
   size: 300mi
 
 vault:
-  token: "placeholder"
+  token: ""
   address: https://vault.vault.cluster.svc.local:8200
   transitKey: vault-kms-provider
 

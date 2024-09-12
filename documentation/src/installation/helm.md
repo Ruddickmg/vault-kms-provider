@@ -1,8 +1,10 @@
 ---
 title: Helm
+tags:
+  - quick-start
 ---
 
-## Helm
+## Install via Helm
 
 Add the helm repository
 ```shell

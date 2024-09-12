@@ -3,10 +3,7 @@ layout: nav.njk
 ---
 
 <div class="content-header">
-    <h1>Documentation</h1>
-
-        # Boom Bitch!
-
+    <h1>{{ header | default: 'Documentation' }}</h1>
 </div>
 <div class="content-body">
     {{ content }}

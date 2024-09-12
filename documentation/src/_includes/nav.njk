@@ -1,17 +1,25 @@
 ---
 layout: base.liquid
+links: ["configuration", "installation"]
 ---
 
 <div class="homepage">
     <div class="sidebar">
        <div class="navbar">
+           <div>
+             <a href="/">
+               <h2>Quick Start</h2>
+             </a>
+           </div>
            {% for category, categories in collections %}
-               {% if category !== "all" %}
+               {% if category !== "all" and category !== "quick-start" %}
                <div>
                  <h2>{{ category }}</h2>
                  <ul>
                    {% for page in categories %}
+                     {% if page.data.title %}
                        <li><a href={{ page.url }}>{{ page.data.title }}</a></li>
+                     {% endif %}
                    {% endfor %}
                  </ul>
                </div>

@@ -4,3 +4,17 @@
   flex-grow: 5;
   margin-right: 15%;
 }
+
+.content-body {
+  padding: 20px 5px;
+}
+
+.content-header {
+  h1 {
+    font-size: xxx-large;
+  }
+  padding: 20px 5px;
+  border-bottom: lightgray;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}

@@ -5,6 +5,10 @@ import MarkdownIt from 'markdown-it'
 import { default as MarkdownItGitHubAlerts } from 'markdown-it-github-alerts'
 
 export default function (config) {
+  config.setBrowserSyncConfig({
+    injectChanges: false,
+    files: './dist/css/**/*.css'
+  });
   const md = MarkdownIt({
     html: true,
     breaks: true,
@@ -13,9 +17,6 @@ export default function (config) {
     .use(MarkdownItGitHubAlerts)
     .use(prism);
   config.addPlugin(syntaxHighlight);
-  config.setBrowserSyncConfig({
-    files: './docs/css/**/*.css'
-  });
   config.setLibrary('liquid', new Liquid({
     extname: '.liquid',
     dynamicPartials: false,
@@ -26,7 +27,7 @@ export default function (config) {
   return {
     dir: {
       input: "src",
-      output: "docs",
+      output: "dist",
       includes: "_includes",
     }
   }

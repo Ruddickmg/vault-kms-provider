@@ -1,4 +1,5 @@
 {
   "layout": "home.liquid",
-  "tags": ["Installation"]
+  "tags": ["Installation"],
+  "header": "Installation"
 }

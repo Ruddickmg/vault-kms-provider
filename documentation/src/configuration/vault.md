@@ -1,10 +1,12 @@
 ---
 title: Vault
+tags:
+  - quick-start
 ---
 
-### Vault
+## Set up Vault
 
-#### Encryption
+### Encryption
 
 Enable the transit gateway in Vault for encryption/decryption of data for Kubernetes.
 ```shell
@@ -26,26 +28,24 @@ path "/transit/keys/vault-kms-provider" {
 }
 ```
 
-Create the policy in vault
+Add the policy to vault
 ```shell
 vault policy write vault-kms-provider transit.hcl
 ```
 
-#### Authentication
-
-Vault needs to be configured to allow the KMS provider to connect to it, the default method of authentication is kubernetes authentication via service accounts.
+### Authentication
 
 Enable authentication via kubernetes
 ```shell
 vault auth enable kubernetes
 ```
 
-Set the host URL to the kubernetes API for 
+Set the host URL to the kubernetes API
 ```shell
 vault write auth/kubernetes/config kubernetes_host="https://kubernetes.default.svc/"
 ```
 
-Finally, you will need to create a role for the KMS provider's service account so that it can authenticate with vault.
+Create a role for the KMS provider's service account so that it can authenticate with vault.
 ```shell
 vault write auth/kubernetes/role/vault-kms-provider \
     bound_service_account_names=vault-kms-provider \

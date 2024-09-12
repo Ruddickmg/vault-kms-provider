@@ -1,13 +1,17 @@
 ---
 title: Kubernetes
+tags:
+  - quick-start
 ---
 
-### Kubernetes
+## Configure Kubernetes
 
 > [!NOTE]
-> Official docs for encryption configuration can be found [here](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/)
+> Kubernetes documentation on setting up encryption can be found [here](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file)
 
-Create an encryption configuration for Kubernetes
+Create an encryption configuration for the Kubernetes api server
+
+`./encryption-configuration.yaml`
 ```yaml
 apiVersion: apiserver.config.k8s.io/v1
 kind: EncryptionConfiguration
@@ -23,39 +27,17 @@ resources:
       - identity: {}
 ```
 
-Then update the kubectl api server configuration to use this file. This may be different depending on your Kubernetes distro. Below are examples from different distros but the list is not exhaustive, if your distro is not included then consult the documentation.
-<details>
-  <summary>Kubernetes</summary>
+Point the api server to your encryption configuration
 
-For Kubernetes, update the `/etc/kubernetes/manifests/kube-apiserver.yaml` file by adding the following to the `spec` section
-
+`/etc/kubernetes/manifests/kube-apiserver.yaml`
 ```yaml
+# add these commands to your Kubernetes api server configuration
 spec:
   containers:
     - command:
         - kube-apiserver
-        # tell Kubernetes where to find the encryption configuration
-        - --encryption-provider-config=/etc/kubernetes/enc/enc.yaml
-      # add a volume that points to the configuration file
-      volumeMounts:
-        - name: enc                          
-          mountPath: /etc/kubernetes/enc
-          readOnly: true
-  # add a volume that points to the configuration file
-  volumes:
-    - name: enc
-      hostPath:
-        path: /etc/kubernetes/enc
-        type: DirectoryOrCreate
+        # Point to your encryption file
+        - --encryption-provider-config="/path/to/your/encryption-configuration.yaml"
 ```
 
- </details>
-<details>
-  <summary>K3s</summary>
-
-   In K3s you can specify the location of the encryption configuration file via command line arguments
-
-  ```bash
-    curl -sfL https://get.k3s.io | sh -s - --kube-apiserver-arg=encryption-provider-config=/etc/kubernetes/enc/enc.yaml
-  ```
-</details>
+This is done in differently in some flavors of kubernetes, if yours is different, consult the documentation of your Kubernetes distro for instructions on how to point Kubernetes to your configuration file.
