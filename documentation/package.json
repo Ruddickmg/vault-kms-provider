@@ -1,0 +1,31 @@
+{
+  "name": "vault-kms-provider-documentation",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Documentation for the Vault KMS Provider",
+  "scripts": {
+    "build:documentation": "eleventy",
+    "watch:documentation": "eleventy --serve",
+    "build:styles": "sass src/styles:dist/css --load-path=node_modules",
+    "watch:styles": "pnpm run build:styles --watch",
+    "start": "pnpm run watch:documentation & pnpm run watch:styles",
+    "build": "pnpm run build:styles & pnpm run build:documentation"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ruddickmg/vault-kms-provider.git"
+  },
+  "dependencies": {
+    "@11ty/eleventy": "^3.0.0-alpha.19",
+    "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
+    "liquidjs": "^10.16.7",
+    "markdown-it": "^14.1.0",
+    "markdown-it-attrs": "^4.2.0",
+    "markdown-it-github-alerts": "^0.3.0",
+    "markdown-it-prism": "^2.3.0",
+    "nunjucks": "^3.2.4",
+    "nunjucks-markdown": "^2.0.1",
+    "sass": "^1.78.0"
+  },
+  "private": true
+}

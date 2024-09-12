@@ -20,6 +20,9 @@ executors:
   release:
     docker:
       - image: 'quay.io/helmpack/chart-releaser:latest'
+  node:
+    docker:
+      - image: node:lts
   rust-app:
     environment:
       PIPELINE_NUM: << pipeline.number >>
@@ -117,14 +120,53 @@ workflows:
           requires:
             - publish-latest-manifest
             - chart_formatting
+      - documentation:
+          requires:
+            - release
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
+  documentation:
+    executor: node
+    working_directory: ~/app/documentation
+    steps:
+      - checkout:
+          path: ~/app
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+      - run:
+          name: Configure git
+          command: |
+            git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
+            git config --global user.email "ruddickmg@gmail.com"
+            git config --global user.name "ruddickmg"
+      - run:
+          name: Install pnpm
+          command: npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
+      - run:
+          name: Install github pages
+          command: npm install -g gh-pages
+      - run:
+          name: Install sass
+          command: npm install -g sass
+      - run:
+          name: Build documentation
+          command: pnpm run build
+      - run:
+          name: Release documentation
+          command: gh-pages -a -d dist -m "update documentation"
   release:
     executor: release
     steps:
       - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
       - run:
           name: Install ssh
           command: apk add openssh-client
@@ -133,7 +175,7 @@ jobs:
           command: |
             git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
             git config --global user.email "ruddickmg@gmail.com"
-            git config --global user.name "Marcus Ruddick"
+            git config --global user.name "ruddickmg"
       - run:
           name: Package chart
           command: |

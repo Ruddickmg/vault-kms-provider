@@ -2,3 +2,5 @@
 /.idea
 .idea
 sockets
+node_modules
+documentation/dist

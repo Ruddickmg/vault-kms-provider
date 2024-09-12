@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "{{ .Values.configuration.name }}"
+  name: "{{ .Values.configMap.name }}"
 data:
   SOCKET_PATH: "{{ .Values.socket.path }}/{{ .Values.socket.name }}"
   SOCKET_PERMISSIONS: "{{ .Values.socket.permissions }}"
