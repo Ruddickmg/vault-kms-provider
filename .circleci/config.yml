@@ -161,7 +161,7 @@ jobs:
           command: pnpm run build
       - run:
           name: Release documentation
-          command: gh-pages -a -d dist -m "update documentation"
+          command: gh-pages -a -d dist -m "[skip ci] Update documentation"
   release:
     executor: release
     steps:
