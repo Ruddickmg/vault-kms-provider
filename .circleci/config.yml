@@ -54,6 +54,13 @@ executors:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 workflows:
+  documentation:
+    - documentation:
+        filters:
+          branches:
+            only:
+              - main
+
   ci-cd:
     jobs:
       - chart_formatting
@@ -120,9 +127,6 @@ workflows:
           requires:
             - publish-latest-manifest
             - chart_formatting
-      - documentation:
-          requires:
-            - release
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -159,7 +163,7 @@ jobs:
           command: pnpm run build
       - run:
           name: Release documentation
-          command: gh-pages -a -d dist -m "update documentation"
+          command: gh-pages -a -d dist -m "[skip ci] update documentation"
   release:
     executor: release
     steps:
