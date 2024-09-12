@@ -55,11 +55,12 @@ executors:
 
 workflows:
   documentation:
-    - documentation:
-        filters:
-          branches:
-            only:
-              - main
+    jobs:
+      - documentation:
+          filters:
+            branches:
+              only:
+                - main
 
   ci-cd:
     jobs:
