@@ -54,6 +54,13 @@ executors:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 workflows:
+  documentation:
+    jobs:
+      - documentation:
+          filters:
+            branches:
+              only:
+                - main
   ci-cd:
     jobs:
       - chart_formatting
@@ -122,9 +129,6 @@ workflows:
           requires:
             - publish-latest-manifest
             - chart_formatting
-      - documentation:
-          requires:
-            - release
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
