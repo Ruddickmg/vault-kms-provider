@@ -24,7 +24,8 @@
     "markdown-it-github-alerts": "^0.3.0",
     "markdown-it-prism": "^2.3.0",
     "nunjucks": "^3.2.4",
-    "nunjucks-markdown": "^2.0.1"
+    "nunjucks-markdown": "^2.0.1",
+    "sass": "^1.78.0"
   },
   "private": true
 }
