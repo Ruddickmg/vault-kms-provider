@@ -4,9 +4,12 @@
   "type": "module",
   "description": "Documentation for the Vault KMS Provider",
   "scripts": {
-    "watch:eleventy": "eleventy --serve",
-    "watch:sass": "sass src/styles:dist/css --watch --load-path=node_modules",
-    "start": "pnpm run watch:eleventy & pnpm run watch:sass"
+    "build:documentation": "eleventy",
+    "watch:documentation": "eleventy --serve",
+    "build:styles": "sass src/styles:dist/css --load-path=node_modules",
+    "watch:styles": "pnpm run build:styles --watch",
+    "start": "pnpm run watch:documentation & pnpm run watch:styles",
+    "build": "pnpm run build:styles & pnpm run build:documentation"
   },
   "repository": {
     "type": "git",

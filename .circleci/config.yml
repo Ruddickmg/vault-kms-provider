@@ -20,6 +20,9 @@ executors:
   release:
     docker:
       - image: 'quay.io/helmpack/chart-releaser:latest'
+  node:
+    docker:
+      - image: node:lts
   rust-app:
     environment:
       PIPELINE_NUM: << pipeline.number >>
@@ -117,10 +120,30 @@ workflows:
           requires:
             - publish-latest-manifest
             - chart_formatting
+      - release-documentation
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
+  release-documentation:
+    executor: node
+    steps:
+      - checkout
+      - run:
+          name: Install pnpm
+          command: npm install -g pnpm
+      - run:
+          name: Install github pages
+          command: pnpm install -g gh-pages
+      - run:
+          name: Install dependencies
+          command: cd documentation & pnpm install
+      - run:
+          name: Build documentation
+          command: cd documentation & pnpm run build
+      - run:
+          name: Release documentation
+          command: cd documentation & pnpm run gh-pages -a -d dist -m "update documentation"
   release:
     executor: release
     steps:
