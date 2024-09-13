@@ -57,6 +57,14 @@ spec:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
+          {{- if .Values.vault.token.set }}
+          env:
+            - name: VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.vault.token.name }}
+                  key: {{ .Values.vault.token.key }}
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ .Values.configMap.name }}

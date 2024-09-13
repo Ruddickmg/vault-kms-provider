@@ -32,10 +32,24 @@ socketVolume:
   storageClass: unix-socket-storage
   size: 300mi
 
+# configurations for connecting to vault
 vault:
-  token: ""
+  # the url to the running vault instance
   address: https://vault.vault.cluster.svc.local:8200
+  # the key with which the encryption records will be initialized
   transitKey: vault-kms-provider
+  # details for a secret that contains a vault token for vault authorization
+  token:
+    # if set to true the value of the secret below will be added to the vault-kms-provider containers environment variables
+    set: false
+    # if set to true a secret will be created with the value, name and key below. It is not secure to directly create a secret via this helm chart but this can be used for testing/debugging if necessary
+    create: false
+    # It is not secure to set this value directly but this can be used for testing/debugging purposes
+    value: ""
+    # name of the secret to be used or created, if create is set to false, the secret must be manually created by the user, this is a secure way of using the vault token directly
+    name: vault-auth-token
+    # the key/path within the secret where the vault token is stored
+    key: token
 
 nodeSelector:
   *labelKey: *labelValue
@@ -103,8 +117,6 @@ serviceAccount:
   token:
     name: vault-token
     path: /var/run/secrets/tokens
-
-authToken: ""
 
 role:
   name: vault-kms-access

@@ -7,7 +7,6 @@ data:
   LOG_FORMAT: "{{ .Values.logging.format }}"
   SOCKET_PATH: "{{ .Values.socket.path }}/{{ .Values.socket.name }}"
   SOCKET_PERMISSIONS: "{{ .Values.socket.permissions }}"
-  VAULT_TOKEN: "{{ .Values.authToken }}"
   {{- if and .Values.serviceAccount.token.path .Values.serviceAccount.token.name }}
   VAULT_TOKEN_PATH: "{{ .Values.serviceAccount.token.path }}/{{ .Values.serviceAccount.token.name }}"
   {{- end }}
