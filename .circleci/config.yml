@@ -355,6 +355,9 @@ jobs:
               --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG \
               --kube-apiserver-arg=encryption-provider-config-automatic-reload=true \
       - run:
+          name: Grant permissions on kube config
+          command: sudo chown $USER:$USER $KUBECONFIG
+      - run:
           name: Deploy vault
           command: |
             helm repo add hashicorp https://helm.releases.hashicorp.com
