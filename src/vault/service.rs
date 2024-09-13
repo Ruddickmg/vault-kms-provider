@@ -43,7 +43,7 @@ pub struct VaultKmsServer {
 impl VaultKmsServer {
     #[instrument(skip(self, path))]
     async fn get_token_from_file_path(&self, path: &str) -> Result<String, ClientError> {
-        let jwt = fs::read_to_string(path.clone()).map_err(|error| {
+        let jwt = fs::read_to_string(path).map_err(|error| {
             debug!(
                 "An error occurred attempting to read from \"{}\": {}",
                 path,
@@ -77,7 +77,7 @@ impl VaultKmsServer {
             Ok(token.to_string())
         } else if let Some(path) = token_path {
             debug!("Retrieving token from path: {}", path);
-            self.get_token_from_file_path(&path)
+            self.get_token_from_file_path(&path).await
         } else {
             debug!("No auth token found");
             Err(ClientError::APIError {
