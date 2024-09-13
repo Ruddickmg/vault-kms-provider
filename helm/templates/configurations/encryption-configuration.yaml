@@ -13,11 +13,6 @@ resources:
           timeout: 3s
       {{- end }}
       {{- if .Values.encryption.fallback }}
-      {{/*  TODO: remove this when a fix is released for k8s kmsv2  */}}
-      - aesgcm:
-          keys:
-            - name: key1
-              secret: DoOdl1a6BtizC2kYDyGJprSQuKcefB9TTcdePGMmb3k=
       - identity: {}
       {{- end }}
 {{- end }}
