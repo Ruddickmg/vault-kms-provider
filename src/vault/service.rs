@@ -44,12 +44,12 @@ impl VaultKmsServer {
     #[instrument(skip(self))]
     async fn get_token(&self) -> Result<String, ClientError> {
         let config = VaultConfiguration::new();
-        let token = config.vault_token;
-        let path = config.vault_token_path;
-        if token != "" {
+        let vault_token = config.vault_token;
+        let token_path = config.vault_token_path;
+        if let Some(token) = vault_token {
             debug!("Using raw token of length: {}", token.len());
             Ok(token.to_string())
-        } else if path != "" {
+        } else if let Some(path) = token_path {
             let jwt = fs::read_to_string(path.clone()).map_err(|error| {
                 debug!(
                     "An error occurred attempting to read from \"{}\": {}",
