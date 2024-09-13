@@ -422,10 +422,11 @@ jobs:
             else
               exit 1
             fi
-      - run:
-          name: Update encryption configuration file
-          command: |
-            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
+#  TODO: uncomment this when the fix has been released for k8s kmsv2
+#      - run:
+#          name: Update encryption configuration file
+#          command: |
+#            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
       - run:
           name: Wait for startup
           command: sleep 10
