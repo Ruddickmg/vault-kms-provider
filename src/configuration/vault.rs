@@ -16,8 +16,9 @@ impl VaultConfiguration {
     pub fn new() -> Self {
         Self {
             vault_role: get_env("VAULT_ROLE", DEFAULT_VAULT_ROLE),
-            vault_token: std::env::var("VAULT_TOKEN").map_or(None, | token | Some(token.to_string())),
-            vault_token_path: std::env::var("VAULT_TOKEN_PATH").map_or(None, | token | Some(token.to_string())),
+            vault_token: std::env::var("VAULT_TOKEN").map_or(None, |token| Some(token.to_string())),
+            vault_token_path: std::env::var("VAULT_TOKEN_PATH")
+                .map_or(None, |token| Some(token.to_string())),
             vault_address: get_env("VAULT_ADDRESS", DEFAULT_VAULT_ADDRESS),
             vault_transit_key: get_env("VAULT_TRANSIT_KEY", DEFAULT_VAULT_TRANSIT_KEY),
         }
