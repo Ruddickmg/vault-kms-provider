@@ -435,7 +435,10 @@ jobs:
       - run:
           name: Run e2e tests
           command: |
-            helm test vault-kms-provider -n vault --logs
+            helm test vault-kms-provider -n vault --logs \
+              --set "role.rules[0].apiGroups={}" \
+              --set "role.rules[0].resources={secrets}" \
+              --set "role.rules[0].verbs={get,create}" \
 
   publish-amd:
     executor: ubuntu
