@@ -177,7 +177,7 @@ jobs:
           command: |
             git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
             git config --global user.email "ruddickmg@gmail.com"
-            git config --global user.name "ruddickmg"
+            git config --global user.name "Marcus Ruddick"
       - run:
           name: Package chart
           command: |
