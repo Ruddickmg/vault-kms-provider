@@ -41,6 +41,32 @@ pub struct VaultKmsServer {
 }
 
 impl VaultKmsServer {
+    #[instrument(skip(self, path))]
+    async fn get_token_from_file_path(&self, path: &str) -> Result<String, ClientError> {
+        let jwt = fs::read_to_string(path.clone()).map_err(|error| {
+            debug!(
+                    "An error occurred attempting to read from \"{}\": {}",
+                    path,
+                    error.to_string()
+                );
+            ClientError::FileNotFoundError {
+                path: path.to_string(),
+            }
+        })?;
+        debug!("Using mounted jwt of length: {}", jwt.len());
+        let vault_settings = client::VaultClientSettingsBuilder::default()
+          .address(&self.address)
+          .build()
+          .unwrap();
+        let client = client::VaultClient::new(vault_settings).unwrap();
+        debug!("Logging in to vault as: {}", self.role);
+        Ok(
+            vaultrs::auth::kubernetes::login(&client, KUBERNETES_AUTH_MOUNT, &self.role, &jwt)
+              .await?
+              .client_token,
+        )
+    }
+
     #[instrument(skip(self))]
     async fn get_token(&self) -> Result<String, ClientError> {
         let config = VaultConfiguration::new();
@@ -50,28 +76,8 @@ impl VaultKmsServer {
             debug!("Using raw token of length: {}", token.len());
             Ok(token.to_string())
         } else if let Some(path) = token_path {
-            let jwt = fs::read_to_string(path.clone()).map_err(|error| {
-                debug!(
-                    "An error occurred attempting to read from \"{}\": {}",
-                    path,
-                    error.to_string()
-                );
-                ClientError::FileNotFoundError {
-                    path: path.to_string(),
-                }
-            })?;
-            debug!("Using mounted jwt of length: {}", jwt.len());
-            let vault_settings = client::VaultClientSettingsBuilder::default()
-                .address(&self.address)
-                .build()
-                .unwrap();
-            let client = client::VaultClient::new(vault_settings).unwrap();
-            debug!("Logging in to vault as: {}", self.role);
-            Ok(
-                vaultrs::auth::kubernetes::login(&client, KUBERNETES_AUTH_MOUNT, &self.role, &jwt)
-                    .await?
-                    .client_token,
-            )
+            debug!("Retrieving token from path: {}", path);
+           self.get_token_from_file_path(&path)
         } else {
             debug!("No auth token found");
             Err(ClientError::APIError {
