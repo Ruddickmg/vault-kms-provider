@@ -354,9 +354,9 @@ jobs:
               --write-kubeconfig-mode 777 \
               --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG \
               --kube-apiserver-arg=encryption-provider-config-automatic-reload=true \
-      - run:
-          name: Grant permissions on kube config
-          command: sudo chown $USER:$USER $KUBECONFIG
+#      - run:
+#          name: Grant permissions on kube config
+#          command: sudo chown $USER:$USER $KUBECONFIG
       - run:
           name: Deploy vault
           command: |
@@ -366,10 +366,7 @@ jobs:
               --set "server.dev.enabled=true"
       - run:
           name: Wait for vault startup
-          command: sleep 30
-      - run:
-          name: Log requests
-          command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
+          command: sleep 60
       - run:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
@@ -402,6 +399,9 @@ jobs:
                 ttl=1h
             kubectl -n vault exec vault-0 -- vault read auth/kubernetes/role/vault-kms-provider
       - run:
+          name: Log requests
+          command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
+      - run:
           name: Deploy vault-kms-provider
           command: |
             helm install vault-kms-provider ./helm -n vault \
@@ -412,7 +412,7 @@ jobs:
               --set "logging.level=debug"
       - run:
           name: Wait for vault-kms-provider startup
-          command: sleep 30
+          command: sleep 40
       - run:
           name: Check that socket file was created/mounted
           command: |
@@ -427,9 +427,9 @@ jobs:
 #          name: Update encryption configuration file
 #          command: |
 #            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
-      - run:
-          name: Wait for startup
-          command: sleep 10
+#      - run:
+#          name: Wait for startup
+#          command: sleep 10
       - run:
           name: Run e2e tests
           command: |
