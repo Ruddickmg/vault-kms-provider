@@ -6,7 +6,7 @@ image:
   tag: latest
 
 logging:
-  level: "debug"
+  level: "info"
   format: "json"
 
 configMap:
