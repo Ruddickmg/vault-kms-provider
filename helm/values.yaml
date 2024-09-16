@@ -35,7 +35,7 @@ socketVolume:
 # configurations for connecting to vault
 vault:
   # the url to the running vault instance
-  address: https://vault.vault.cluster.svc.local:8200
+  address: https://vault.vault.svc.cluster.local:8200
   # the key with which the encryption records will be initialized
   transitKey: vault-kms-provider
   # details for a secret that contains a vault token for vault authorization

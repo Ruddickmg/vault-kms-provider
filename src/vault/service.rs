@@ -41,9 +41,25 @@ pub struct VaultKmsServer {
 }
 
 impl VaultKmsServer {
+
     #[instrument(skip(self, path))]
-    async fn get_token_from_file_path(&self, path: &str) -> Result<String, ClientError> {
-        let jwt = fs::read_to_string(path).map_err(|error| {
+    async fn request_token_from_vault(&self, jwt: &str) -> Result<String, ClientError> {
+        let vault_settings = client::VaultClientSettingsBuilder::default()
+          .address(&self.address)
+          .build()
+          .unwrap();
+        let client = client::VaultClient::new(vault_settings).unwrap();
+        debug!("Logging in to vault as: {}", self.role);
+        Ok(
+            vaultrs::auth::kubernetes::login(&client, KUBERNETES_AUTH_MOUNT, &self.role, &jwt)
+              .await?
+              .client_token,
+        )
+    }
+
+    #[instrument(skip(self, path))]
+    fn get_jwt_from_file(&self, path: &str) ->  Result<String, ClientError> {
+        fs::read_to_string(path).map_err(|error| {
             debug!(
                 "An error occurred attempting to read from \"{}\": {}",
                 path,
@@ -52,19 +68,14 @@ impl VaultKmsServer {
             ClientError::FileNotFoundError {
                 path: path.to_string(),
             }
-        })?;
+        })
+    }
+
+    #[instrument(skip(self, path))]
+    async fn request_token_with_jwt(&self, path: &str) -> Result<String, ClientError> {
+        let jwt = self.get_jwt_from_file(path)?;
         debug!("Using mounted jwt of length: {}", jwt.len());
-        let vault_settings = client::VaultClientSettingsBuilder::default()
-            .address(&self.address)
-            .build()
-            .unwrap();
-        let client = client::VaultClient::new(vault_settings).unwrap();
-        debug!("Logging in to vault as: {}", self.role);
-        Ok(
-            vaultrs::auth::kubernetes::login(&client, KUBERNETES_AUTH_MOUNT, &self.role, &jwt)
-                .await?
-                .client_token,
-        )
+        self.request_token_from_vault(&jwt).await
     }
 
     #[instrument(skip(self))]
@@ -77,7 +88,7 @@ impl VaultKmsServer {
             Ok(token.to_string())
         } else if let Some(path) = token_path {
             debug!("Retrieving token from path: {}", path);
-            self.get_token_from_file_path(&path).await
+            self.request_token_with_jwt(&path).await
         } else {
             debug!("No auth token found");
             Err(ClientError::APIError {

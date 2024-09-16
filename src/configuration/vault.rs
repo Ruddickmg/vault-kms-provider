@@ -1,6 +1,6 @@
 use crate::utilities::env::{get_env, get_env_option};
 
-const DEFAULT_VAULT_ADDRESS: &str = "https://vault.vault.cluster.svc.local:8200";
+const DEFAULT_VAULT_ADDRESS: &str = "https://vault.vault.svc.cluster.local:8200";
 const DEFAULT_VAULT_TRANSIT_KEY: &str = "vault-kms-provider";
 const DEFAULT_VAULT_ROLE: &str = "vault-kms-provider";
 
