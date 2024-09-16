@@ -41,24 +41,23 @@ pub struct VaultKmsServer {
 }
 
 impl VaultKmsServer {
-
-    #[instrument(skip(self, path))]
+    #[instrument(skip(self, jwt))]
     async fn request_token_from_vault(&self, jwt: &str) -> Result<String, ClientError> {
         let vault_settings = client::VaultClientSettingsBuilder::default()
-          .address(&self.address)
-          .build()
-          .unwrap();
+            .address(&self.address)
+            .build()
+            .unwrap();
         let client = client::VaultClient::new(vault_settings).unwrap();
         debug!("Logging in to vault as: {}", self.role);
         Ok(
             vaultrs::auth::kubernetes::login(&client, KUBERNETES_AUTH_MOUNT, &self.role, &jwt)
-              .await?
-              .client_token,
+                .await?
+                .client_token,
         )
     }
 
     #[instrument(skip(self, path))]
-    fn get_jwt_from_file(&self, path: &str) ->  Result<String, ClientError> {
+    fn get_jwt_from_file(&self, path: &str) -> Result<String, ClientError> {
         fs::read_to_string(path).map_err(|error| {
             debug!(
                 "An error occurred attempting to read from \"{}\": {}",
