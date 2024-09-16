@@ -366,7 +366,7 @@ jobs:
               --set "server.dev.enabled=true"
       - run:
           name: Wait for vault startup
-          command: sleep 60
+          command: sleep 35
       - run:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
@@ -412,7 +412,7 @@ jobs:
               --set "logging.level=debug"
       - run:
           name: Wait for vault-kms-provider startup
-          command: sleep 40
+          command: sleep 35
       - run:
           name: Check that socket file was created/mounted
           command: |
