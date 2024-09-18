@@ -155,6 +155,9 @@ jobs:
       - run:
           name: Build documentation
           command: pnpm run build
+      - run:
+          name: Clear SSH keys
+          command: ssh-add -D
       - add_ssh_keys:
           fingerprints:
             - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
