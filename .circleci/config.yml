@@ -354,9 +354,9 @@ jobs:
               --write-kubeconfig-mode 777 \
               --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG \
               --kube-apiserver-arg=encryption-provider-config-automatic-reload=true \
-#      - run:
-#          name: Grant permissions on kube config
-#          command: sudo chown $USER:$USER $KUBECONFIG
+      - run:
+          name: Grant permissions on kube config
+          command: sudo chown $USER:$USER $KUBECONFIG
       - run:
           name: Deploy vault
           command: |
@@ -423,14 +423,13 @@ jobs:
             else
               exit 1
             fi
-#  TODO: uncomment this when the fix has been released for k8s kmsv2
-#      - run:
-#          name: Update encryption configuration file
-#          command: |
-#            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
-#      - run:
-#          name: Wait for startup
-#          command: sleep 10
+      - run:
+          name: Update encryption configuration file
+          command: |
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
+      - run:
+          name: Wait for startup
+          command: sleep 10
       - run:
           name: Run e2e tests
           command: |
