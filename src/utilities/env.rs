@@ -54,7 +54,7 @@ mod test_get_env_option {
 
     #[test]
     fn returns_an_environment_variable_if_it_exists() {
-        let variable_name = "OPTION_TEST_VARIABLE";
+        let variable_name = "OPTION_TEST_VARIABLE_EXISTS";
         let variable = "world";
         unsafe {
             std::env::set_var(variable_name, variable);
@@ -65,7 +65,7 @@ mod test_get_env_option {
 
     #[test]
     fn returns_none_if_the_variable_is_an_empty_string() {
-        let variable_name = "OPTION_TEST_VARIABLE";
+        let variable_name = "OPTION_TEST_VARIABLE_EMPTY";
         let variable = "";
         unsafe {
             std::env::set_var(variable_name, variable);
