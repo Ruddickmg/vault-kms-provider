@@ -53,15 +53,17 @@ executors:
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
-workflows:
-  documentation:
-    jobs:
-      - documentation:
-          filters:
-            branches:
-              only:
-                - main
+commands:
+  checkout_write:
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+      - checkout
 
+#-----------------------------------------------------------------------------------------------------------------------------
+
+workflows:
   ci-cd:
     jobs:
       - chart_formatting
@@ -120,17 +122,14 @@ workflows:
             - dockerhub
           requires:
             - e2e_tests
-            - publish-amd
-            - publish-arm
 
       - release:
-          filters:
-            branches:
-              only:
-                - main
           requires:
             - publish-latest-manifest
-            - chart_formatting
+
+      - documentation:
+          requires:
+            - release
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -139,11 +138,11 @@ jobs:
     executor: node
     working_directory: ~/app/documentation
     steps:
-      - checkout:
-          path: ~/app
       - add_ssh_keys:
           fingerprints:
             - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+      - checkout:
+          path: ~/app
       - run:
           name: Configure git
           command: |
@@ -171,13 +170,13 @@ jobs:
   release:
     executor: release
     steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
       - run:
           name: Install ssh
           command: apk add openssh-client
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+      - checkout
       - run:
           name: Configure git
           command: |
@@ -204,12 +203,13 @@ jobs:
             cr index --push \
               --git-repo $CIRCLE_PROJECT_REPONAME \
               --owner $CIRCLE_PROJECT_USERNAME \
+              --release-name-template "v{{ .Version }}" \
               --token $GITHUB_TOKEN
 
   build:
     executor: rust-app
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Update
           command: sudo apt-get update
@@ -232,7 +232,7 @@ jobs:
     environment:
       MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Checkout main
           command: git clone "$MAIN_BRANCH_URL"
@@ -258,7 +258,7 @@ jobs:
   generate_tag:
     executor: ubuntu
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Create workspace
           command: mkdir /tmp/workspace
@@ -277,7 +277,7 @@ jobs:
   check_formatting:
     executor: rust-app
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Check formatting
           command: cargo fmt -- --check
@@ -285,7 +285,7 @@ jobs:
   chart_formatting:
     executor: chart-test
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Lint helm chart
           command: ct lint --all --chart-dirs .
@@ -293,7 +293,7 @@ jobs:
   unit_tests:
     executor: ubuntu
     steps:
-      - checkout
+      - checkout_write
       - rust/install
       - run:
           name: Run unit tests
@@ -302,7 +302,7 @@ jobs:
   integration_tests:
     executor: ubuntu
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Start vault
           command: docker compose up vault -d
@@ -335,7 +335,7 @@ jobs:
       ETCDCTL_API: 3
       CERTS: /tmp/certs
     steps:
-      - checkout
+      - checkout_write
       - attach_workspace:
           at: /tmp/workspace
       - helm/install_helm_client:
@@ -446,7 +446,7 @@ jobs:
       ARCH: amd64
       PLATFORM: linux/amd64
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Log in to Docker
           command: |
@@ -472,7 +472,7 @@ jobs:
       ARCH: arm64
       PLATFORM: linux/arm64
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Log in to Docker
           command: |

@@ -30,12 +30,14 @@ See usage [documentation here](https://vault-kms-provider.io/)
     - [ ] Tls certs
     - [x] Token
 - [ ] Cache vault token
+- [ ] Update vault token on mounted jwt file changes
 - [x] Create a docs page on github pages
 - [ ] Allow Tls for http communication
 - [x] Document manual integration steps
 - [x] Create Helm Chart for easy deployment
 - [x] Set up helm char repository via GitHub pages
 - [x] Set up logging
+- [ ] Remove logs for imported libraries
 
 ## Kubernetes authentication
 
