@@ -351,9 +351,8 @@ jobs:
           name: Install k3s
           command: |
             curl -sfL https://get.k3s.io | sh -s - \
-              --write-kubeconfig-mode 777 \
               --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG \
-              --kube-apiserver-arg=encryption-provider-config-automatic-reload=true \
+              --kube-apiserver-arg=encryption-provider-config-automatic-reload=true
       - run:
           name: Grant permissions on kube config
           command: sudo chown $USER:$USER $KUBECONFIG
