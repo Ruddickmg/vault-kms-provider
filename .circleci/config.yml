@@ -119,6 +119,7 @@ workflows:
           context:
             - dockerhub
           requires:
+            - e2e_tests
             - publish-amd
             - publish-arm
 
@@ -128,7 +129,6 @@ workflows:
               only:
                 - main
           requires:
-            - e2e_tests
             - publish-latest-manifest
             - chart_formatting
 
