@@ -12,7 +12,7 @@ title: Provider
 When deploying via helm, it is important to ensure that the `vault.address` is set correctly.
 
 ```shell
-helm install vault-kms-provider --set "vault.address=https://vault.default.cluster.svc.local:8200"
+helm install vault-kms-provider --set "vault.address=https://vault.default.svc.cluster.local:8200"
 ```
 
 Depending on the type of authentication you require you may want to disable the service account.
@@ -27,7 +27,7 @@ Below are all the environment variables and their defaults for configuration of 
 
 ```hcl
 # Url of the vault service
-VAULT_ADDRESS = "https://vault.vault.cluster.svc.local:8200"
+VAULT_ADDRESS = "https://vault.vault.svc.cluster.local:8200"
 
 # Path to the socket used for communication with the Kubernetes API server
 SOCKET_PATH = "./sockets/vault-kms-provider.sock"

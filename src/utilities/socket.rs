@@ -8,10 +8,11 @@ use tokio_stream::wrappers::UnixListenerStream;
 use tonic::transport::{Channel, Endpoint};
 #[cfg(unix)]
 use tower::service_fn;
+use tracing::{info, instrument};
 
 static UNIX_SOCKET_PATH: OnceLock<String> = OnceLock::new();
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum UnixSocketPermissions {
     OwnerAccess = 0o600,
     OwnerAndGroupAccess = 0o660,
@@ -34,6 +35,7 @@ impl From<String> for UnixSocketPermissions {
     }
 }
 
+#[instrument]
 pub fn create_unix_socket(
     path: &str,
     permissions: UnixSocketPermissions,
@@ -50,7 +52,9 @@ pub fn create_unix_socket(
     Ok(unix_stream)
 }
 
+#[instrument]
 pub async fn connect_to_unix_socket(path: &str) -> Result<Channel, tonic::transport::Error> {
+    info!("Server listening to unix socket: \"{}\"", path);
     UNIX_SOCKET_PATH.get_or_init(|| path.to_string());
     // this url doesn't matter since we are replacing it with the unix stream connection
     Endpoint::try_from("http://[::]:50051")?
