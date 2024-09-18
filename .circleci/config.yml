@@ -53,77 +53,83 @@ executors:
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
+commands:
+  checkout_write:
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+      - checkout
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
 workflows:
-  documentation:
+  ci-cd:
     jobs:
-      - documentation
-# TODO: uncomment when documentation is fixed
-#  ci-cd:
-#    jobs:
-#      - chart_formatting
-#      - generate_tag
-#      - check_formatting
-#      - build
-#      - unit_tests
-#      - integration_tests
-#      - e2e_tests:
-#          requires:
-#            - publish-manifest
-#      - check_version:
-#          filters:
-#            branches:
-#              ignore:
-#                - main
-#      - publish-arm:
-#          requires:
-#            - generate_tag
-#            - check_version
-#            - chart_formatting
-#            - check_formatting
-#            - build
-#            - unit_tests
-#            - integration_tests
-#          context:
-#            - dockerhub
-#
-#      - publish-amd:
-#          requires:
-#            - generate_tag
-#            - check_version
-#            - check_formatting
-#            - chart_formatting
-#            - build
-#            - unit_tests
-#            - integration_tests
-#          context:
-#            - dockerhub
-#
-#      - publish-manifest:
-#          context:
-#            - dockerhub
-#          requires:
-#            - publish-amd
-#            - publish-arm
-#
-#      - publish-manifest:
-#          name: publish-latest-manifest
-#          tag: latest
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          context:
-#            - dockerhub
-#          requires:
-#            - e2e_tests
-#
-#      - release:
-#          requires:
-#            - publish-latest-manifest
-#
-#      - documentation:
-#          requires:
-#            - release
+      - chart_formatting
+      - generate_tag
+      - check_formatting
+      - build
+      - unit_tests
+      - integration_tests
+      - e2e_tests:
+          requires:
+            - publish-manifest
+      - check_version:
+          filters:
+            branches:
+              ignore:
+                - main
+      - publish-arm:
+          requires:
+            - generate_tag
+            - check_version
+            - chart_formatting
+            - check_formatting
+            - build
+            - unit_tests
+            - integration_tests
+          context:
+            - dockerhub
+
+      - publish-amd:
+          requires:
+            - generate_tag
+            - check_version
+            - check_formatting
+            - chart_formatting
+            - build
+            - unit_tests
+            - integration_tests
+          context:
+            - dockerhub
+
+      - publish-manifest:
+          context:
+            - dockerhub
+          requires:
+            - publish-amd
+            - publish-arm
+
+      - publish-manifest:
+          name: publish-latest-manifest
+          tag: latest
+          filters:
+            branches:
+              only:
+                - main
+          context:
+            - dockerhub
+          requires:
+            - e2e_tests
+
+      - release:
+          requires:
+            - publish-latest-manifest
+
+      - documentation:
+          requires:
+            - release
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -164,13 +170,13 @@ jobs:
   release:
     executor: release
     steps:
-      - checkout
       - run:
           name: Install ssh
           command: apk add openssh-client
       - add_ssh_keys:
           fingerprints:
             - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+      - checkout
       - run:
           name: Configure git
           command: |
@@ -203,7 +209,7 @@ jobs:
   build:
     executor: rust-app
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Update
           command: sudo apt-get update
@@ -226,7 +232,7 @@ jobs:
     environment:
       MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Checkout main
           command: git clone "$MAIN_BRANCH_URL"
@@ -252,7 +258,7 @@ jobs:
   generate_tag:
     executor: ubuntu
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Create workspace
           command: mkdir /tmp/workspace
@@ -271,7 +277,7 @@ jobs:
   check_formatting:
     executor: rust-app
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Check formatting
           command: cargo fmt -- --check
@@ -279,7 +285,7 @@ jobs:
   chart_formatting:
     executor: chart-test
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Lint helm chart
           command: ct lint --all --chart-dirs .
@@ -287,7 +293,7 @@ jobs:
   unit_tests:
     executor: ubuntu
     steps:
-      - checkout
+      - checkout_write
       - rust/install
       - run:
           name: Run unit tests
@@ -296,7 +302,7 @@ jobs:
   integration_tests:
     executor: ubuntu
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Start vault
           command: docker compose up vault -d
@@ -329,7 +335,7 @@ jobs:
       ETCDCTL_API: 3
       CERTS: /tmp/certs
     steps:
-      - checkout
+      - checkout_write
       - attach_workspace:
           at: /tmp/workspace
       - helm/install_helm_client:
@@ -440,7 +446,7 @@ jobs:
       ARCH: amd64
       PLATFORM: linux/amd64
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Log in to Docker
           command: |
@@ -466,7 +472,7 @@ jobs:
       ARCH: arm64
       PLATFORM: linux/arm64
     steps:
-      - checkout
+      - checkout_write
       - run:
           name: Log in to Docker
           command: |
