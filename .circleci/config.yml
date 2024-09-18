@@ -405,7 +405,7 @@ jobs:
           name: Deploy vault-kms-provider
           command: |
             helm install vault-kms-provider ./helm -n vault \
-              --set "vault.address=http://vault.vault.svc.cluster.local:8200"
+              --set "vault.address=http://vault.vault.svc.cluster.local:8200" \
               --set "image.tag=$(cat /tmp/workspace/docker_tag)" \
               --set "role.rules[0].apiGroups={}" \
               --set "role.rules[0].resources={secrets}" \
