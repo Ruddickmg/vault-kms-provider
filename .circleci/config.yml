@@ -194,6 +194,7 @@ jobs:
             cr index --push \
               --git-repo $CIRCLE_PROJECT_REPONAME \
               --owner $CIRCLE_PROJECT_USERNAME \
+              --release-name-template "v{{ .Version }}" \
               --token $GITHUB_TOKEN
 
   build:
