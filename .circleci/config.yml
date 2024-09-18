@@ -54,14 +54,6 @@ executors:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 workflows:
-  documentation:
-    jobs:
-      - documentation:
-          filters:
-            branches:
-              only:
-                - main
-
   ci-cd:
     jobs:
       - chart_formatting
@@ -112,25 +104,23 @@ workflows:
       - publish-manifest:
           name: publish-latest-manifest
           tag: latest
-          filters:
-            branches:
-              only:
-                - main
+#          TODO: uncomment this when the release process is confirmed working (before merging into main)
+#          filters:
+#            branches:
+#              only:
+#                - main
           context:
             - dockerhub
           requires:
             - e2e_tests
-            - publish-amd
-            - publish-arm
 
       - release:
-          filters:
-            branches:
-              only:
-                - main
           requires:
             - publish-latest-manifest
-            - chart_formatting
+
+      - documentation:
+          requires:
+            - release
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -172,12 +162,12 @@ jobs:
     executor: release
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
       - run:
           name: Install ssh
           command: apk add openssh-client
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
       - run:
           name: Configure git
           command: |
