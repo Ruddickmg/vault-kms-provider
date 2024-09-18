@@ -119,6 +119,7 @@ workflows:
           context:
             - dockerhub
           requires:
+            - e2e_tests
             - publish-amd
             - publish-arm
 
@@ -510,13 +511,14 @@ jobs:
       - run:
           name: Create Manifest
           command: |
+            export TAG="$(cat /tmp/workspace/docker_tag)"
             if [[ -z "<< parameters.tag >>" ]]; then
-              export TAG="$(cat /tmp/workspace/docker_tag)"
+              export LABEL=$TAG
             else
-              export TAG="<< parameters.tag >>"
+              export LABEL="<< parameters.tag >>"
             fi
             REPO="$DOCKERHUB_REPOSITORY:$TAG"
-            docker manifest create $REPO \
+            docker manifest create $DOCKERHUB_REPOSITORY:$LABEL \
               --amend "${REPO}-arm64" \
               --amend "${REPO}-amd64"
       - run:
