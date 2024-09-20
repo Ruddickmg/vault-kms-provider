@@ -10,7 +10,7 @@ services:
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: SiQOECxwSDCeQt1r0n5kqQCr
       VAULT_LOG_LEVEL: debug
-      VAULT_CACERT: /vault/userconfig/tls-server/server.crt
+      VAULT_CACERT: /vault/userconfig/tls-server/ca.crt
       VAULT_ADDR: https://127.0.0.1:8400
       VAULT_TOKEN: SiQOECxwSDCeQt1r0n5kqQCr
     command:
@@ -26,7 +26,7 @@ services:
     environment:
       VAULT_ADDRESS: https://vault:8400
       VAULT_TOKEN: SiQOECxwSDCeQt1r0n5kqQCr
-      VAULT_CACERT: /etc/ssl/certs/server.crt
+      VAULT_CACERT: /etc/ssl/certs/ca.crt
       SOCKET_PATH: /sockets/vault-kms-provider.sock
       LOG_LEVEL: info
     build:

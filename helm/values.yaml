@@ -50,6 +50,12 @@ vault:
     name: vault-auth-token
     # the key/path within the secret where the vault token is stored
     key: token
+  # configuration for tls communication with vault
+  ca:
+    # path to CA certificate file
+    file: ""
+    # path to directory containing CA certificate file(s)
+    directory: ""
 
 nodeSelector:
   *labelKey: *labelValue
