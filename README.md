@@ -32,7 +32,7 @@ See usage [documentation here](https://vault-kms-provider.io/)
 - [ ] Cache vault token
 - [ ] Update vault token on mounted jwt file changes
 - [x] Create a docs page on github pages
-- [ ] Allow Tls for http communication
+- [x] Allow Tls for http communication
 - [x] Document manual integration steps
 - [x] Create Helm Chart for easy deployment
 - [x] Set up helm char repository via GitHub pages
@@ -84,6 +84,12 @@ Then finally you can run the integration tests with the following command
 cargo test --test *
 ```
 
+> [!NOTE]
+> you can output logs for debugging vault into console by running the following command
+> ```shell
+> docker compose exec vault vault audit enable file file_path=stdout
+> ```
+
 ### End to end
 End to end tests are implemented using helm's testing library, you can find the tests themselves in the `helm/templates/tests` directory. There are also some files used for testing located in the `helm/test_files` directory.
 
@@ -107,4 +113,18 @@ The tests expect there to be an etcd backend for them to access in order to conf
 Once the vault KMS provider has been set up, you can run the tests with the following command:
 ```shell
 helm test vault-kms-provider
+```
+
+## TLS
+
+Tls is enabled by setting environment variables that point to the relevant certificate files required to enable tls.
+
+####  environment variables
+
+```shell
+# Defines the path to a ca certificate file
+VAULT_CACERT="/path/to/cert/file.crt"
+
+# Defines the path to a directory containing ca certificate file
+VAULT_CAPATH="/path/to/cert/directory"
 ```

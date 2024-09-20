@@ -4,20 +4,29 @@ services:
   vault:
     image: hashicorp/vault:latest
     container_name: vault
+    volumes:
+      - ./helm/test_files/certs:/vault/userconfig/tls-server
+      - ./:/mnt
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: SiQOECxwSDCeQt1r0n5kqQCr
       VAULT_LOG_LEVEL: debug
-      VAULT_ADDR: http://127.0.0.1:8200
+      VAULT_CACERT: /vault/userconfig/tls-server/server.crt
+      VAULT_ADDR: https://127.0.0.1:8400
       VAULT_TOKEN: SiQOECxwSDCeQt1r0n5kqQCr
+    command:
+      - server
+      - -dev
+      - -config=/mnt/dev-tls-config.hcl
     networks:
       - vault-kms-provider
     expose:
-      - 8200:8200
+      - 8400:8400
 
   vault-kms-provider:
     environment:
+      VAULT_ADDRESS: https://vault:8400
       VAULT_TOKEN: SiQOECxwSDCeQt1r0n5kqQCr
-      VAULT_ADDRESS: http://vault:8200
+      VAULT_CACERT: /etc/ssl/certs/server.crt
       SOCKET_PATH: /sockets/vault-kms-provider.sock
       LOG_LEVEL: info
     build:
@@ -30,6 +39,7 @@ services:
       - vault-kms-provider
     volumes:
       - ./sockets:/sockets
+      - ./helm/test_files/certs:/etc/ssl/certs
 
 networks:
   vault-kms-provider:
