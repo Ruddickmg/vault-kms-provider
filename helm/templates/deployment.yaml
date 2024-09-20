@@ -22,15 +22,17 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.volumes }}
+      {{- if or or .Values.volumeMounts .Values.vault.ca.secret.enabled .Values.serviceAccount.create }}
       volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- if .Values.serviceAccount.create }}
-        {{- if and .Values.serviceAccount.token.name .Values.serviceAccount.token.path }}
-          {{- if not .Values.volumes }}
-      volumes:
-          {{- end  }}
+        {{- if .Values.volumes }}
+          {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
+        {{- if .Values.vault.ca.secret.mountPath }}
+        - name: {{ .Values.vault.ca.secret.name }}
+          secret:
+            secretName: {{ .Values.vault.ca.secret.name }}
+        {{- end }}
+        {{- if and and .Values.serviceAccount.create .Values.serviceAccount.token.name .Values.serviceAccount.token.path }}
         - name: {{ .Values.serviceAccount.token.name }}
           projected:
             sources:
@@ -39,6 +41,8 @@ spec:
                   expirationSeconds: 3600
                   audience: vault
         {{- end }}
+      {{- end }}
+      {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
       {{- end }}
@@ -68,14 +72,21 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Values.configMap.name }}
-          {{- with .Values.volumeMounts }}
+          {{- if or or (and .Values.serviceAccount.token.name .Values.serviceAccount.token.path) .Values.volumeMounts .Values.vault.ca.secret.enabled }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- if and .Values.serviceAccount.token.name .Values.serviceAccount.token.path }}
-            {{- if not .Values.volumeMounts }}
-          volumeMounts:
+            {{- if .Values.volumeMounts }}
+              {{ toYaml .Values.volumeMounts | indent 12 }}
             {{- end }}
-            - mountPath: {{ .Values.serviceAccount.token.path }}
-              name: {{ .Values.serviceAccount.token.name }}
+            {{- if and .Values.serviceAccount.token.name .Values.serviceAccount.token.path }}
+              - mountPath: {{ .Values.serviceAccount.token.path }}
+                name: {{ .Values.serviceAccount.token.name }}
+            {{- end }}
+            {{- if .Values.vault.ca.secret.mountPath }}
+              - name: {{ .Values.vault.ca.secret.name }}
+                mountPath: {{ .Values.vault.ca.secret.mountPath}}
+                {{- if .Values.vault.ca.secret.subPath }}
+                subPath: {{ .Values.vault.ca.secret.subPath }}
+                {{- end }}
+                readOnly: true
+            {{- end }}
           {{- end }}

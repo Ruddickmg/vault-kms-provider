@@ -108,6 +108,9 @@ The parameters we set here are giving the tests the ability to create and modify
 #### Etcd
 The tests expect there to be an etcd backend for them to access in order to confirm the stored data (secrets) is encrypted. There are too many potential k8s tools to cover how to make this work, but you may look to this repositories circleci config for examples on how to set one up if your brand of k8s does not use etcd. Either way, you will need to be sure the tests have access to an etcd backend to retrieve the data stored by k8s.
 
+The tests will need to be able to make requests to etcd. In order to communicate over tls, you will need to point to tls certificates that can verify communication with Etcd. The tests run by helm will mount a volume at `/tmp/certs` where it will look for three files:
+`ca.crt`, `tls.crt`, and `tls.key`. With these certificates in place the tests should run fine over tls.
+
 #### Running helm test
 
 Once the vault KMS provider has been set up, you can run the tests with the following command:

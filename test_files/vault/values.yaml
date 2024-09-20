@@ -1,0 +1,18 @@
+injector:
+  enabled: false
+server:
+  extraEnvironmentVars:
+    VAULT_CACERT: /vault/userconfig/test-certs/ca.crt
+  extraVolumes:
+    - type: secret
+      name: test-certs
+  dev:
+    enabled: true
+config: |
+  listener "tcp" {
+    address = "[::]:8200"
+    cluster_address = "[::]:8201"
+    tls_disable = false
+    tls_cert_file = "/vault/userconfig/test-certs/tls.crt"
+    tls_key_file = "/vault/userconfig/test-certs/tls.key"
+  }

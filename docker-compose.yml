@@ -5,8 +5,8 @@ services:
     image: hashicorp/vault:latest
     container_name: vault
     volumes:
-      - ./helm/test_files/certs:/vault/userconfig/tls-server
-      - ./:/mnt
+      - ./test_files/certs:/vault/userconfig/tls-server
+      - ./test_files/vault:/mnt
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: SiQOECxwSDCeQt1r0n5kqQCr
       VAULT_LOG_LEVEL: debug
@@ -16,7 +16,7 @@ services:
     command:
       - server
       - -dev
-      - -config=/mnt/dev-tls-config.hcl
+      - -config=/mnt/tls-config.hcl
     networks:
       - vault-kms-provider
     expose:
@@ -39,7 +39,7 @@ services:
       - vault-kms-provider
     volumes:
       - ./sockets:/sockets
-      - ./helm/test_files/certs:/etc/ssl/certs
+      - ./test_files/certs:/etc/ssl/certs
 
 networks:
   vault-kms-provider:

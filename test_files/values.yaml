@@ -1,0 +1,17 @@
+logging:
+  level: debug
+
+vault:
+  ca:
+    secret:
+      enabled: true
+      name: test-certs
+
+role:
+  name: vault-kms-access
+  rules:
+    - apiGroups: {}
+    - resources: secrets
+    - verbs:
+        - get
+        - create

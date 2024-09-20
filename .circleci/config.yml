@@ -343,11 +343,11 @@ jobs:
       - run:
           name: Set up certificates
           command: |
-            cp -r ./helm/test_files/certs $CERTS
+            cp -r ./test_files/certs $CERTS
             ls $CERTS
       - run:
           name: Run etcd
-          command: docker compose -f ./helm/test_files/docker-compose.etcd.yml up -d
+          command: docker compose -f ./test_files/docker-compose.etcd.yml up -d
       - run:
           name: Create encryption configuration file
           command: |
@@ -363,12 +363,17 @@ jobs:
           name: Grant permissions on kube config
           command: sudo chown $USER:$USER $KUBECONFIG
       - run:
+          name: Create tls secret
+          command: |
+            kubectl create secret tls test-certs \
+              --certificate-authority=/tmp/certs/ca.crt \
+              --cert=/tmp/certs/tls.cert \
+              --key=/tmp/certs/tls.key
+      - run:
           name: Deploy vault
           command: |
             helm repo add hashicorp https://helm.releases.hashicorp.com
-            helm install vault hashicorp/vault -n vault --create-namespace \
-              --set "injector.enabled=false" \
-              --set "server.dev.enabled=true"
+            helm install vault hashicorp/vault -n vault --create-namespace -f test_files/vault/values.yaml
       - run:
           name: Wait for vault startup
           command: sleep 35
@@ -409,13 +414,8 @@ jobs:
       - run:
           name: Deploy vault-kms-provider
           command: |
-            helm install vault-kms-provider ./helm -n vault \
-              --set "vault.address=http://vault.vault.svc.cluster.local:8200" \
-              --set "image.tag=$(cat /tmp/workspace/docker_tag)" \
-              --set "role.rules[0].apiGroups={}" \
-              --set "role.rules[0].resources={secrets}" \
-              --set "role.rules[0].verbs={get,create}" \
-              --set "logging.level=debug"
+            helm install vault-kms-provider ./helm -n vault -f test_files/values.yaml \
+              --set "image.tag=$(cat /tmp/workspace/docker_tag)"
       - run:
           name: Wait for vault-kms-provider startup
           command: sleep 35
