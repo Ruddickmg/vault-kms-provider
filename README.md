@@ -115,11 +115,11 @@ Once the vault KMS provider has been set up, you can run the tests with the foll
 helm test vault-kms-provider
 ```
 
-## TLS
+## Tls
 
 Tls is enabled by setting environment variables that point to the relevant certificate files required to enable tls.
 
-####  environment variables
+###  environment variables
 
 ```shell
 # Defines the path to a ca certificate file
