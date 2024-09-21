@@ -1,5 +1,7 @@
 injector:
   enabled: false
+global:
+  tlsDisable: false
 server:
   extraEnvironmentVars:
     VAULT_CACERT: /vault/userconfig/test-certs/ca.crt
