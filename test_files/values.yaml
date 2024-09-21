@@ -14,6 +14,6 @@ volumeMounts:
 role:
   name: vault-kms-access
   rules:
-    - apiGroups: []
+    - apiGroups: [""]
       resources: ["secrets"]
       verbs: ["get", "create"]
