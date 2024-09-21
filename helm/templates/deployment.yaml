@@ -22,7 +22,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if or or .Values.volumeMounts .Values.vault.ca.secret.enabled .Values.serviceAccount.create }}
+      {{- if or (or .Values.volumeMounts .Values.vault.ca.secret.enabled) .Values.serviceAccount.create }}
       volumes:
         {{- if .Values.volumes }}
           {{- toYaml .Values.volumes | nindent 8 }}
@@ -32,7 +32,7 @@ spec:
           secret:
             secretName: {{ .Values.vault.ca.secret.name }}
         {{- end }}
-        {{- if and and .Values.serviceAccount.create .Values.serviceAccount.token.name .Values.serviceAccount.token.path }}
+        {{- if and (and .Values.serviceAccount.create .Values.serviceAccount.token.name) .Values.serviceAccount.token.path }}
         - name: {{ .Values.serviceAccount.token.name }}
           projected:
             sources:
@@ -72,21 +72,21 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Values.configMap.name }}
-          {{- if or or (and .Values.serviceAccount.token.name .Values.serviceAccount.token.path) .Values.volumeMounts .Values.vault.ca.secret.enabled }}
+          {{- if or (or (and .Values.serviceAccount.token.name .Values.serviceAccount.token.path) .Values.volumeMounts) .Values.vault.ca.secret.enabled }}
           volumeMounts:
             {{- if .Values.volumeMounts }}
-              {{ toYaml .Values.volumeMounts | indent 12 }}
+            {{- .Values.volumeMounts | toYaml | nindent 12 }}
             {{- end }}
             {{- if and .Values.serviceAccount.token.name .Values.serviceAccount.token.path }}
-              - mountPath: {{ .Values.serviceAccount.token.path }}
-                name: {{ .Values.serviceAccount.token.name }}
+            - name: {{ .Values.serviceAccount.token.name }}
+              mountPath: {{ .Values.serviceAccount.token.path }}
             {{- end }}
             {{- if .Values.vault.ca.secret.mountPath }}
-              - name: {{ .Values.vault.ca.secret.name }}
-                mountPath: {{ .Values.vault.ca.secret.mountPath}}
-                {{- if .Values.vault.ca.secret.subPath }}
-                subPath: {{ .Values.vault.ca.secret.subPath }}
-                {{- end }}
-                readOnly: true
+            - name: {{ .Values.vault.ca.secret.name }}
+              mountPath: {{ .Values.vault.ca.secret.mountPath}}
+              {{- if .Values.vault.ca.secret.subPath }}
+              subPath: {{ .Values.vault.ca.secret.subPath }}
+              {{- end }}
+              readOnly: true
             {{- end }}
           {{- end }}

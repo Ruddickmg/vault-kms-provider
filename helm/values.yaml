@@ -88,8 +88,8 @@ volumes:
       claimName: *volumeClaimName
 
 volumeMounts:
-  - mountPath: *socketPath
-    name: *volumeName
+  - name: *volumeName
+    mountPath: *socketPath
 
 priorityClassName: system-cluster-critical
 
