@@ -379,6 +379,12 @@ jobs:
           name: Wait for vault startup
           command: sleep 35
       - run:
+          name: Initialize vault
+          command: kubectl -n vault exec vault-0 -- vault operator init -key-shares=1 -key-threshold=1 -format="json" > keys.json
+      - run:
+          name: Unseal vault
+          command: kubectl -n vault exec vault-0 -- vault operator unseal $UNSEAL_KEY -format="json" > token.json
+      - run:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
       - run:

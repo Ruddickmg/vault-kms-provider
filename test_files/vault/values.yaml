@@ -5,14 +5,10 @@ global:
   tlsDisable: false
 server:
   extraEnvironmentVars:
-#    VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8400
     VAULT_CACERT: /vault/userconfig/test-certs/ca.crt
-    VAULT_ADDR: https://127.0.0.1:8200
   extraVolumes:
     - type: secret
       name: test-certs
-  dev:
-    enabled: true
   standalone:
     enabled: true
     config: |
