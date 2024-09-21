@@ -1,6 +1,11 @@
 logging:
   level: debug
 
+vault:
+  ca:
+    file: /etc/ssl/certs/ca.crt
+    directory: ""
+
 volumes:
   - name: vault-ca-certificate
     secret:

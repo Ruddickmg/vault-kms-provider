@@ -1,5 +1,6 @@
 use crate::utilities::env;
 use std::fs;
+use tracing::{debug, info};
 
 const VAULT_CA_PATH: &str = "VAULT_CA_PATH";
 const VAULT_CA_CERTIFICATE: &str = "VAULT_CA_CERT";
@@ -24,6 +25,10 @@ impl TlsConfiguration {
                 certs.push(file_path);
             }
         }
+        info!("CA certificates to import: {:?}", certs);
+        certs.iter().for_each(| cert | {
+            debug!("cert: \n{}", fs::read_to_string(cert).unwrap());
+        });
         certs
     }
 
@@ -41,5 +46,30 @@ impl TlsConfiguration {
             }
         }
         vec![]
+    }
+}
+
+#[test]
+mod tls_certificate_tests {
+    use super::*;
+
+    #[test]
+    pub fn gets_all_certs_located_in_a_directory_path() -> () {
+
+    }
+
+    #[test]
+    pub fn gets_a_specified_cert_file_path() -> () {
+
+    }
+
+    #[test]
+    pub fn will_not_create_duplicate_file_paths() -> () {
+
+    }
+
+    #[test]
+    pub fn will_combine_files_from_directory_with_specific_files_if_both_are_defined() -> () {
+
     }
 }
