@@ -12,12 +12,9 @@ server:
   standalone:
     enabled: true
     config: |
-      cluster_addr  = "https://127.0.0.1:8201"
-      api_addr      = "https://127.0.0.1:8200"
       listener "tcp" {
         address = "[::]:8200"
         cluster_address = "[::]:8201"
-        tls_disable = 0
         tls_cert_file = "/vault/userconfig/test-certs/tls.crt"
         tls_key_file = "/vault/userconfig/test-certs/tls.key"
       }
