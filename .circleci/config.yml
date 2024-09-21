@@ -390,30 +390,30 @@ jobs:
           name: Enable transit
           command: |
             export TOKEN=$(cat keys.json | jq -r .root_token);
-            kubectl -n vault exec vault-0 -- VAULT_TOKEN=$TOKEN vault secrets enable transit
+            kubectl -n vault exec vault-0 -- VAULT_TOKEN=$TOKEN; vault secrets enable transit
       - run:
           name: Create policy for transit access
           command: |
             export TOKEN=$(cat keys.json | jq -r .root_token);
-            kubectl -n vault exec -i vault-0 -- VAULT_TOKEN=$TOKEN vault policy write $TRANSIT_POLICY - \<< EOF
+            kubectl -n vault exec -i vault-0 -- VAULT_TOKEN=$TOKEN; vault policy write $TRANSIT_POLICY - \<< EOF
                 $(cat ./policies/transit.hcl)
             EOF
       - run:
           name: Enable authentication
           command: |
             export TOKEN=$(cat keys.json | jq -r .root_token);
-            kubectl -n vault exec vault-0 -- VAULT_TOKEN=$TOKEN vault auth enable kubernetes
+            kubectl -n vault exec vault-0 -- VAULT_TOKEN=$TOKEN; vault auth enable kubernetes
       - run:
           name: Configure authentication
           command: |
             export TOKEN=$(cat keys.json | jq -r .root_token);
-            kubectl -n vault exec vault-0 -- VAULT_TOKEN=$TOKEN vault write auth/kubernetes/config \
+            kubectl -n vault exec vault-0 -- VAULT_TOKEN=$TOKEN; vault write auth/kubernetes/config \
               kubernetes_host="https://kubernetes.default.svc/"
       - run:
           name: Configure auth role
           command: |
             export TOKEN=$(cat keys.json | jq -r .root_token);
-            kubectl -n vault exec vault-0 -- VAULT_TOKEN=$TOKEN vault write auth/kubernetes/role/vault-kms-provider \
+            kubectl -n vault exec vault-0 -- VAULT_TOKEN=$TOKEN; vault write auth/kubernetes/role/vault-kms-provider \
                 bound_service_account_names=vault-kms-provider \
                 bound_service_account_namespaces=vault \
                 alias_name_source=serviceaccount_name \
@@ -424,7 +424,7 @@ jobs:
           name: Log requests
           command: |
             export TOKEN=$(cat keys.json | jq -r .root_token);
-            kubectl -n vault exec vault-0 -- VAULT_TOKEN=$TOKEN vault audit enable file file_path=stdout
+            kubectl -n vault exec vault-0 -- VAULT_TOKEN=$TOKEN; vault audit enable file file_path=stdout
       - run:
           name: Deploy vault-kms-provider
           command: |
