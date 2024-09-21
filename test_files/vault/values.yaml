@@ -10,14 +10,16 @@ server:
       name: test-certs
   dev:
     enabled: true
-config: |
-  listener "tcp" {
-    address = "[::]:8200"
-    cluster_address = "[::]:8201"
-    tls_disable = false
-    tls_cert_file = "/vault/userconfig/test-certs/tls.crt"
-    tls_key_file = "/vault/userconfig/test-certs/tls.key"
-  }
-  storage "file" {
-    path = "/vault/data"
-  }
+  standalone:
+    enabled: true
+    config: |
+      listener "tcp" {
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+        tls_disable = false
+        tls_cert_file = "/vault/userconfig/test-certs/tls.crt"
+        tls_key_file = "/vault/userconfig/test-certs/tls.key"
+      }
+      storage "file" {
+        path = "/vault/data"
+      }
