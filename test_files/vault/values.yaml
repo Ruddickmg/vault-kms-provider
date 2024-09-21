@@ -5,6 +5,7 @@ global:
 server:
   extraEnvironmentVars:
     VAULT_CACERT: /vault/userconfig/test-certs/ca.crt
+    VAULT_ADDR: https://127.0.0.1:8200
   extraVolumes:
     - type: secret
       name: test-certs
