@@ -365,6 +365,7 @@ jobs:
       - run:
           name: Create tls secret
           command: |
+            kubectl create namespace vault
             kubectl -n vault create secret generic test-certs \
               --from-file=ca.crt=$CERTS/ca.crt \
               --from-file=tls.crt=$CERTS/tls.crt \
