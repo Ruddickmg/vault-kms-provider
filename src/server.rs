@@ -1,5 +1,6 @@
 extern crate lib;
 
+use lib::configuration::tls;
 use lib::{
     configuration::{socket::SocketConfiguration, vault::VaultConfiguration},
     kms::key_management_service_server::KeyManagementServiceServer,
@@ -8,7 +9,6 @@ use lib::{
 };
 use tokio::join;
 use tonic::transport::Server;
-use lib::configuration::tls;
 
 mod checks;
 
