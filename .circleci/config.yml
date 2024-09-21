@@ -366,6 +366,7 @@ jobs:
           name: Create tls secret
           command: |
             kubectl create secret tls test-certs \
+              --insecure-skip-tls-verify \
               --certificate-authority=$CERTS/ca.crt \
               --cert=$CERTS/tls.crt \
               --key=$CERTS/tls.key
