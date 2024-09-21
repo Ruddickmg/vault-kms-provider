@@ -367,7 +367,7 @@ jobs:
           command: |
             kubectl create secret tls test-certs \
               --certificate-authority=$CERTS/ca.crt \
-              --cert=$CERTS/tls.cert \
+              --cert=$CERTS/tls.crt \
               --key=$CERTS/tls.key
       - run:
           name: Deploy vault
