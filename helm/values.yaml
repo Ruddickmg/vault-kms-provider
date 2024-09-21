@@ -29,16 +29,6 @@ vault:
     file: ""
     # path to directory containing CA certificate file(s)
     directory: /etc/ssl/certs
-    # secret to import tls certificates from
-    secret:
-      # toggle whether to use a secret or not
-      enabled: false
-      # name of the secret to mount
-      name: vault-ca-certificate
-      # where to mount the tls secret
-      mountPath: /etc/ssl/certs
-      # sub path for the mount path
-      subPath: ""
 
 # Configuration for logging
 logging:
@@ -56,7 +46,7 @@ nodeLabel:
 
 socket:
   name: vault-kms-provider.sock
-  path: &socketPath /run/sockets
+  path: /run/sockets
   hostPath: /mnt
   permissions: any
 
@@ -65,8 +55,8 @@ service:
   host: 0.0.0.0
 
 socketVolume:
-  name: &volumeName vault-kms-provider-socket-volume
-  claim: &volumeClaimName socket-volume
+  name: vault-kms-provider-socket-volume
+  claim: socket-volume
   storageClass: unix-socket-storage
   size: 300mi
 
@@ -81,15 +71,6 @@ tolerations:
 
 local:
   path: /mnt
-
-volumes:
-  - name: *volumeName
-    persistentVolumeClaim:
-      claimName: *volumeClaimName
-
-volumeMounts:
-  - name: *volumeName
-    mountPath: *socketPath
 
 priorityClassName: system-cluster-critical
 
@@ -147,6 +128,8 @@ encryption:
   fallback: true
   enabled: true
 
+volumes: {}
+volumeMounts: {}
 podAnnotations: {}
 podLabels: {}
 affinity: {}

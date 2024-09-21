@@ -365,11 +365,10 @@ jobs:
       - run:
           name: Create tls secret
           command: |
-            kubectl create secret tls test-certs \
-              --insecure-skip-tls-verify \
-              --certificate-authority=$CERTS/ca.crt \
-              --cert=$CERTS/tls.crt \
-              --key=$CERTS/tls.key
+            kubectl -n vault create secret generic test-certs \
+              --from-file=ca.crt=$CERTS/ca.crt \
+              --from-file=tls.crt=$CERTS/tls.crt \
+              --from-file=tls.key=$CERTS/tls.key
       - run:
           name: Deploy vault
           command: |

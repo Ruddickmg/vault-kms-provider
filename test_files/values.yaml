@@ -1,11 +1,15 @@
 logging:
   level: debug
 
-vault:
-  ca:
+volumes:
+  - name: vault-ca-certificate
     secret:
-      enabled: true
-      name: test-certs
+      secretName: test-certs
+
+volumeMounts:
+  - name: vault-ca-certificate
+    mountPath: /etc/ssl/certs
+    readOnly: true
 
 role:
   name: vault-kms-access
