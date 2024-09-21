@@ -1,11 +1,13 @@
 injector:
   enabled: false
 global:
+  enabled: true
   tlsDisable: false
 server:
   extraEnvironmentVars:
+    VAULT_DEV_LISTEN_ADDRESS: http://127.0.0.1:8400
     VAULT_CACERT: /vault/userconfig/test-certs/ca.crt
-    VAULT_ADDR: https://127.0.0.1:8200
+#    VAULT_ADDR: https://127.0.0.1:8200
   extraVolumes:
     - type: secret
       name: test-certs
@@ -17,7 +19,7 @@ server:
       listener "tcp" {
         address = "[::]:8200"
         cluster_address = "[::]:8201"
-        tls_disable = false
+        tls_disable = 0
         tls_cert_file = "/vault/userconfig/test-certs/tls.crt"
         tls_key_file = "/vault/userconfig/test-certs/tls.key"
       }
