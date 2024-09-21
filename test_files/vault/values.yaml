@@ -5,7 +5,6 @@ global:
 server:
   extraEnvironmentVars:
     VAULT_CACERT: /vault/userconfig/test-certs/ca.crt
-    VAULT_ADDR: https://127.0.0.1:8200
   extraVolumes:
     - type: secret
       name: test-certs
@@ -18,4 +17,7 @@ config: |
     tls_disable = false
     tls_cert_file = "/vault/userconfig/test-certs/tls.crt"
     tls_key_file = "/vault/userconfig/test-certs/tls.key"
+  }
+  storage "file" {
+    path = "/vault/data"
   }
