@@ -26,7 +26,7 @@ impl TlsConfiguration {
             }
         }
         info!("CA certificates to import: {:?}", certs);
-        certs.iter().for_each(| cert | {
+        certs.iter().for_each(|cert| {
             debug!("cert: \n{}", fs::read_to_string(cert).unwrap());
         });
         certs
@@ -54,22 +54,14 @@ mod tls_certificate_tests {
     use super::*;
 
     #[test]
-    pub fn gets_all_certs_located_in_a_directory_path() -> () {
-
-    }
+    pub fn gets_all_certs_located_in_a_directory_path() -> () {}
 
     #[test]
-    pub fn gets_a_specified_cert_file_path() -> () {
-
-    }
+    pub fn gets_a_specified_cert_file_path() -> () {}
 
     #[test]
-    pub fn will_not_create_duplicate_file_paths() -> () {
-
-    }
+    pub fn will_not_create_duplicate_file_paths() -> () {}
 
     #[test]
-    pub fn will_combine_files_from_directory_with_specific_files_if_both_are_defined() -> () {
-
-    }
+    pub fn will_combine_files_from_directory_with_specific_files_if_both_are_defined() -> () {}
 }
