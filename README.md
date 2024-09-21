@@ -126,8 +126,8 @@ Tls is enabled by setting environment variables that point to the relevant certi
 
 ```shell
 # Defines the path to a ca certificate file
-VAULT_CACERT="/path/to/cert/file.crt"
+VAULT_CA_CERT="/path/to/cert/file.crt"
 
 # Defines the path to a directory containing ca certificate file
-VAULT_CAPATH="/path/to/cert/directory"
+VAULT_CA_PATH="/path/to/cert/directory"
 ```

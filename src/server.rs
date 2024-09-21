@@ -8,6 +8,7 @@ use lib::{
 };
 use tokio::join;
 use tonic::transport::Server;
+use lib::configuration::tls;
 
 mod checks;
 
@@ -17,10 +18,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let socket_config = SocketConfiguration::new();
     let socket = create_unix_socket(&socket_config.socket_path, socket_config.permissions)?;
     let vault_config = VaultConfiguration::new();
+    let tls_config = tls::TlsConfiguration::new();
     let vault_kms_server = vault::VaultKmsServer::new(
         &vault_config.vault_transit_key,
         &vault_config.vault_address,
         &vault_config.vault_role,
+        &tls_config.certs(),
     );
     vault_kms_server.initialize().await?;
     let (server, health_checks) = join!(

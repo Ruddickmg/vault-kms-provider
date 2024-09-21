@@ -26,7 +26,8 @@ services:
     environment:
       VAULT_ADDRESS: https://vault:8400
       VAULT_TOKEN: SiQOECxwSDCeQt1r0n5kqQCr
-      VAULT_CACERT: /etc/ssl/certs/ca.crt
+      VAULT_CA_PATH: /etc/ssl/certs
+      VAULT_CA_CERT: /etc/ssl/certs/ca.crt
       SOCKET_PATH: /sockets/vault-kms-provider.sock
       LOG_LEVEL: info
     build:

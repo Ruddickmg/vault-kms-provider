@@ -14,8 +14,8 @@ data:
   VAULT_TOKEN_PATH: "{{ .Values.serviceAccount.token.path }}/{{ .Values.serviceAccount.token.name }}"
   {{- end }}
   {{- if .Values.vault.ca.file }}
-  VAULT_CACERT: {{ .Values.vault.ca.file }}
+  VAULT_CA_CERT: {{ .Values.vault.ca.file }}
   {{- end }}
   {{- if .Values.vault.ca.directory }}
-  VAULT_CAPATH: {{ .Values.vault.ca.directory }}
+  VAULT_CA_PATH: {{ .Values.vault.ca.directory }}
   {{- end }}

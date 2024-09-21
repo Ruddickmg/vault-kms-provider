@@ -38,6 +38,7 @@ pub struct VaultKmsServer {
     role: String,
     address: String,
     key_name: String,
+    certificates: Vec<String>,
 }
 
 impl VaultKmsServer {
@@ -45,6 +46,7 @@ impl VaultKmsServer {
     async fn request_token_from_vault(&self, jwt: &str) -> Result<String, ClientError> {
         let vault_settings = client::VaultClientSettingsBuilder::default()
             .address(&self.address)
+            .ca_certs(self.certificates.clone())
             .build()
             .unwrap();
         let client = client::VaultClient::new(vault_settings).unwrap();
@@ -102,6 +104,7 @@ impl VaultKmsServer {
         let token = self.get_token().await?;
         let vault_settings = client::VaultClientSettingsBuilder::default()
             .address(&self.address)
+            .ca_certs(self.certificates.clone())
             .token(token)
             .build()
             .unwrap();
@@ -109,11 +112,12 @@ impl VaultKmsServer {
     }
 
     #[instrument]
-    pub fn new(name: &str, address: &str, role: &str) -> Self {
+    pub fn new(name: &str, address: &str, role: &str, certs: &Vec<String>) -> Self {
         VaultKmsServer {
             role: role.to_string(),
             address: address.to_string(),
             key_name: name.to_string(),
+            certificates: certs.clone(),
         }
     }
 
