@@ -392,8 +392,8 @@ jobs:
             helm upgrade vault hashicorp/vault -n vault -f test_files/vault/values.yaml \
               --set "server.extraEnvironmentVars.VAULT_TOKEN=$(cat keys.json | jq -r .root_token)"
       - run:
-          name: Wait for startup
-          command: sleep 10
+          name: Restart vault
+          command: kubectl delete pod vault-0 -n vault
       - run:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
