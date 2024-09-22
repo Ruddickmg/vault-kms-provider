@@ -120,7 +120,7 @@ helm test vault-kms-provider
 
 ## Tls
 
-Tls is enabled by setting environment variables that point to the relevant certificate files required to enable tls.
+Tls is enabled by setting environment variables that point to the relevant certificate files required for tls.
 
 ###  environment variables
 
