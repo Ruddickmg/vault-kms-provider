@@ -170,13 +170,9 @@ jobs:
             - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
       - checkout
       - run:
-          name: Remove git url replacement
-          command:  git config --global --unset url.https://github.com.insteadof
-      - run:
           name: Configure git
           command: |
             git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
-            git config --global url.https://github.com.insteadof ssh://git@github.com
             git config --global user.email "ruddickmg@gmail.com"
             git config --global user.name "Marcus Ruddick"
       - run:
@@ -192,6 +188,9 @@ jobs:
               --owner $CIRCLE_PROJECT_USERNAME \
               --release-name-template "v{{ .Version }}" \
               --token $GITHUB_TOKEN
+      - run:
+          name: Remove git url replacement
+          command:  git config --global --unset url.https://github.com.insteadof
       - run:
           name: Add chart to gh-pages
           command: |
