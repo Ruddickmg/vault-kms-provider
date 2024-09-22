@@ -119,9 +119,7 @@ workflows:
           requires:
             - publish-latest-manifest
 
-      - document:
-          requires:
-            - release
+      - document
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
