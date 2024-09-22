@@ -382,11 +382,6 @@ jobs:
           name: Initialize vault
           command: kubectl -n vault exec vault-0 -- vault operator init -key-shares=1 -key-threshold=1 -format="json" > keys.json
       - run:
-          name: Unseal vault
-          command: |
-            export UNSEAL_KEY=$(cat keys.json | jq -r .unseal_keys_b64[0]);
-            kubectl -n vault exec vault-0 -- vault operator unseal $UNSEAL_KEY
-      - run:
           name: Set vault token
           command: |
             helm upgrade vault hashicorp/vault -n vault -f test_files/vault/values.yaml \
@@ -398,7 +393,7 @@ jobs:
           name: Wait for vault startup
           command: sleep 5
       - run:
-          name: Unseal vault after restart
+          name: Unseal vault
           command: |
             export UNSEAL_KEY=$(cat keys.json | jq -r .unseal_keys_b64[0]);
             kubectl -n vault exec vault-0 -- vault operator unseal $UNSEAL_KEY
