@@ -1,6 +1,6 @@
 [package]
 name = "vault_kms_provider"
-version = "0.3.2"
+version = "0.4.0"
 edition = "2021"
 
 [dependencies]
@@ -13,7 +13,7 @@ hyper = { version = "1.4.1", features = ["http1", "server"] }
 prost = "0.13.1"
 prost-derive = "0.13.1"
 tokio = { version = "1.39.2", features = ["macros", "rt-multi-thread"] }
-tokio-stream = { version = "0.1.15", features = ["net"]}
+tokio-stream = { version = "0.1.15", features = ["net"] }
 tonic = "0.12.1"
 tower = "0.4.13"
 tracing = "0.1.40"

@@ -7,9 +7,15 @@ data:
   LOG_FORMAT: "{{ .Values.logging.format }}"
   SOCKET_PATH: "{{ .Values.socket.path }}/{{ .Values.socket.name }}"
   SOCKET_PERMISSIONS: "{{ .Values.socket.permissions }}"
-  {{- if and .Values.serviceAccount.token.path .Values.serviceAccount.token.name }}
-  VAULT_TOKEN_PATH: "{{ .Values.serviceAccount.token.path }}/{{ .Values.serviceAccount.token.name }}"
-  {{- end }}
   VAULT_ADDRESS: "{{ .Values.vault.address }}"
   VAULT_TRANSIT_KEY: "{{ .Values.vault.transitKey }}"
   HTTP_ADDRESS: "{{ .Values.service.host }}:{{ .Values.service.port }}"
+  {{- if and .Values.serviceAccount.token.path .Values.serviceAccount.token.name }}
+  VAULT_TOKEN_PATH: "{{ .Values.serviceAccount.token.path }}/{{ .Values.serviceAccount.token.name }}"
+  {{- end }}
+  {{- if .Values.vault.ca.file }}
+  VAULT_CA_CERT: {{ .Values.vault.ca.file }}
+  {{- end }}
+  {{- if .Values.vault.ca.directory }}
+  VAULT_CA_PATH: {{ .Values.vault.ca.directory }}
+  {{- end }}

@@ -325,13 +325,13 @@ jobs:
       SOCKET_FILE: /mnt/vault-kms-provider.sock
       ENCRYPTION_CONFIG: /tmp/encryption/configuration.yaml
       K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
-      K3S_DATASTORE_CAFILE: /tmp/certs/server.crt
-      K3S_DATASTORE_CERTFILE: /tmp/certs/client.crt
-      K3S_DATASTORE_KEYFILE: /tmp/certs/client.key
+      K3S_DATASTORE_CAFILE: /tmp/certs/ca.crt
+      K3S_DATASTORE_CERTFILE: /tmp/certs/tls.crt
+      K3S_DATASTORE_KEYFILE: /tmp/certs/tls.key
       ETCDCTL_ENDPOINTS: https://127.0.0.1:2379
-      ETCDCTL_CACERT: /tmp/certs/server.crt
-      ETCDCTL_CERT: /tmp/certs/client.crt
-      ETCDCTL_KEY: /tmp/certs/client.key
+      ETCDCTL_CACERT: /tmp/certs/ca.crt
+      ETCDCTL_CERT: /tmp/certs/tls.crt
+      ETCDCTL_KEY: /tmp/certs/tls.key
       ETCDCTL_API: 3
       CERTS: /tmp/certs
     steps:
@@ -343,11 +343,11 @@ jobs:
       - run:
           name: Set up certificates
           command: |
-            cp -r ./helm/test_files/certs $CERTS
+            cp -r ./test_files/certs $CERTS
             ls $CERTS
       - run:
           name: Run etcd
-          command: docker compose -f ./helm/test_files/docker-compose.etcd.yml up -d
+          command: docker compose -f ./test_files/docker-compose.etcd.yml up -d
       - run:
           name: Create encryption configuration file
           command: |
@@ -363,15 +363,40 @@ jobs:
           name: Grant permissions on kube config
           command: sudo chown $USER:$USER $KUBECONFIG
       - run:
+          name: Create tls secret
+          command: |
+            kubectl create namespace vault
+            kubectl -n vault create secret generic test-certs \
+              --from-file=ca.crt=$CERTS/ca.crt \
+              --from-file=tls.crt=$CERTS/tls.crt \
+              --from-file=tls.key=$CERTS/tls.key
+      - run:
           name: Deploy vault
           command: |
             helm repo add hashicorp https://helm.releases.hashicorp.com
-            helm install vault hashicorp/vault -n vault --create-namespace \
-              --set "injector.enabled=false" \
-              --set "server.dev.enabled=true"
+            helm install vault hashicorp/vault -n vault --create-namespace -f test_files/vault/values.yaml
       - run:
           name: Wait for vault startup
           command: sleep 35
+      - run:
+          name: Initialize vault
+          command: kubectl -n vault exec vault-0 -- vault operator init -key-shares=1 -key-threshold=1 -format="json" > keys.json
+      - run:
+          name: Set vault token
+          command: |
+            helm upgrade vault hashicorp/vault -n vault -f test_files/vault/values.yaml \
+              --set "server.extraEnvironmentVars.VAULT_TOKEN=$(cat keys.json | jq -r .root_token)"
+      - run:
+          name: Restart vault
+          command: kubectl delete pod vault-0 -n vault
+      - run:
+          name: Wait for vault startup
+          command: sleep 5
+      - run:
+          name: Unseal vault
+          command: |
+            export UNSEAL_KEY=$(cat keys.json | jq -r .unseal_keys_b64[0]);
+            kubectl -n vault exec vault-0 -- vault operator unseal $UNSEAL_KEY
       - run:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
@@ -384,8 +409,7 @@ jobs:
             kubectl -n vault exec vault-0 -- vault policy read $TRANSIT_POLICY
       - run:
           name: Enable authentication
-          command: |
-            kubectl -n vault exec vault-0 -- vault auth enable kubernetes
+          command: kubectl -n vault exec vault-0 -- vault auth enable kubernetes
       - run:
           name: Configure authentication
           command: |
@@ -409,13 +433,8 @@ jobs:
       - run:
           name: Deploy vault-kms-provider
           command: |
-            helm install vault-kms-provider ./helm -n vault \
-              --set "vault.address=http://vault.vault.svc.cluster.local:8200" \
-              --set "image.tag=$(cat /tmp/workspace/docker_tag)" \
-              --set "role.rules[0].apiGroups={}" \
-              --set "role.rules[0].resources={secrets}" \
-              --set "role.rules[0].verbs={get,create}" \
-              --set "logging.level=debug"
+            helm install vault-kms-provider ./helm -n vault -f test_files/values.yaml \
+              --set "image.tag=$(cat /tmp/workspace/docker_tag)"
       - run:
           name: Wait for vault-kms-provider startup
           command: sleep 35

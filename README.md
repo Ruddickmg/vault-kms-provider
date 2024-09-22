@@ -32,7 +32,7 @@ See usage [documentation here](https://vault-kms-provider.io/)
 - [ ] Cache vault token
 - [ ] Update vault token on mounted jwt file changes
 - [x] Create a docs page on github pages
-- [ ] Allow Tls for http communication
+- [x] Allow Tls for http communication
 - [x] Document manual integration steps
 - [x] Create Helm Chart for easy deployment
 - [x] Set up helm char repository via GitHub pages
@@ -84,6 +84,12 @@ Then finally you can run the integration tests with the following command
 cargo test --test *
 ```
 
+> [!NOTE]
+> you can output logs for debugging vault into console by running the following command
+> ```shell
+> docker compose exec vault vault audit enable file file_path=stdout
+> ```
+
 ### End to end
 End to end tests are implemented using helm's testing library, you can find the tests themselves in the `helm/templates/tests` directory. There are also some files used for testing located in the `helm/test_files` directory.
 
@@ -102,9 +108,26 @@ The parameters we set here are giving the tests the ability to create and modify
 #### Etcd
 The tests expect there to be an etcd backend for them to access in order to confirm the stored data (secrets) is encrypted. There are too many potential k8s tools to cover how to make this work, but you may look to this repositories circleci config for examples on how to set one up if your brand of k8s does not use etcd. Either way, you will need to be sure the tests have access to an etcd backend to retrieve the data stored by k8s.
 
+The tests will need to be able to make requests to etcd. In order to communicate over tls, you will need to point to tls certificates that can verify communication with Etcd. The tests run by helm will mount a volume at `/tmp/certs` where it will look for three files:
+`ca.crt`, `tls.crt`, and `tls.key`. With these certificates in place the tests should run fine over tls.
+
 #### Running helm test
 
 Once the vault KMS provider has been set up, you can run the tests with the following command:
 ```shell
 helm test vault-kms-provider
+```
+
+## Tls
+
+Tls is enabled by setting environment variables that point to the relevant certificate files required for tls.
+
+###  environment variables
+
+```shell
+# Defines the path to a ca certificate file
+VAULT_CA_CERT="/path/to/cert/file.crt"
+
+# Defines the path to a directory containing ca certificate file
+VAULT_CA_PATH="/path/to/cert/directory"
 ```

@@ -5,33 +5,6 @@ image:
   pullPolicy: IfNotPresent
   tag: latest
 
-logging:
-  level: "info"
-  format: "json"
-
-configMap:
-  name: vault-kms-provider-configuration
-
-nodeLabel:
-  key: &labelKey node-role.kubernetes.io/control-plane
-  value: &labelValue "true"
-
-socket:
-  name: vault-kms-provider.sock
-  path: &socketPath /run/sockets
-  hostPath: /mnt
-  permissions: any
-
-service:
-  port: &healthCheckPort 8080
-  host: 0.0.0.0
-
-socketVolume:
-  name: &volumeName vault-kms-provider-socket-volume
-  claim: &volumeClaimName socket-volume
-  storageClass: unix-socket-storage
-  size: 300mi
-
 # configurations for connecting to vault
 vault:
   # the url to the running vault instance
@@ -50,6 +23,42 @@ vault:
     name: vault-auth-token
     # the key/path within the secret where the vault token is stored
     key: token
+  # configuration for tls communication with vault
+  ca:
+    # path to CA certificate file
+    file: ""
+    # path to directory containing CA certificate file(s)
+    directory: /etc/ssl/certs
+
+# Configuration for logging
+logging:
+  # level of logs to print, can be: none, error, warn, info, debug, or trace
+  level: "info"
+  # log formats, can be: json, pretty, etc..
+  format: "json"
+
+configMap:
+  name: vault-kms-provider-configuration
+
+nodeLabel:
+  key: &labelKey node-role.kubernetes.io/control-plane
+  value: &labelValue "true"
+
+socket:
+  name: vault-kms-provider.sock
+  path: /run/sockets
+  hostPath: /mnt
+  permissions: any
+
+service:
+  port: &healthCheckPort 8080
+  host: 0.0.0.0
+
+socketVolume:
+  name: vault-kms-provider-socket-volume
+  claim: socket-volume
+  storageClass: unix-socket-storage
+  size: 300mi
 
 nodeSelector:
   *labelKey: *labelValue
@@ -62,15 +71,6 @@ tolerations:
 
 local:
   path: /mnt
-
-volumes:
-  - name: *volumeName
-    persistentVolumeClaim:
-      claimName: *volumeClaimName
-
-volumeMounts:
-  - mountPath: *socketPath
-    name: *volumeName
 
 priorityClassName: system-cluster-critical
 
@@ -128,6 +128,8 @@ encryption:
   fallback: true
   enabled: true
 
+volumes: {}
+volumeMounts: {}
 podAnnotations: {}
 podLabels: {}
 affinity: {}

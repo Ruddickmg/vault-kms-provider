@@ -22,15 +22,14 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.volumes }}
       volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- if .Values.serviceAccount.create }}
-        {{- if and .Values.serviceAccount.token.name .Values.serviceAccount.token.path }}
-          {{- if not .Values.volumes }}
-      volumes:
-          {{- end  }}
+        - name: {{ .Values.socketVolume.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.socketVolume.claim }}
+        {{- if .Values.volumes }}
+          {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
+        {{- if and (and .Values.serviceAccount.create .Values.serviceAccount.token.name) .Values.serviceAccount.token.path }}
         - name: {{ .Values.serviceAccount.token.name }}
           projected:
             sources:
@@ -39,6 +38,7 @@ spec:
                   expirationSeconds: 3600
                   audience: vault
         {{- end }}
+      {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
       {{- end }}
@@ -68,14 +68,13 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Values.configMap.name }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- if and .Values.serviceAccount.token.name .Values.serviceAccount.token.path }}
-            {{- if not .Values.volumeMounts }}
-          volumeMounts:
+            - name: {{ .Values.socketVolume.name }}
+              mountPath: {{ .Values.socket.path }}
+            {{- if .Values.volumeMounts }}
+            {{- .Values.volumeMounts | toYaml | nindent 12 }}
             {{- end }}
-            - mountPath: {{ .Values.serviceAccount.token.path }}
-              name: {{ .Values.serviceAccount.token.name }}
-          {{- end }}
+            {{- if and .Values.serviceAccount.token.name .Values.serviceAccount.token.path }}
+            - name: {{ .Values.serviceAccount.token.name }}
+              mountPath: {{ .Values.serviceAccount.token.path }}
+            {{- end }}

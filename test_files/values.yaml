@@ -1,0 +1,24 @@
+logging:
+  level: debug
+
+vault:
+  ca:
+    file: /etc/ssl/certs/ca.crt
+    directory: ""
+
+volumes:
+  - name: vault-ca-certificate
+    secret:
+      secretName: test-certs
+
+volumeMounts:
+  - name: vault-ca-certificate
+    mountPath: /etc/ssl/certs
+    readOnly: true
+
+role:
+  name: vault-kms-access
+  rules:
+    - apiGroups: [""]
+      resources: ["secrets"]
+      verbs: ["get", "create"]
