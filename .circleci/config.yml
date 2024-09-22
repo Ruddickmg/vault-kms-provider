@@ -398,6 +398,11 @@ jobs:
           name: Wait for vault startup
           command: sleep 5
       - run:
+          name: Unseal vault after restart
+          command: |
+            export UNSEAL_KEY=$(cat keys.json | jq -r .unseal_keys_b64[0]);
+            kubectl -n vault exec vault-0 -- vault operator unseal $UNSEAL_KEY
+      - run:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
       - run:
@@ -409,8 +414,7 @@ jobs:
             kubectl -n vault exec vault-0 -- vault policy read $TRANSIT_POLICY
       - run:
           name: Enable authentication
-          command: |
-            kubectl -n vault exec vault-0 -- vault auth enable kubernetes
+          command: kubectl -n vault exec vault-0 -- vault auth enable kubernetes
       - run:
           name: Configure authentication
           command: |
