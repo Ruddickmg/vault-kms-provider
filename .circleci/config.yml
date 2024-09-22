@@ -137,7 +137,6 @@ jobs:
           path: ~/app
       - run:
           name: Configure git
-          # ssh://git@github.com/Ruddickmg/vault-kms-provider.git
           command: |
             git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
             git config --global user.email "ruddickmg@gmail.com"
@@ -196,7 +195,6 @@ jobs:
           command: |
             mkdir .cr-index
             cr index --push \
-              --git-config
               --git-repo $CIRCLE_PROJECT_REPONAME \
               --owner $CIRCLE_PROJECT_USERNAME \
               --release-name-template "v{{ .Version }}" \
