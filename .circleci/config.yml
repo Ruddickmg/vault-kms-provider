@@ -83,34 +83,19 @@ workflows:
       - publish-arm:
           requires:
             - generate_tag
-            - check_version
-            - chart_formatting
-            - check_formatting
-            - build
-            - unit_tests
-            - integration_tests
           context:
             - dockerhub
-
       - publish-amd:
           requires:
             - generate_tag
-            - check_version
-            - check_formatting
-            - chart_formatting
-            - build
-            - unit_tests
-            - integration_tests
           context:
             - dockerhub
-
       - publish-manifest:
           context:
             - dockerhub
           requires:
             - publish-amd
             - publish-arm
-
       - publish-manifest:
           name: publish-latest-manifest
           tag: latest
@@ -121,20 +106,27 @@ workflows:
           context:
             - dockerhub
           requires:
+            - generate_tag
+            - check_version
+            - chart_formatting
+            - check_formatting
+            - build
+            - unit_tests
+            - integration_tests
             - e2e_tests
 
       - release:
           requires:
             - publish-latest-manifest
 
-      - documentation:
+      - document:
           requires:
             - release
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
-  documentation:
+  document:
     executor: node
     working_directory: ~/app/documentation
     steps:
@@ -190,6 +182,7 @@ jobs:
       - run:
           name: Release chart
           command: |
+            git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
             cr upload --generate-release-notes --skip-existing \
               --commit $CIRCLE_BRANCH \
               --git-repo $CIRCLE_PROJECT_REPONAME \
@@ -199,6 +192,7 @@ jobs:
       - run:
           name: Add chart to gh-pages
           command: |
+            git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
             mkdir .cr-index
             cr index --push \
               --git-repo $CIRCLE_PROJECT_REPONAME \
