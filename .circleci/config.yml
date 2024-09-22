@@ -395,6 +395,9 @@ jobs:
           name: Restart vault
           command: kubectl delete pod vault-0 -n vault
       - run:
+          name: Wait for vault startup
+          command: sleep 5
+      - run:
           name: Enable transit
           command: kubectl -n vault exec vault-0 -- vault secrets enable transit
       - run:
