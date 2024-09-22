@@ -190,7 +190,9 @@ jobs:
               --token $GITHUB_TOKEN
       - run:
           name: Remove git url replacement
-          command:  git config --global --unset url.https://github.com.insteadof
+          command:  |
+            git config --global --unset url.https://github.com.insteadof || true
+            git config --list
       - run:
           name: Add chart to gh-pages
           command: |
