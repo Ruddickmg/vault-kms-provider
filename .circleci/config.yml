@@ -81,36 +81,17 @@ workflows:
               ignore:
                 - main
       - publish-arm:
-          requires:
-            - generate_tag
-            - check_version
-            - chart_formatting
-            - check_formatting
-            - build
-            - unit_tests
-            - integration_tests
           context:
             - dockerhub
-
       - publish-amd:
-          requires:
-            - generate_tag
-            - check_version
-            - check_formatting
-            - chart_formatting
-            - build
-            - unit_tests
-            - integration_tests
           context:
             - dockerhub
-
       - publish-manifest:
           context:
             - dockerhub
           requires:
             - publish-amd
             - publish-arm
-
       - publish-manifest:
           name: publish-latest-manifest
           tag: latest
@@ -121,6 +102,13 @@ workflows:
           context:
             - dockerhub
           requires:
+            - generate_tag
+            - check_version
+            - chart_formatting
+            - check_formatting
+            - build
+            - unit_tests
+            - integration_tests
             - e2e_tests
 
       - release:
