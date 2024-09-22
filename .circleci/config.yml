@@ -170,12 +170,10 @@ jobs:
             - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
       - checkout
       - run:
-          name: Remove git url replacement
-          command: git config --global --unset url.ssh://git@github.com.insteadof=https://github.com
-      - run:
           name: Configure git
           command: |
             git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
+            git config --global url.https://github.com.insteadof ssh://git@github.com
             git config --global user.email "ruddickmg@gmail.com"
             git config --global user.name "Marcus Ruddick"
       - run:
