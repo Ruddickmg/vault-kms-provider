@@ -127,14 +127,14 @@ workflows:
           requires:
             - publish-latest-manifest
 
-      - documentation:
+      - document:
           requires:
             - release
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
-  documentation:
+  document:
     executor: node
     working_directory: ~/app/documentation
     steps:
@@ -190,6 +190,7 @@ jobs:
       - run:
           name: Release chart
           command: |
+            git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
             cr upload --generate-release-notes --skip-existing \
               --commit $CIRCLE_BRANCH \
               --git-repo $CIRCLE_PROJECT_REPONAME \
@@ -199,6 +200,7 @@ jobs:
       - run:
           name: Add chart to gh-pages
           command: |
+            git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
             mkdir .cr-index
             cr index --push \
               --git-repo $CIRCLE_PROJECT_REPONAME \
