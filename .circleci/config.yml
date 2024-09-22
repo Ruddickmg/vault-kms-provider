@@ -170,6 +170,9 @@ jobs:
             - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
       - checkout
       - run:
+          name: Remove git url replacement
+          command:  git config --global --unset url.https://github.com.insteadof
+      - run:
           name: Configure git
           command: |
             git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
