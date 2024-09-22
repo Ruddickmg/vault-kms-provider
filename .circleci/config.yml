@@ -99,10 +99,10 @@ workflows:
       - publish-manifest:
           name: publish-latest-manifest
           tag: latest
-          filters:
-            branches:
-              only:
-                - main
+#          filters:
+#            branches:
+#              only:
+#                - main
           context:
             - dockerhub
           requires:
@@ -137,7 +137,6 @@ jobs:
           path: ~/app
       - run:
           name: Configure git
-          # ssh://git@github.com/Ruddickmg/vault-kms-provider.git
           command: |
             git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
             git config --global user.email "ruddickmg@gmail.com"
@@ -174,8 +173,7 @@ jobs:
           name: Configure git
           command: |
             git remote set-url origin https://github.com/Ruddickmg/vault-kms-provider.git
-            git config --global --unset url.ssh://git@github.com.insteadof=https://github.com
-            git config --global url.https://github.com.insteadOf ssh://git@github.com
+            git config --global --unset url.ssh://git@github.com.insteadof
             git config --global user.email "ruddickmg@gmail.com"
             git config --global user.name "Marcus Ruddick"
       - run:
@@ -196,7 +194,6 @@ jobs:
           command: |
             mkdir .cr-index
             cr index --push \
-              --git-config
               --git-repo $CIRCLE_PROJECT_REPONAME \
               --owner $CIRCLE_PROJECT_USERNAME \
               --release-name-template "v{{ .Version }}" \
