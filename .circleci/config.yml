@@ -191,7 +191,7 @@ jobs:
       - run:
           name: Remove git url replacement
           command:  |
-            git config --global --unset url.https://github.com.insteadof || true
+            git config --global --unset url.ssh://git@github.com.insteadof || true
             git config --list
       - run:
           name: Add chart to gh-pages
