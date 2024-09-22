@@ -81,9 +81,13 @@ workflows:
               ignore:
                 - main
       - publish-arm:
+          requires:
+            - generate_tag
           context:
             - dockerhub
       - publish-amd:
+          requires:
+            - generate_tag
           context:
             - dockerhub
       - publish-manifest:
