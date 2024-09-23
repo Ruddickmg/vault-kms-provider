@@ -9,6 +9,7 @@ use lib::{
 };
 use tokio::join;
 use tonic::transport::Server;
+use lib::utilities::watcher;
 
 mod checks;
 
@@ -26,13 +27,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         &tls_config.certs(),
     );
     vault_kms_server.initialize().await?;
-    let (server, health_checks) = join!(
+    let (server, health_checks, watch) = join!(
         Server::builder()
             .add_service(KeyManagementServiceServer::new(vault_kms_server))
             .serve_with_incoming(socket),
-        checks::serve()
+        checks::serve(),
+        watcher::watch("test_files/hello.ts")
     );
     server?;
     health_checks?;
+    watch?;
     Ok(())
 }
