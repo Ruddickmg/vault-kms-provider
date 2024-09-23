@@ -1,6 +1,6 @@
+mod client;
 mod keys;
 mod service;
-mod client;
 
 pub use client::Client;
 

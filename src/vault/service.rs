@@ -4,11 +4,11 @@ use crate::kms::{
 };
 use crate::vault::client;
 use base64::{prelude::BASE64_STANDARD, Engine};
+use std::sync::Arc;
 use std::{collections::HashMap, io::ErrorKind, string::ToString};
+use tokio::sync::RwLock;
 use tonic::{Code, Request, Response, Status};
 use tracing::{debug, info, instrument};
-use tokio::sync::RwLock;
-use std::sync::{Arc};
 
 const OKAY_RESPONSE: &str = "ok";
 
@@ -24,8 +24,12 @@ impl VaultKmsServer {
     #[instrument(skip(self))]
     pub async fn initialize(&self) -> Result<(), std::io::Error> {
         let mut client = self.client.write().await;
-        client.refresh_token().await.map_err(|e| std::io::Error::other(e.to_string()))?;
-        client.request_encryption(&BASE64_STANDARD.encode("initialize".as_bytes()))
+        client
+            .refresh_token()
+            .await
+            .map_err(|e| std::io::Error::other(e.to_string()))?;
+        client
+            .request_encryption(&BASE64_STANDARD.encode("initialize".as_bytes()))
             .await
             .map_err(|error| {
                 let error = format!("Failed to initialize: {}", error.0.to_string());

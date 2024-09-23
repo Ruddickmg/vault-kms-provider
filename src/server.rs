@@ -22,10 +22,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let vault_config = VaultConfiguration::new();
     let tls_config = tls::TlsConfiguration::new();
     let settings = VaultClientSettingsBuilder::default()
-      .address(&vault_config.vault_address)
-      .ca_certs(tls_config.certs())
-      .build()?;
-    let client = Arc::new(RwLock::new(vault::Client::new(VaultClient::new(settings).unwrap(), &vault_config)));
+        .address(&vault_config.vault_address)
+        .ca_certs(tls_config.certs())
+        .build()?;
+    let client = Arc::new(RwLock::new(vault::Client::new(
+        VaultClient::new(settings).unwrap(),
+        &vault_config,
+    )));
     let vault_kms_server = vault::VaultKmsServer::new(client.clone());
     vault_kms_server.initialize().await?;
     let (server, health_checks, watch) = join!(
