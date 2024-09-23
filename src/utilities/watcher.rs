@@ -1,3 +1,5 @@
+use std::sync::{Arc};
+use tokio::sync::RwLock;
 use futures::{
     channel::mpsc::{channel, Receiver},
     SinkExt,
@@ -7,6 +9,7 @@ use notify::EventKind::Access;
 use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
 use tokio_stream::StreamExt;
 use tracing::info;
+use crate::vault::Client;
 
 pub fn async_watcher() -> notify::Result<(RecommendedWatcher, Receiver<notify::Result<Event>>)> {
     let (mut tx, rx) = channel(1);
@@ -21,10 +24,7 @@ pub fn async_watcher() -> notify::Result<(RecommendedWatcher, Receiver<notify::R
     Ok((watcher, rx))
 }
 
-pub async fn watch<F>(path_to_watch: Option<String>, update: F) -> Result<(), std::io::Error>
-where
-  F: Fn() -> (),
-{
+pub async fn watch(path_to_watch: Option<String>, client: Arc<RwLock<Client>>) -> Result<(), std::io::Error> {
     if let Some(path) = path_to_watch {
         let (mut watcher, mut rx) = async_watcher().unwrap();
         watcher
@@ -37,7 +37,7 @@ where
                     "Refreshing token due to updated JWT at path: {}",
                     event.paths.pop().unwrap().to_str().unwrap()
                 );
-                    update()
+                    client.write().await.refresh_token().await.map_err(|e| std::io::Error::other(e.to_string()))?;
                 }
             }
         }

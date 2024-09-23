@@ -7,8 +7,8 @@ use lib::{
     vault,
 };
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::join;
+use tokio::sync::RwLock;
 use tonic::transport::Server;
 use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
 
@@ -17,7 +17,6 @@ mod checks;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     logging::initialize();
-    let rotate_token: Arc<AtomicBool> = Arc::new(AtomicBool::new(true));
     let socket_config = SocketConfiguration::new();
     let socket = create_unix_socket(&socket_config.socket_path, socket_config.permissions)?;
     let vault_config = VaultConfiguration::new();
@@ -26,17 +25,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
       .address(&vault_config.vault_address)
       .ca_certs(tls_config.certs())
       .build()?;
-    let client = vault::Client::new(VaultClient::new(settings).unwrap(), &vault_config, rotate_token.clone());
-    let vault_kms_server = vault::VaultKmsServer::new(client);
+    let client = Arc::new(RwLock::new(vault::Client::new(VaultClient::new(settings).unwrap(), &vault_config)));
+    let vault_kms_server = vault::VaultKmsServer::new(client.clone());
     vault_kms_server.initialize().await?;
     let (server, health_checks, watch) = join!(
         Server::builder()
             .add_service(KeyManagementServiceServer::new(vault_kms_server))
             .serve_with_incoming(socket),
         checks::serve(),
-        watcher::watch(vault_config.jwt_path.clone(), move || {
-            rotate_token.swap(true, Ordering::Relaxed);
-        }),
+        watcher::watch(vault_config.jwt_path.clone(), client),
     );
     server?;
     health_checks?;

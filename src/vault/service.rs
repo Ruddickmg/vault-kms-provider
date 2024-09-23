@@ -4,13 +4,10 @@ use crate::kms::{
 };
 use crate::vault::client;
 use base64::{prelude::BASE64_STANDARD, Engine};
-use std::{collections::HashMap, fs, io::ErrorKind, string::ToString,sync::atomic::{Ordering}};
+use std::{collections::HashMap, io::ErrorKind, string::ToString};
 use tonic::{Code, Request, Response, Status};
-use tracing::{debug, info, instrument, warn};
-use vaultrs::client::Client;
-use vaultrs::error::ClientError;
+use tracing::{debug, info, instrument};
 use tokio::sync::RwLock;
-use std::borrow::Borrow;
 use std::sync::{Arc};
 
 const OKAY_RESPONSE: &str = "ok";
@@ -20,53 +17,14 @@ pub struct VaultKmsServer {
 }
 
 impl VaultKmsServer {
-
-    #[instrument(skip(self, path))]
-    async fn request_token_with_jwt(&self, path: &str) -> Result<String, ClientError> {
-        let client = self.client.read().await;
-        let jwt = fs::read_to_string(path).map_err(|_| ClientError::FileNotFoundError {
-            path: path.to_string(),
-        })?;
-        debug!("Using mounted jwt of length: {}", jwt.len());
-        Ok(client.jwt_auth(&jwt).await?.client_token)
-    }
-
-    #[instrument(skip(self))]
-    async fn get_token(&self) -> Result<Option<String>, ClientError> {
-        let client = self.client.read().await;
-        let token = if client.rotate.load(Ordering::Relaxed) {
-            if let Some(path) = client.jwt_path.clone() {
-                Some(self.request_token_with_jwt(&path).await?)
-            } else if let Some(token) = client.token.clone() {
-                Some(token)
-            } else {
-                warn!("No token found");
-                None
-            }
-        } else {
-            None
-        };
-        client.borrow().rotate.swap(false, Ordering::Relaxed);
-        Ok(token)
-    }
-
-    #[instrument(skip(self))]
-   async fn refresh_token(&self) -> Result<(), ClientError> {
-        let mut client = self.client.write().await;
-        if let Some(token) = self.get_token().await? {
-            client.client.set_token(&token);
-        }
-        Ok(())
-    }
-
-    pub fn new(client: client::Client) -> Self {
-        Self { client: Arc::new(RwLock::new(client)) }
+    pub fn new(client: Arc<RwLock<client::Client>>) -> Self {
+        Self { client }
     }
 
     #[instrument(skip(self))]
     pub async fn initialize(&self) -> Result<(), std::io::Error> {
-        let client = self.client.read().await;
-        self.refresh_token().await.map_err(|e| std::io::Error::other(e.to_string()))?;
+        let mut client = self.client.write().await;
+        client.refresh_token().await.map_err(|e| std::io::Error::other(e.to_string()))?;
         client.request_encryption(&BASE64_STANDARD.encode("initialize".as_bytes()))
             .await
             .map_err(|error| {
@@ -83,6 +41,7 @@ impl VaultKmsServer {
 
 #[tonic::async_trait]
 impl KeyManagementService for VaultKmsServer {
+    #[instrument(skip(self, _request))]
     async fn status(
         &self,
         _request: Request<StatusRequest>,
@@ -97,6 +56,7 @@ impl KeyManagementService for VaultKmsServer {
         }))
     }
 
+    #[instrument(skip(self, request))]
     async fn decrypt(
         &self,
         request: Request<DecryptRequest>,
@@ -115,6 +75,7 @@ impl KeyManagementService for VaultKmsServer {
         response
     }
 
+    #[instrument(skip(self, request))]
     async fn encrypt(
         &self,
         request: Request<EncryptRequest>,
