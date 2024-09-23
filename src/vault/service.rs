@@ -1,41 +1,19 @@
-use crate::configuration::vault::VaultConfiguration;
 use crate::kms::{
     key_management_service_server::KeyManagementService, DecryptRequest, DecryptResponse,
     EncryptRequest, EncryptResponse, StatusRequest, StatusResponse,
 };
-use crate::vault::keys::KeyInfo;
+use crate::vault::client;
 use base64::{prelude::BASE64_STANDARD, Engine};
-use std::{collections::HashMap, fs, io::ErrorKind, string::ToString, sync::Arc, sync::atomic::{AtomicBool, Ordering}};
+use std::{collections::HashMap, fs, io::ErrorKind, string::ToString,sync::atomic::{Ordering}};
 use tonic::{Code, Request, Response, Status};
 use tracing::{debug, info, instrument, warn};
-use vaultrs::{api::AuthInfo, error::ClientError, transit, client::{Client, VaultClient}};
+use vaultrs::client::Client;
+use vaultrs::error::ClientError;
 
 const OKAY_RESPONSE: &str = "ok";
-const TRANSIT_MOUNT: &str = "transit";
-const KUBERNETES_AUTH_MOUNT: &str = "kubernetes";
-
-#[derive(Debug)]
-struct VaultError(ClientError);
-
-impl From<VaultError> for Status {
-    fn from(value: VaultError) -> Self {
-        Status::new(Code::Internal, value.0.to_string())
-    }
-}
-
-impl From<ClientError> for VaultError {
-    fn from(value: ClientError) -> Self {
-        VaultError(value)
-    }
-}
 
 pub struct VaultKmsServer {
-    role: String,
-    key_name: String,
-    token: Option<String>,
-    jwt_path: Option<String>,
-    client: VaultClient,
-    rotate: Arc<AtomicBool>
+    client: client::Client,
 }
 
 impl VaultKmsServer {
@@ -46,15 +24,15 @@ impl VaultKmsServer {
             path: path.to_string(),
         })?;
         debug!("Using mounted jwt of length: {}", jwt.len());
-        Ok(self.jwt_auth(&jwt).await?.client_token)
+        Ok(self.client.jwt_auth(&jwt).await?.client_token)
     }
 
     #[instrument(skip(self))]
     async fn get_token(&self) -> Result<Option<String>, ClientError> {
-        let token = if self.rotate.load(Ordering::Relaxed) {
-            if let Some(path) = self.jwt_path.clone() {
+        let token = if self.client.rotate.load(Ordering::Relaxed) {
+            if let Some(path) = self.client.jwt_path.clone() {
                 Some(self.request_token_with_jwt(&path).await?)
-            } else if let Some(token) = self.token.clone() {
+            } else if let Some(token) = self.client.token.clone() {
                 Some(token)
             } else {
                 warn!("No token found");
@@ -63,33 +41,26 @@ impl VaultKmsServer {
         } else {
             None
         };
-        self.rotate.swap(false, Ordering::Relaxed);
+        self.client.rotate.swap(false, Ordering::Relaxed);
         Ok(token)
     }
 
     #[instrument(skip(self))]
    async fn refresh_token(&mut self) -> Result<(), ClientError> {
         if let Some(token) = self.get_token().await? {
-            self.client.set_token(&token);
+            self.client.client.set_token(&token);
         }
         Ok(())
     }
 
-    pub fn new(client: VaultClient, config: &VaultConfiguration, rotate: Arc<AtomicBool>) -> Self {
-        Self {
-            role: config.vault_role.to_string(),
-            key_name: config.vault_transit_key.to_string(),
-            jwt_path: config.jwt_path.clone(),
-            token: config.vault_token.clone(),
-            rotate,
-            client,
-        }
+    pub fn new(client: client::Client) -> Self {
+        Self { client }
     }
 
     #[instrument(skip(self))]
     pub async fn initialize(&mut self) -> Result<(), std::io::Error> {
         self.refresh_token().await.map_err(|e| std::io::Error::other(e.to_string()))?;
-        self.request_encryption(&BASE64_STANDARD.encode("initialize".as_bytes()))
+        self.client.request_encryption(&BASE64_STANDARD.encode("initialize".as_bytes()))
             .await
             .map_err(|error| {
                 let error = format!("Failed to initialize: {}", error.0.to_string());
@@ -97,45 +68,9 @@ impl VaultKmsServer {
             })?;
         info!(
             "Encryption key: \"{}\" has been initialized in vault",
-            self.key_name
+            self.client.key_name
         );
         Ok(())
-    }
-
-    #[instrument(skip(self, jwt))]
-    async fn jwt_auth(&self, jwt: &str) -> Result<AuthInfo, ClientError> {
-        debug!("Logging in to vault as: {}", self.role);
-        Ok(vaultrs::auth::kubernetes::login(&self.client, KUBERNETES_AUTH_MOUNT, &self.role, &jwt).await?)
-    }
-
-    #[instrument(skip(self))]
-    async fn request_key(&self) -> Result<KeyInfo, VaultError> {
-        Ok(
-            transit::key::read(&self.client, TRANSIT_MOUNT, &self.key_name)
-                .await?
-                .keys
-                .into(),
-        )
-    }
-
-    #[instrument(skip(self, data))]
-    async fn request_encryption(&self, data: &str) -> Result<String, VaultError> {
-        debug!("Requesting encryption, data: {}", data);
-        Ok(
-            transit::data::encrypt(&self.client, TRANSIT_MOUNT, &self.key_name, data, None)
-                .await?
-                .ciphertext,
-        )
-    }
-
-    #[instrument(skip(self, data))]
-    async fn request_decryption(&self, data: &str) -> Result<String, VaultError> {
-        debug!("Requesting decryption, data: {}", data);
-        Ok(
-            transit::data::decrypt(&self.client, TRANSIT_MOUNT, &self.key_name, data, None)
-                .await?
-                .plaintext,
-        )
     }
 }
 
@@ -147,7 +82,7 @@ impl KeyManagementService for VaultKmsServer {
         _request: Request<StatusRequest>,
     ) -> Result<Response<StatusResponse>, Status> {
         debug!("Status request");
-        let key = self.request_key().await?;
+        let key = self.client.request_key().await?;
         Ok(Response::new(StatusResponse {
             version: key.version,
             key_id: key.id,
@@ -163,7 +98,7 @@ impl KeyManagementService for VaultKmsServer {
         info!("Decryption request");
         let encrypted = String::from_utf8(request.get_ref().ciphertext.to_vec())
             .map_err(|error| Status::new(Code::Internal, error.to_string()))?;
-        let plaintext = self.request_decryption(&encrypted).await?;
+        let plaintext = self.client.request_decryption(&encrypted).await?;
         let response = Ok(Response::new(DecryptResponse {
             plaintext: BASE64_STANDARD
                 .decode(plaintext.as_bytes())
@@ -180,8 +115,8 @@ impl KeyManagementService for VaultKmsServer {
     ) -> Result<Response<EncryptResponse>, Status> {
         info!("Encryption request");
         let encoded = BASE64_STANDARD.encode(&request.get_ref().plaintext);
-        let ciphertext = self.request_encryption(&encoded).await?;
-        let key = self.request_key().await?;
+        let ciphertext = self.client.request_encryption(&encoded).await?;
+        let key = self.client.request_key().await?;
         let response = Ok(Response::new(EncryptResponse {
             key_id: key.id,
             ciphertext: ciphertext.as_bytes().to_vec(),

@@ -10,8 +10,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::join;
 use tonic::transport::Server;
-use vaultrs::client;
-use vaultrs::client::VaultClient;
+use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
 
 mod checks;
 
@@ -23,12 +22,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let socket = create_unix_socket(&socket_config.socket_path, socket_config.permissions)?;
     let vault_config = VaultConfiguration::new();
     let tls_config = tls::TlsConfiguration::new();
-    let settings = client::VaultClientSettingsBuilder::default()
+    let settings = VaultClientSettingsBuilder::default()
       .address(&vault_config.vault_address)
       .ca_certs(tls_config.certs())
       .build()?;
-    let client = VaultClient::new(settings)?;
-    let mut vault_kms_server = vault::VaultKmsServer::new(client, &vault_config, rotate_token.clone());
+    let client = vault::Client::new(VaultClient::new(settings).unwrap(), &vault_config, rotate_token.clone());
+    let mut vault_kms_server = vault::VaultKmsServer::new(client);
     vault_kms_server.initialize().await?;
     let (server, health_checks, watch) = join!(
         Server::builder()
