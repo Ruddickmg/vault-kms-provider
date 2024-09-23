@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
       .ca_certs(tls_config.certs())
       .build()?;
     let client = vault::Client::new(VaultClient::new(settings).unwrap(), &vault_config, rotate_token.clone());
-    let mut vault_kms_server = vault::VaultKmsServer::new(client);
+    let vault_kms_server = vault::VaultKmsServer::new(client);
     vault_kms_server.initialize().await?;
     let (server, health_checks, watch) = join!(
         Server::builder()
