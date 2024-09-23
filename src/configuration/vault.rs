@@ -7,7 +7,7 @@ const DEFAULT_VAULT_ROLE: &str = "vault-kms-provider";
 pub struct VaultConfiguration {
     pub vault_role: String,
     pub vault_address: String,
-    pub vault_token_path: Option<String>,
+    pub jwt_path: Option<String>,
     pub vault_token: Option<String>,
     pub vault_transit_key: String,
 }
@@ -17,7 +17,7 @@ impl VaultConfiguration {
         Self {
             vault_role: get_env("VAULT_ROLE", DEFAULT_VAULT_ROLE),
             vault_token: get_env_option("VAULT_TOKEN"),
-            vault_token_path: get_env_option("VAULT_TOKEN_PATH"),
+            jwt_path: get_env_option("VAULT_TOKEN_PATH"),
             vault_address: get_env("VAULT_ADDRESS", DEFAULT_VAULT_ADDRESS),
             vault_transit_key: get_env("VAULT_TRANSIT_KEY", DEFAULT_VAULT_TRANSIT_KEY),
         }

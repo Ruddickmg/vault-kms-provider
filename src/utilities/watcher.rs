@@ -21,18 +21,24 @@ pub fn async_watcher() -> notify::Result<(RecommendedWatcher, Receiver<notify::R
     Ok((watcher, rx))
 }
 
-pub async fn watch(path: &str) -> Result<(), std::io::Error> {
-    let (mut watcher, mut rx) = async_watcher().unwrap();
-    watcher
-        .watch(path.as_ref(), RecursiveMode::NonRecursive)
-        .unwrap();
-    while let Some(res) = rx.next().await {
-        if let Ok(mut event) = res {
-            if event.kind == Access(AccessKind::Close(AccessMode::Write)) {
-                info!(
+pub async fn watch<F>(path_to_watch: Option<String>, update: F) -> Result<(), std::io::Error>
+where
+  F: Fn() -> (),
+{
+    if let Some(path) = path_to_watch {
+        let (mut watcher, mut rx) = async_watcher().unwrap();
+        watcher
+          .watch(path.as_ref(), RecursiveMode::NonRecursive)
+          .unwrap();
+        while let Some(res) = rx.next().await {
+            if let Ok(mut event) = res {
+                if event.kind == Access(AccessKind::Close(AccessMode::Write)) {
+                    info!(
                     "Refreshing token due to updated JWT at path: {}",
                     event.paths.pop().unwrap().to_str().unwrap()
                 );
+                    update()
+                }
             }
         }
     }

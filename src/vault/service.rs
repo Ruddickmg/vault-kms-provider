@@ -4,19 +4,11 @@ use crate::kms::{
     EncryptRequest, EncryptResponse, StatusRequest, StatusResponse,
 };
 use crate::vault::keys::KeyInfo;
-use base64::prelude::BASE64_STANDARD;
-use base64::Engine;
-use std::collections::HashMap;
-use std::fs;
-use std::io::ErrorKind;
-use std::string::ToString;
-use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use base64::{prelude::BASE64_STANDARD, Engine};
+use std::{collections::HashMap, fs, io::ErrorKind, string::ToString, sync::Arc, sync::atomic::{AtomicBool, Ordering}};
 use tonic::{Code, Request, Response, Status};
 use tracing::{debug, info, instrument, warn};
-use vaultrs::client::{Client, VaultClient, VaultClientSettingsBuilder};
-use vaultrs::{client, error::ClientError, transit};
-use vaultrs::api::AuthInfo;
+use vaultrs::{api::AuthInfo, error::ClientError, transit, client::{Client, VaultClient}};
 
 const OKAY_RESPONSE: &str = "ok";
 const TRANSIT_MOUNT: &str = "transit";
@@ -40,10 +32,9 @@ impl From<ClientError> for VaultError {
 pub struct VaultKmsServer {
     role: String,
     key_name: String,
-    address: String,
-    certificates: Vec<String>,
     token: Option<String>,
     jwt_path: Option<String>,
+    client: VaultClient,
     rotate: Arc<AtomicBool>
 }
 
@@ -72,43 +63,32 @@ impl VaultKmsServer {
         } else {
             None
         };
-        if token.is_some() {
-            self.rotate.swap(false, Ordering::Relaxed);
-        }
+        self.rotate.swap(false, Ordering::Relaxed);
         Ok(token)
     }
 
-    fn unauthenticated_client(&self) -> Result<VaultClient, ClientError> {
-        let settings = client::VaultClientSettingsBuilder::default()
-          .address(&self.address)
-          .ca_certs(self.certificates.clone())
-          .build()
-          .unwrap();
-        VaultClient::new(settings)
-    }
-
-   async fn get_client(&self) -> Result<VaultClient, ClientError> {
-        let mut client = self.unauthenticated_client()?;
+    #[instrument(skip(self))]
+   async fn refresh_token(&mut self) -> Result<(), ClientError> {
         if let Some(token) = self.get_token().await? {
-            client.set_token(&token);
+            self.client.set_token(&token);
         }
-        Ok(client)
+        Ok(())
     }
 
-    pub fn new(config: &VaultConfiguration, certificates: Vec<String>, rotate: Arc<AtomicBool>) -> Self {
+    pub fn new(client: VaultClient, config: &VaultConfiguration, rotate: Arc<AtomicBool>) -> Self {
         Self {
             role: config.vault_role.to_string(),
             key_name: config.vault_transit_key.to_string(),
-            address: config.vault_address.to_string(),
-            jwt_path: config.vault_token_path.clone(),
+            jwt_path: config.jwt_path.clone(),
             token: config.vault_token.clone(),
-            certificates,
             rotate,
+            client,
         }
     }
 
     #[instrument(skip(self))]
-    pub async fn initialize(&self) -> Result<(), std::io::Error> {
+    pub async fn initialize(&mut self) -> Result<(), std::io::Error> {
+        self.refresh_token().await.map_err(|e| std::io::Error::other(e.to_string()))?;
         self.request_encryption(&BASE64_STANDARD.encode("initialize".as_bytes()))
             .await
             .map_err(|error| {
@@ -125,13 +105,13 @@ impl VaultKmsServer {
     #[instrument(skip(self, jwt))]
     async fn jwt_auth(&self, jwt: &str) -> Result<AuthInfo, ClientError> {
         debug!("Logging in to vault as: {}", self.role);
-        Ok(vaultrs::auth::kubernetes::login(&self.unauthenticated_client()?, KUBERNETES_AUTH_MOUNT, &self.role, &jwt).await?)
+        Ok(vaultrs::auth::kubernetes::login(&self.client, KUBERNETES_AUTH_MOUNT, &self.role, &jwt).await?)
     }
 
     #[instrument(skip(self))]
     async fn request_key(&self) -> Result<KeyInfo, VaultError> {
         Ok(
-            transit::key::read(&self.get_client().await?, TRANSIT_MOUNT, &self.key_name)
+            transit::key::read(&self.client, TRANSIT_MOUNT, &self.key_name)
                 .await?
                 .keys
                 .into(),
@@ -142,7 +122,7 @@ impl VaultKmsServer {
     async fn request_encryption(&self, data: &str) -> Result<String, VaultError> {
         debug!("Requesting encryption, data: {}", data);
         Ok(
-            transit::data::encrypt(&self.get_client().await?, TRANSIT_MOUNT, &self.key_name, data, None)
+            transit::data::encrypt(&self.client, TRANSIT_MOUNT, &self.key_name, data, None)
                 .await?
                 .ciphertext,
         )
@@ -152,7 +132,7 @@ impl VaultKmsServer {
     async fn request_decryption(&self, data: &str) -> Result<String, VaultError> {
         debug!("Requesting decryption, data: {}", data);
         Ok(
-            transit::data::decrypt(&self.get_client().await?, TRANSIT_MOUNT, &self.key_name, data, None)
+            transit::data::decrypt(&self.client, TRANSIT_MOUNT, &self.key_name, data, None)
                 .await?
                 .plaintext,
         )

@@ -7,9 +7,11 @@ use lib::{
     vault,
 };
 use std::sync::Arc;
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::join;
 use tonic::transport::Server;
+use vaultrs::client;
+use vaultrs::client::VaultClient;
 
 mod checks;
 
@@ -21,14 +23,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let socket = create_unix_socket(&socket_config.socket_path, socket_config.permissions)?;
     let vault_config = VaultConfiguration::new();
     let tls_config = tls::TlsConfiguration::new();
-    let vault_kms_server = vault::VaultKmsServer::new(&vault_config, tls_config.certs(), rotate_token.clone());
+    let settings = client::VaultClientSettingsBuilder::default()
+      .address(&vault_config.vault_address)
+      .ca_certs(tls_config.certs())
+      .build()?;
+    let client = VaultClient::new(settings)?;
+    let mut vault_kms_server = vault::VaultKmsServer::new(client, &vault_config, rotate_token.clone());
     vault_kms_server.initialize().await?;
     let (server, health_checks, watch) = join!(
         Server::builder()
             .add_service(KeyManagementServiceServer::new(vault_kms_server))
             .serve_with_incoming(socket),
         checks::serve(),
-        watcher::watch("test_files/hello.ts")
+        watcher::watch(vault_config.jwt_path.clone(), move || {
+            rotate_token.swap(true, Ordering::Relaxed);
+        }),
     );
     server?;
     health_checks?;
