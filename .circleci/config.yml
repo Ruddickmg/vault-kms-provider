@@ -315,6 +315,8 @@ jobs:
 
   benchmark:
     executor: ubuntu
+    environment:
+      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
     steps:
       - checkout_write
       - run:

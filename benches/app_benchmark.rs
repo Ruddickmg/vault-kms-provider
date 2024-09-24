@@ -46,7 +46,6 @@ fn from_elem(c: &mut Criterion) {
     let rt = Runtime::new().unwrap();
 
     c.bench_with_input(BenchmarkId::new(BENCHMARK_NAME, size), &size, |b, _| {
-
         b.to_async(&rt)
             .iter(|| make_calls_to_vault_for_encryption(&text));
     });
