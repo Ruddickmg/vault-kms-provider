@@ -44,7 +44,7 @@ async fn make_calls_to_vault_for_encryption(text: &str) -> Result<(), std::io::E
 fn from_elem(c: &mut Criterion) {
     let size: usize = 1024;
 
-    c.bench_with_input(BenchmarkId::new(BENCHMARK_NAME, size), &size, |b, &s| {
+    c.bench_with_input(BenchmarkId::new(BENCHMARK_NAME, size), &size, |b, _| {
         let text: String = Name(EN).fake();
         let rt = Runtime::new().unwrap();
 

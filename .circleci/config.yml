@@ -331,12 +331,14 @@ jobs:
           name: Build
           command: cargo bench --no-run
       - restore_cache:
-          key: benchmarks
+          keys:
+            - benchmarks-main
+            - benchmarks-{{ .Environment.CIRCLE_BRANCH }}
       - run:
           name: Run benchmarks
           command: cargo bench
       - save_cache:
-          key: benchmarks
+          key: benchmarks-{{ .Environment.CIRCLE_BRANCH }}
           paths:
             - target/criterion/vault-kms-provider
 
