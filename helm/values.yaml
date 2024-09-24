@@ -75,9 +75,9 @@ local:
 priorityClassName: system-cluster-critical
 
 podSecurityContext:
-  fsGroup: 1001
-  runAsUser: 1001
-  runAsGroup: 1001
+  fsGroup: 10001
+  runAsUser: 10001
+  runAsGroup: 10001
   fsGroupChangePolicy: "OnRootMismatch"
 
 securityContext:
