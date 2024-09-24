@@ -31,7 +31,8 @@ See usage [documentation here](https://vault-kms-provider.io/)
     - [x] Token
 - [ ] Cache vault token
 - [ ] Update vault token on mounted jwt file changes
-- [x] Create a docs page on github pages
+- [x] Set up application benchmarks
+- [x] Create a docs page on GitHub pages
 - [x] Allow Tls for http communication
 - [x] Document manual integration steps
 - [x] Create Helm Chart for easy deployment

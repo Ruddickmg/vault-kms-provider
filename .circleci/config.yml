@@ -330,14 +330,17 @@ jobs:
       - run:
           name: Build
           command: cargo bench --no-run
+      - run:
+          name: Checkout main
+          command: git clone "$MAIN_BRANCH_URL"
       - restore_cache:
           keys:
-            - benchmarks-main
+            - benchmarks-main-{{ checksum "vault-kms-provider/Cargo.toml" }}
       - run:
           name: Run benchmarks
           command: cargo bench
       - save_cache:
-          key: benchmarks-{{ .Environment.CIRCLE_BRANCH }}
+          key: benchmarks-{{ .Environment.CIRCLE_BRANCH }}-{{ checksum "Cargo.toml" }}
           paths:
             - target/criterion/vault-kms-provider
 
