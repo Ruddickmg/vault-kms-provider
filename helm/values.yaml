@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ruddickmg/vault-kms-provider
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   tag: latest
 
 # configurations for connecting to vault
