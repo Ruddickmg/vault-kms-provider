@@ -66,6 +66,7 @@ commands:
 workflows:
   ci-cd:
     jobs:
+      - benchmark
       - chart_formatting
       - generate_tag
       - check_formatting
