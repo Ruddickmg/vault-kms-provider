@@ -24,8 +24,7 @@ async fn make_calls_to_vault_for_encryption(text: &str) -> Result<(), std::io::E
         .await
         .map_err(|e| std::io::Error::other(e.to_string()))?
         .into_inner();
-    println!("encrypted: {}", String::from_utf8(response.ciphertext.clone()).map_err(|e| std::io::Error::other(e.to_string()))?);
-    let response = client
+    client
         .decrypt(Request::new(DecryptRequest {
             ciphertext: response.ciphertext,
             uid: uid.to_string(),
@@ -34,7 +33,6 @@ async fn make_calls_to_vault_for_encryption(text: &str) -> Result<(), std::io::E
         }))
         .await
         .map_err(|e| std::io::Error::other(e.to_string()))?;
-    println!("decrypted: {}", String::from_utf8(response.into_inner().plaintext).map_err(|e| std::io::Error::other(e.to_string()))?);
     client
         .status(Request::new(StatusRequest {}))
         .await
