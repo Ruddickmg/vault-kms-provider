@@ -1,6 +1,6 @@
 [package]
 name = "vault_kms_provider"
-version = "0.4.3"
+version = "0.4.4"
 edition = "2021"
 
 [dependencies]
@@ -19,6 +19,16 @@ tower = "0.4.13"
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["json", "ansi"] }
 vaultrs = "0.7.2"
+
+[dev-dependencies]
+fake = "2.9.2"
+pretty_assertions = "1.4.1"
+criterion = { version = "0.5.1", features = ["html_reports", "async_tokio", "async"] }
+
+[[bench]]
+name = "app_benchmark"
+harness = false
+bench = true
 
 [build-dependencies]
 tonic-build = "0.12.1"

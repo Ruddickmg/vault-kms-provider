@@ -28,6 +28,7 @@ RUN mkdir /run/sockets
 WORKDIR /usr/src/$PKG_NAME
 
 COPY Cargo.toml Cargo.lock build.rs ./
+COPY ./benches ./benches
 COPY ./proto ./proto
 COPY ./src ./src
 

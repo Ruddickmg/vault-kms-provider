@@ -64,6 +64,9 @@ commands:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 workflows:
+  metrics:
+    jobs:
+      - benchmark
   ci-cd:
     jobs:
       - chart_formatting
@@ -99,10 +102,10 @@ workflows:
       - publish-manifest:
           name: publish-latest-manifest
           tag: latest
-#          filters:
-#            branches:
-#              only:
-#                - main
+          filters:
+            branches:
+              only:
+                - main
           context:
             - dockerhub
           requires:
@@ -309,6 +312,39 @@ jobs:
       - run:
           name: Run integration tests
           command: cargo test --test '*'
+
+  benchmark:
+    executor: ubuntu
+    environment:
+      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
+    steps:
+      - checkout_write
+      - run:
+          name: Start vault
+          command: docker compose up vault -d
+      - rust/install
+      - run:
+          name: Enable transit
+          command: docker compose exec vault vault secrets enable transit
+      - run:
+          name: Start KMS provider
+          command: docker compose up vault-kms-provider -d
+      - run:
+          name: Build
+          command: cargo bench --no-run
+      - run:
+          name: Checkout main
+          command: git clone "$MAIN_BRANCH_URL"
+      - restore_cache:
+          keys:
+            - benchmarks-main-{{ checksum "vault-kms-provider/Cargo.toml" }}
+      - run:
+          name: Run benchmarks
+          command: cargo bench
+      - save_cache:
+          key: benchmarks-{{ .Environment.CIRCLE_BRANCH }}-{{ checksum "Cargo.toml" }}
+          paths:
+            - target/criterion/vault-kms-provider
 
   e2e_tests:
     executor: ubuntu

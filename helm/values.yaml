@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ruddickmg/vault-kms-provider
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   tag: latest
 
 # configurations for connecting to vault
@@ -75,15 +75,16 @@ local:
 priorityClassName: system-cluster-critical
 
 podSecurityContext:
-  fsGroup: 1001
-  runAsUser: 1001
-  runAsGroup: 1001
+  fsGroup: 10001
+  runAsUser: 10001
+  runAsGroup: 10001
   fsGroupChangePolicy: "OnRootMismatch"
 
 securityContext:
   capabilities:
     drop:
       - ALL
+  allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
 
