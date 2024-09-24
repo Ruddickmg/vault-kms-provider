@@ -334,7 +334,7 @@ jobs:
           key: benchmarks
       - run:
           name: Run benchmarks
-          command: cargo bench --benchmarks
+          command: cargo bench
       - save_cache:
           key: benchmarks
           paths:
