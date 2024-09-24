@@ -333,7 +333,6 @@ jobs:
       - restore_cache:
           keys:
             - benchmarks-main
-            - benchmarks-{{ .Environment.CIRCLE_BRANCH }}
       - run:
           name: Run benchmarks
           command: cargo bench
