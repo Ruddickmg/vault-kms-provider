@@ -132,6 +132,45 @@ workflows:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
+  benchmark:
+    executor: ubuntu
+    environment:
+      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
+    steps:
+      - checkout_write
+      - run:
+          name: Start vault
+          command: docker compose up vault -d
+      - rust/install
+      - run:
+          name: Enable transit
+          command: docker compose exec vault vault secrets enable transit
+      - run:
+          name: Start KMS provider
+          command: docker compose up vault-kms-provider -d
+      - run:
+          name: Build
+          command: cargo bench --no-run
+      - run:
+          name: Checkout main
+          command: git clone "$MAIN_BRANCH_URL"
+      - restore_cache:
+          keys:
+            - benchmarks-main-{{ checksum "vault-kms-provider/Cargo.toml" }}
+      - run:
+          name: Run benchmarks
+          command: cargo bench
+      - save_cache:
+          key: benchmarks-{{ .Environment.CIRCLE_BRANCH }}-{{ checksum "Cargo.toml" }}
+          paths:
+            - target/criterion/vault-kms-provider
+      - run:
+          name: Make directory
+      - persist_to_workspace:
+          root: target/criterion/vault-kms-provider/benchmarks
+          paths:
+            - report
+
   document:
     executor: node
     working_directory: ~/app/documentation
@@ -163,10 +202,10 @@ jobs:
           at: .
       - run:
           name: Copy benchmark report to documentation
-          command: mv ./report/index.html ./src/benchmarks/report.html
+          command: mv target/criterion/vault-kms-provider/benchmarks/report/index.html ./src/benchmarks/report.html
       - run:
           name: Copy benchmark assets to documentation
-          command: mv ./report/* ./src/benchmarks
+          command: mv target/criterion/vault-kms-provider/benchmarks/report/* ./src/benchmarks
       - run:
           name: Build documentation
           command: pnpm run build
@@ -323,43 +362,6 @@ jobs:
       - run:
           name: Run integration tests
           command: cargo test --test '*'
-
-  benchmark:
-    executor: ubuntu
-    environment:
-      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
-    steps:
-      - checkout_write
-      - run:
-          name: Start vault
-          command: docker compose up vault -d
-      - rust/install
-      - run:
-          name: Enable transit
-          command: docker compose exec vault vault secrets enable transit
-      - run:
-          name: Start KMS provider
-          command: docker compose up vault-kms-provider -d
-      - run:
-          name: Build
-          command: cargo bench --no-run
-      - run:
-          name: Checkout main
-          command: git clone "$MAIN_BRANCH_URL"
-      - restore_cache:
-          keys:
-            - benchmarks-main-{{ checksum "vault-kms-provider/Cargo.toml" }}
-      - run:
-          name: Run benchmarks
-          command: cargo bench
-      - save_cache:
-          key: benchmarks-{{ .Environment.CIRCLE_BRANCH }}-{{ checksum "Cargo.toml" }}
-          paths:
-            - target/criterion/vault-kms-provider
-      - persist_to_workspace:
-          root: benchmarks
-          paths:
-            - target/criterion/vault-kms-provider/benchmarks/report
 
   e2e_tests:
     executor: ubuntu
