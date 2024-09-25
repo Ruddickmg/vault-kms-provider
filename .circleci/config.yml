@@ -164,8 +164,6 @@ jobs:
           key: benchmarks-{{ .Environment.CIRCLE_BRANCH }}-{{ checksum "Cargo.toml" }}
           paths:
             - target/criterion/vault-kms-provider
-      - run:
-          name: Make directory
       - persist_to_workspace:
           root: ./target/criterion/vault-kms-provider/benchmarks
           paths:
