@@ -165,7 +165,7 @@ jobs:
           paths:
             - target/criterion/vault-kms-provider
       - persist_to_workspace:
-          root: ./target/criterion/vault-kms-provider/benchmarks
+          root: ./target/criterion/vault-kms-provider
           paths:
             - decryption/report
             - encryption/report
