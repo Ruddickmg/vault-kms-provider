@@ -64,14 +64,9 @@ commands:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 workflows:
-  metrics:
-    jobs:
-      - benchmark
-      - document:
-          requires:
-            - benchmark
   ci-cd:
     jobs:
+      - benchmark
       - chart_formatting
       - generate_tag
       - check_formatting

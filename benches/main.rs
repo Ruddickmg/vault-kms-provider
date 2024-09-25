@@ -7,5 +7,10 @@ mod decryption;
 mod encryption;
 mod health;
 
-criterion_group!(benches, decryption_benchmark, encryption_benchmark, health_check_benchmark);
+criterion_group!(
+    benches,
+    decryption_benchmark,
+    encryption_benchmark,
+    health_check_benchmark
+);
 criterion_main!(benches);
