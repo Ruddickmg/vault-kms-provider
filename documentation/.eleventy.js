@@ -24,6 +24,7 @@ export default function (config) {
     root: ['_includes'],
   }));
   config.setLibrary('md', md);
+  config.addPassthroughCopy("src/benchmarks");
   return {
     dir: {
       input: "src",

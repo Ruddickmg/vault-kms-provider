@@ -67,6 +67,9 @@ workflows:
   metrics:
     jobs:
       - benchmark
+      - document:
+          requires:
+            - benchmark
   ci-cd:
     jobs:
       - chart_formatting
@@ -156,6 +159,14 @@ jobs:
       - run:
           name: Install sass
           command: npm install -g sass
+      - attach_workspace:
+          at: .
+      - run:
+          name: Copy benchmark report to documentation
+          command: mv ./report/index.html ./src/benchmarks/report.html
+      - run:
+          name: Copy benchmark assets to documentation
+          command: mv ./report/* ./src/benchmarks
       - run:
           name: Build documentation
           command: pnpm run build
@@ -345,6 +356,10 @@ jobs:
           key: benchmarks-{{ .Environment.CIRCLE_BRANCH }}-{{ checksum "Cargo.toml" }}
           paths:
             - target/criterion/vault-kms-provider
+      - persist_to_workspace:
+          root: benchmarks
+          paths:
+            - target/criterion/vault-kms-provider/benchmarks/report
 
   e2e_tests:
     executor: ubuntu
