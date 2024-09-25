@@ -199,11 +199,11 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Copy benchmark report to documentation
-          command: mv ./report/index.html ./src/benchmarks/report.html
-      - run:
           name: Copy benchmark assets to documentation
           command: mv ./report/* ./src/benchmarks
+      - run:
+          name: Make index file an njk file
+          command: mv ./src/benchmarks/index.html ./src/benchmarks/index.njk
       - run:
           name: Build documentation
           command: pnpm run build
