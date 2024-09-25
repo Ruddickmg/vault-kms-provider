@@ -167,7 +167,7 @@ jobs:
       - run:
           name: Make directory
       - persist_to_workspace:
-          root: target/criterion/vault-kms-provider/benchmarks
+          root: ./target/criterion/vault-kms-provider/benchmarks
           paths:
             - report
 
@@ -202,10 +202,10 @@ jobs:
           at: .
       - run:
           name: Copy benchmark report to documentation
-          command: mv target/criterion/vault-kms-provider/benchmarks/report/index.html ./src/benchmarks/report.html
+          command: mv ./report/index.html ./src/benchmarks/report.html
       - run:
           name: Copy benchmark assets to documentation
-          command: mv target/criterion/vault-kms-provider/benchmarks/report/* ./src/benchmarks
+          command: mv ./report/* ./src/benchmarks
       - run:
           name: Build documentation
           command: pnpm run build
