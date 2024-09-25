@@ -27,7 +27,7 @@ pretty_assertions = "1.4.1"
 criterion = { version = "0.5.1", features = ["html_reports", "async_tokio", "async"] }
 
 [[bench]]
-name = "app_benchmark"
+name = "main"
 harness = false
 bench = true
 
