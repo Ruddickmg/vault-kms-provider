@@ -1,8 +1,6 @@
 use criterion::BenchmarkId;
 use criterion::Criterion;
 use criterion::{criterion_group, criterion_main};
-use fake::locales::EN;
-use fake::{faker::name::raw::*, Fake};
 use lib::kms::{DecryptRequest, EncryptRequest, StatusRequest};
 use tokio::runtime::Runtime;
 use tonic::Request;
@@ -41,13 +39,12 @@ async fn make_calls_to_vault_for_encryption(text: &str) -> Result<(), std::io::E
 }
 
 fn from_elem(c: &mut Criterion) {
-    let size: usize = 1024;
-    let text: String = Name(EN).fake();
+    let text: &str = "benchmarks";
     let rt = Runtime::new().unwrap();
 
-    c.bench_with_input(BenchmarkId::new(BENCHMARK_NAME, size), &size, |b, _| {
+    c.bench_with_input(BenchmarkId::new(BENCHMARK_NAME, &text), &text, |b, t| {
         b.to_async(&rt)
-            .iter(|| make_calls_to_vault_for_encryption(&text));
+            .iter(|| make_calls_to_vault_for_encryption(t));
     });
 }
 

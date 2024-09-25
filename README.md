@@ -29,8 +29,8 @@ See usage [documentation here](https://vault-kms-provider.io/)
         - [ ] Jwt
     - [ ] Tls certs
     - [x] Token
-- [ ] Cache vault token
-- [ ] Update vault token on mounted jwt file changes
+- [x] Cache vault token
+- [x] Update vault token on mounted jwt file changes
 - [x] Set up application benchmarks
 - [x] Create a docs page on GitHub pages
 - [x] Allow Tls for http communication

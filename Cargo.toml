@@ -23,7 +23,6 @@ vaultrs = "0.7.2"
 futures = "0.3.30"
 
 [dev-dependencies]
-fake = "2.9.2"
 pretty_assertions = "1.4.1"
 criterion = { version = "0.5.1", features = ["html_reports", "async_tokio", "async"] }
 
