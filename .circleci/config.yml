@@ -167,7 +167,9 @@ jobs:
       - persist_to_workspace:
           root: ./target/criterion/vault-kms-provider/benchmarks
           paths:
-            - report
+            - decryption/report
+            - encryption/report
+            - health/report
 
   document:
     executor: node
@@ -199,11 +201,17 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Copy benchmark assets to documentation
-          command: mv ./report/* ./src/benchmarks
+          name: Copy benchmarks into documentation
+          command: |
+            mv ./encryption/report ./src/benchmarks/encryption
+            mv ./decryption/report ./src/benchmarks/decryption
+            mv ./health/report ./src/benchmarks/health
       - run:
-          name: Make index file an njk file
-          command: mv ./src/benchmarks/index.html ./src/benchmarks/index.njk
+          name: Reformat index files
+          command: |
+            mv ./src/benchmarks/encryption/index.html ./src/benchmarks/encryption/index.njk
+            mv ./src/benchmarks/decryption/index.html ./src/benchmarks/decryption/index.njk
+            mv ./src/benchmarks/health/index.html ./src/benchmarks/health/index.njk
       - run:
           name: Build documentation
           command: pnpm run build

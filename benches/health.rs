@@ -30,7 +30,7 @@ pub fn health_check_benchmark(c: &mut Criterion) {
       .unwrap();
   });
 
-  c.bench_with_input(BenchmarkId::new(BENCHMARK_NAME, "decryption"), &(), |b, _ | {
+  c.bench_with_input(BenchmarkId::new(BENCHMARK_NAME, "health"), &(), |b, _ | {
     b.to_async(&rt)
       .iter(|| check_health());
   });
