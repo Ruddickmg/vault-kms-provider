@@ -25,7 +25,7 @@ impl TlsConfiguration {
                 certs.push(file_path);
             }
         }
-        info!("CA certificates to import: {:?}", certs);
+        info!("Importing CA certificates: {:?}", certs);
         certs.iter().for_each(|cert| {
             debug!("cert: \n{}", fs::read_to_string(cert).unwrap());
         });

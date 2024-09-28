@@ -18,7 +18,7 @@ tokio-stream = { version = "0.1.15", features = ["net"] }
 tonic = "0.12.1"
 tower = "0.4.13"
 tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["json", "ansi"] }
+tracing-subscriber = { version = "0.3.18", features = ["json", "ansi", "env-filter"] }
 vaultrs = "0.7.2"
 futures = "0.3.30"
 
