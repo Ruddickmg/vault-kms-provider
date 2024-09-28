@@ -115,14 +115,12 @@ workflows:
             - unit_tests
             - integration_tests
             - e2e_tests
-
       - release:
           requires:
             - publish-latest-manifest
-
       - document:
           requires:
-#            - release
+            - release
             - benchmark
 
 #-----------------------------------------------------------------------------------------------------------------------------
@@ -243,7 +241,8 @@ jobs:
               --git-repo $CIRCLE_PROJECT_REPONAME \
               --owner $CIRCLE_PROJECT_USERNAME \
               --release-name-template "v{{ .Version }}" \
-              --token $GITHUB_TOKEN
+              --token $GITHUB_TOKEN \
+              --
       - run:
           name: Add chart to gh-pages
           command: |
