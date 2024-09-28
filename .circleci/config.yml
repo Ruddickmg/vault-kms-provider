@@ -64,11 +64,9 @@ commands:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 workflows:
-  metrics:
-    jobs:
-      - benchmark
   ci-cd:
     jobs:
+      - benchmark
       - chart_formatting
       - generate_tag
       - check_formatting
@@ -129,6 +127,45 @@ workflows:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
+  benchmark:
+    executor: ubuntu
+    environment:
+      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
+    steps:
+      - checkout_write
+      - run:
+          name: Start vault
+          command: docker compose up vault -d
+      - rust/install
+      - run:
+          name: Enable transit
+          command: docker compose exec vault vault secrets enable transit
+      - run:
+          name: Start KMS provider
+          command: docker compose up vault-kms-provider -d
+      - run:
+          name: Build
+          command: cargo bench --no-run
+      - run:
+          name: Checkout main
+          command: git clone "$MAIN_BRANCH_URL"
+      - restore_cache:
+          keys:
+            - benchmarks-main-{{ checksum "vault-kms-provider/Cargo.toml" }}
+      - run:
+          name: Run benchmarks
+          command: cargo bench
+      - save_cache:
+          key: benchmarks-{{ .Environment.CIRCLE_BRANCH }}-{{ checksum "Cargo.toml" }}
+          paths:
+            - target/criterion/vault-kms-provider
+      - persist_to_workspace:
+          root: ./target/criterion/vault-kms-provider
+          paths:
+            - decryption/report
+            - encryption/report
+            - health/report
+
   document:
     executor: node
     working_directory: ~/app/documentation
@@ -156,6 +193,20 @@ jobs:
       - run:
           name: Install sass
           command: npm install -g sass
+      - attach_workspace:
+          at: .
+      - run:
+          name: Copy benchmarks into documentation
+          command: |
+            mv ./encryption/report ./src/benchmarks/encryption
+            mv ./decryption/report ./src/benchmarks/decryption
+            mv ./health/report ./src/benchmarks/health
+      - run:
+          name: Reformat index files
+          command: |
+            mv ./src/benchmarks/encryption/index.html ./src/benchmarks/encryption/index.njk
+            mv ./src/benchmarks/decryption/index.html ./src/benchmarks/decryption/index.njk
+            mv ./src/benchmarks/health/index.html ./src/benchmarks/health/index.njk
       - run:
           name: Build documentation
           command: pnpm run build
@@ -312,39 +363,6 @@ jobs:
       - run:
           name: Run integration tests
           command: cargo test --test '*'
-
-  benchmark:
-    executor: ubuntu
-    environment:
-      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
-    steps:
-      - checkout_write
-      - run:
-          name: Start vault
-          command: docker compose up vault -d
-      - rust/install
-      - run:
-          name: Enable transit
-          command: docker compose exec vault vault secrets enable transit
-      - run:
-          name: Start KMS provider
-          command: docker compose up vault-kms-provider -d
-      - run:
-          name: Build
-          command: cargo bench --no-run
-      - run:
-          name: Checkout main
-          command: git clone "$MAIN_BRANCH_URL"
-      - restore_cache:
-          keys:
-            - benchmarks-main-{{ checksum "vault-kms-provider/Cargo.toml" }}
-      - run:
-          name: Run benchmarks
-          command: cargo bench
-      - save_cache:
-          key: benchmarks-{{ .Environment.CIRCLE_BRANCH }}-{{ checksum "Cargo.toml" }}
-          paths:
-            - target/criterion/vault-kms-provider
 
   e2e_tests:
     executor: ubuntu

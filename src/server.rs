@@ -1,14 +1,15 @@
 extern crate lib;
 
-use lib::configuration::tls;
 use lib::{
-    configuration::{socket::SocketConfiguration, vault::VaultConfiguration},
+    configuration::{socket::SocketConfiguration, tls, vault::VaultConfiguration},
     kms::key_management_service_server::KeyManagementServiceServer,
-    utilities::{logging, socket::create_unix_socket},
+    utilities::{logging, socket::create_unix_socket, watcher},
     vault,
 };
-use tokio::join;
+use std::sync::Arc;
+use tokio::sync::RwLock;
 use tonic::transport::Server;
+use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
 
 mod checks;
 
@@ -19,20 +20,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let socket = create_unix_socket(&socket_config.socket_path, socket_config.permissions)?;
     let vault_config = VaultConfiguration::new();
     let tls_config = tls::TlsConfiguration::new();
-    let vault_kms_server = vault::VaultKmsServer::new(
-        &vault_config.vault_transit_key,
-        &vault_config.vault_address,
-        &vault_config.vault_role,
-        &tls_config.certs(),
-    );
+    let settings = VaultClientSettingsBuilder::default()
+        .address(&vault_config.vault_address)
+        .ca_certs(tls_config.certs())
+        .build()?;
+    let client = Arc::new(RwLock::new(vault::Client::new(
+        VaultClient::new(settings).unwrap(),
+        &vault_config,
+    )));
+    let vault_kms_server = vault::VaultKmsServer::new(client.clone());
     vault_kms_server.initialize().await?;
-    let (server, health_checks) = join!(
-        Server::builder()
-            .add_service(KeyManagementServiceServer::new(vault_kms_server))
-            .serve_with_incoming(socket),
-        checks::serve()
-    );
-    server?;
-    health_checks?;
+    tokio::try_join!(
+        async {
+            Server::builder()
+                .add_service(KeyManagementServiceServer::new(vault_kms_server))
+                .serve_with_incoming(socket)
+                .await
+                .map_err(|error| std::io::Error::other(error.to_string()))
+        },
+        async {
+            checks::serve()
+                .await
+                .map_err(|error| std::io::Error::other(error.to_string()))
+        },
+        watcher::watch(vault_config.jwt_path.clone(), client),
+    )?;
     Ok(())
 }

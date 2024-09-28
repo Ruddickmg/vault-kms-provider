@@ -1,6 +1,6 @@
 [package]
 name = "vault_kms_provider"
-version = "0.4.4"
+version = "0.5.0"
 edition = "2021"
 
 [dependencies]
@@ -10,6 +10,7 @@ http = "1.1.0"
 http-body-util = "0.1.2"
 hyper-util = {  version = "0.1.6", features = ["tokio"] }
 hyper = { version = "1.4.1", features = ["http1", "server"] }
+notify = "6.1.1"
 prost = "0.13.1"
 prost-derive = "0.13.1"
 tokio = { version = "1.39.2", features = ["macros", "rt-multi-thread"] }
@@ -19,14 +20,14 @@ tower = "0.4.13"
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["json", "ansi"] }
 vaultrs = "0.7.2"
+futures = "0.3.30"
 
 [dev-dependencies]
-fake = "2.9.2"
 pretty_assertions = "1.4.1"
 criterion = { version = "0.5.1", features = ["html_reports", "async_tokio", "async"] }
 
 [[bench]]
-name = "app_benchmark"
+name = "main"
 harness = false
 bench = true
 

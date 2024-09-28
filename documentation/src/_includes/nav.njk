@@ -12,17 +12,21 @@ links: ["configuration", "installation"]
              </a>
            </div>
            {% for category, categories in collections %}
-               {% if category == "installation" or category == "configuration" %}
-               <div>
-                 <a href="/{{ category }}"><h2>{{ category | capitalize }}</h2></a>
-                 <ul>
-                   {% for page in categories %}
-                     {% if page.data.title %}
-                       <li><a href={{ page.url }}>{{ page.data.title }}</a></li>
+               {% if categories.length %}
+                   {% if category == "installation" or category == "configuration" or category == "benchmarks" %}
+                   <div>
+                     {% if category != "benchmarks" %}
+                       <a href="/{{ category }}"><h2>{{ category | capitalize }}</h2></a>
+                     {% else %}
+                       <h2>{{ category | capitalize }}</h2>
                      {% endif %}
-                   {% endfor %}
-                 </ul>
-               </div>
+                     <ul>
+                       {% for page in categories %}
+                         <li><a href={{ page.url }}>{{ page.fileSlug | capitalize }}</a></li>
+                       {% endfor %}
+                     </ul>
+                   </div>
+                   {% endif %}
                {% endif %}
            {% endfor %}
        </div>
