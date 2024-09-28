@@ -35,14 +35,13 @@ pub struct Client {
 
 #[async_trait]
 impl Refresh for Client {
+    #[instrument(skip(self))]
     async fn refresh_token(&mut self) -> Result<(), std::io::Error> {
-        if let Some(token) = self
+        let token = self
             .get_token()
             .await
-            .map_err(|error| std::io::Error::other(error.to_string()))?
-        {
-            self.client.set_token(&token);
-        }
+            .map_err(|error| std::io::Error::other(error.to_string()))?;
+        self.client.set_token(&token);
         Ok(())
     }
 }
@@ -59,15 +58,17 @@ impl Client {
     }
 
     #[instrument(skip(self))]
-    async fn get_token(&self) -> Result<Option<String>, ClientError> {
-        Ok(if let Some(path) = self.jwt_path.clone() {
-            Some(self.request_token_with_jwt(&path).await?)
+    async fn get_token(&self) -> Result<String, ClientError> {
+        if let Some(path) = self.jwt_path.clone() {
+            Ok(self.request_token_with_jwt(&path).await?)
         } else if let Some(token) = self.token.clone() {
-            Some(token)
+            Ok(token)
         } else {
-            warn!("No token found");
-            None
-        })
+            Err(ClientError::APIError {
+                code: 500,
+                errors: vec!["No token found".to_string()],
+            })
+        }
     }
 
     pub fn new(client: VaultClient, config: &VaultConfiguration) -> Self {
