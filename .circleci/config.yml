@@ -122,7 +122,8 @@ workflows:
 
       - document:
           requires:
-            - release
+#            - release
+            - benchmark
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -162,9 +163,9 @@ jobs:
       - persist_to_workspace:
           root: ./target/criterion/vault-kms-provider
           paths:
-            - decryption/report
-            - encryption/report
-            - health/report
+            - decryption
+            - encryption
+            - health
 
   document:
     executor: node
