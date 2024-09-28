@@ -5,18 +5,18 @@ edition = "2021"
 
 [dependencies]
 base64 = "0.22.1"
-bytes = "1.6.1"
+bytes = "1.7.2"
 http = "1.1.0"
 http-body-util = "0.1.2"
-hyper-util = {  version = "0.1.6", features = ["tokio"] }
+hyper-util = {  version = "0.1.9", features = ["tokio"] }
 hyper = { version = "1.4.1", features = ["http1", "server"] }
 notify = "6.1.1"
-prost = "0.13.1"
-prost-derive = "0.13.1"
-tokio = { version = "1.39.2", features = ["macros", "rt-multi-thread"] }
-tokio-stream = { version = "0.1.15", features = ["net"] }
-tonic = "0.12.1"
-tower = "0.4.13"
+prost = "0.13.3"
+prost-derive = "0.13.3"
+tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
+tokio-stream = { version = "0.1.16", features = ["net"] }
+tonic = "0.12.3"
+tower = { version = "0.5.1", features = ["util"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["json", "ansi", "env-filter"] }
 vaultrs = "0.7.2"
@@ -32,7 +32,7 @@ harness = false
 bench = true
 
 [build-dependencies]
-tonic-build = "0.12.1"
+tonic-build = "0.12.3"
 
 [lib]
 name = "lib"
