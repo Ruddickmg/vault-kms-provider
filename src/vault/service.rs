@@ -2,6 +2,7 @@ use crate::kms::{
     key_management_service_server::KeyManagementService, DecryptRequest, DecryptResponse,
     EncryptRequest, EncryptResponse, StatusRequest, StatusResponse,
 };
+use crate::utilities::watcher::Refresh;
 use crate::vault::client;
 use base64::{prelude::BASE64_STANDARD, Engine};
 use std::sync::Arc;

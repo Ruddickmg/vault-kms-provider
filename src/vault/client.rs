@@ -1,10 +1,11 @@
 use crate::configuration::vault::VaultConfiguration;
+use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
 use std::{fs, string::ToString};
-use tonic::{Code, Status};
+use tonic::{async_trait, Code, Status};
 use tracing::{debug, instrument, warn};
-use vaultrs::client::Client as ClientExt;
-use vaultrs::{api::AuthInfo, client::VaultClient, error::ClientError, transit};
+use vaultrs::client::{Client as ClientTrait, VaultClient};
+use vaultrs::{api::AuthInfo, error::ClientError, transit};
 
 const TRANSIT_MOUNT: &str = "transit";
 const KUBERNETES_AUTH_MOUNT: &str = "kubernetes";
@@ -32,10 +33,25 @@ pub struct Client {
     client: VaultClient,
 }
 
+#[async_trait]
+impl Refresh for Client {
+    async fn refresh_token(&mut self) -> Result<(), std::io::Error> {
+        if let Some(token) = self
+            .get_token()
+            .await
+            .map_err(|error| std::io::Error::other(error.to_string()))?
+        {
+            self.client.set_token(&token);
+        }
+        Ok(())
+    }
+}
+
 impl Client {
     #[instrument(skip(self, path))]
     async fn request_token_with_jwt(&self, path: &str) -> Result<String, ClientError> {
-        let jwt = fs::read_to_string(path).map_err(|_| ClientError::FileNotFoundError {
+        let jwt = fs::read_to_string(path).map_err(|error| ClientError::FileReadError {
+            source: error,
             path: path.to_string(),
         })?;
         debug!("Using mounted jwt of length: {}", jwt.len());
@@ -52,14 +68,6 @@ impl Client {
             warn!("No token found");
             None
         })
-    }
-
-    #[instrument(skip(self))]
-    pub(crate) async fn refresh_token(&mut self) -> Result<(), ClientError> {
-        if let Some(token) = self.get_token().await? {
-            self.client.set_token(&token);
-        }
-        Ok(())
     }
 
     pub fn new(client: VaultClient, config: &VaultConfiguration) -> Self {

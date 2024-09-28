@@ -23,14 +23,14 @@ See usage [documentation here](https://vault-kms-provider.io/)
 - [x] Create docker container for plugin
 - [x] Set up ci for deployment
 - [ ] Set up Authentication
-    - [ ] ServiceAccount
-        - [x] Local
-        - [ ] Client
-        - [ ] Jwt
-    - [ ] Tls certs
+    - [x] Kubernetes
     - [x] Token
+    - [ ] User & Password
+    - [ ] App Role
+    - [ ] Tls certs
 - [x] Cache vault token
 - [x] Update vault token on mounted jwt file changes
+- [x] Test Token rotation
 - [x] Set up application benchmarks
 - [x] Create a docs page on GitHub pages
 - [x] Allow Tls for http communication
