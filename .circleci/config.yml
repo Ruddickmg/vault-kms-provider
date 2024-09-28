@@ -119,6 +119,10 @@ workflows:
           requires:
             - publish-latest-manifest
       - document:
+          filters:
+            branches:
+              only:
+                - main
           requires:
             - release
             - benchmark
