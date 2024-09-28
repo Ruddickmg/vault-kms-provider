@@ -115,14 +115,17 @@ workflows:
             - unit_tests
             - integration_tests
             - e2e_tests
-
       - release:
           requires:
             - publish-latest-manifest
-
       - document:
+          filters:
+            branches:
+              only:
+                - main
           requires:
             - release
+            - benchmark
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -162,9 +165,9 @@ jobs:
       - persist_to_workspace:
           root: ./target/criterion/vault-kms-provider
           paths:
-            - decryption/report
-            - encryption/report
-            - health/report
+            - decryption
+            - encryption
+            - health
 
   document:
     executor: node
@@ -242,7 +245,8 @@ jobs:
               --git-repo $CIRCLE_PROJECT_REPONAME \
               --owner $CIRCLE_PROJECT_USERNAME \
               --release-name-template "v{{ .Version }}" \
-              --token $GITHUB_TOKEN
+              --token $GITHUB_TOKEN \
+              --
       - run:
           name: Add chart to gh-pages
           command: |
