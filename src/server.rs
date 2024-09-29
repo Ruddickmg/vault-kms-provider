@@ -1,6 +1,6 @@
 extern crate lib;
 
-use lib::configuration::authentication::Authentication;
+use lib::configuration::authentication::Credentials;
 use lib::{
     configuration::{socket::SocketConfiguration, tls, vault::VaultConfiguration},
     kms::key_management_service_server::KeyManagementServiceServer,
@@ -45,8 +45,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .map_err(|error| std::io::Error::other(error.to_string()))
         },
         watcher::watch(
-            match vault_config.auth {
-                Authentication::Kubernetes(path) => Some(path),
+            match vault_config.credentials {
+                Credentials::Kubernetes(credentials) => Some(credentials.file_path),
                 _ => None,
             },
             client

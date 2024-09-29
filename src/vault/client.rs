@@ -1,4 +1,4 @@
-use crate::configuration::authentication::{Authentication, Credentials};
+use crate::configuration::authentication::{Credentials, Kubernetes, UserPass};
 use crate::configuration::vault::VaultConfiguration;
 use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
@@ -7,9 +7,6 @@ use tonic::{async_trait, Code, Status};
 use tracing::{debug, instrument, warn};
 use vaultrs::client::{Client as ClientTrait, VaultClient};
 use vaultrs::{api::AuthInfo, error::ClientError, transit};
-
-const TRANSIT_MOUNT: &str = "transit";
-const KUBERNETES_AUTH_MOUNT: &str = "kubernetes";
 
 #[derive(Debug)]
 pub struct VaultError(pub ClientError);
@@ -29,8 +26,9 @@ impl From<ClientError> for VaultError {
 pub struct Client {
     pub key_name: String,
     role: String,
-    auth: Authentication,
+    auth: Credentials,
     client: VaultClient,
+    mount_path: String,
 }
 
 #[async_trait]
@@ -47,26 +45,36 @@ impl Refresh for Client {
 }
 
 impl Client {
-    #[instrument(skip(self, path))]
-    async fn request_token_with_jwt(&self, path: &str) -> Result<String, ClientError> {
-        let jwt = fs::read_to_string(path).map_err(|error| ClientError::FileReadError {
-            source: error,
-            path: path.to_string(),
+    #[instrument(skip(self, credentials))]
+    async fn kubernetes_authentication(
+        &self,
+        credentials: &Kubernetes,
+    ) -> Result<String, ClientError> {
+        let jwt = fs::read_to_string(&credentials.file_path).map_err(|error| {
+            ClientError::FileReadError {
+                source: error,
+                path: credentials.file_path.to_string(),
+            }
         })?;
         debug!("Logging in via JWT: {}", jwt.len());
-        Ok(self.jwt_auth(&jwt).await?.client_token)
+        Ok(self
+            .jwt_auth(&credentials.mount_path, &jwt)
+            .await?
+            .client_token)
     }
 
     #[instrument(skip(self))]
     pub async fn get_token(&self) -> Result<String, ClientError> {
-        match self.auth.clone() {
-            Authentication::Token(token) => Ok(token),
-            Authentication::Kubernetes(path) => Ok(self.request_token_with_jwt(&path).await?),
-            Authentication::Credentials(credentials) => Ok(self
-                .request_token_with_credentials(&credentials)
+        match &self.auth {
+            Credentials::Token(token) => Ok(token.to_string()),
+            Credentials::Kubernetes(credentials) => {
+                Ok(self.kubernetes_authentication(credentials).await?)
+            }
+            Credentials::UserPass(credentials) => Ok(self
+                .user_pass_authentication(credentials)
                 .await?
                 .client_token),
-            Authentication::None => Err(ClientError::APIError {
+            Credentials::None => Err(ClientError::APIError {
                 code: 500,
                 errors: vec!["No token found".to_string()],
             }),
@@ -77,20 +85,21 @@ impl Client {
         Self {
             role: config.role.to_string(),
             key_name: config.transit_key.to_string(),
-            auth: config.auth.clone(),
+            auth: config.credentials.clone(),
+            mount_path: config.mount_path.clone(),
             client,
         }
     }
 
     #[instrument(skip(self, credentials))]
-    pub async fn request_token_with_credentials(
+    pub async fn user_pass_authentication(
         &self,
-        credentials: &Credentials,
+        credentials: &UserPass,
     ) -> Result<AuthInfo, ClientError> {
         debug!("Logging in with credentials: {:?}", credentials);
         Ok(vaultrs::auth::userpass::login(
             &self.client,
-            &credentials.path,
+            &credentials.mount_path,
             &credentials.username,
             &credentials.password,
         )
@@ -98,18 +107,15 @@ impl Client {
     }
 
     #[instrument(skip(self, jwt))]
-    pub async fn jwt_auth(&self, jwt: &str) -> Result<AuthInfo, ClientError> {
+    pub async fn jwt_auth(&self, path: &str, jwt: &str) -> Result<AuthInfo, ClientError> {
         debug!("Logging in to vault as: {}", self.role);
-        Ok(
-            vaultrs::auth::kubernetes::login(&self.client, KUBERNETES_AUTH_MOUNT, &self.role, &jwt)
-                .await?,
-        )
+        Ok(vaultrs::auth::kubernetes::login(&self.client, path, &self.role, &jwt).await?)
     }
 
     #[instrument(skip(self))]
     pub async fn request_key(&self) -> Result<KeyInfo, VaultError> {
         Ok(
-            transit::key::read(&self.client, TRANSIT_MOUNT, &self.key_name)
+            transit::key::read(&self.client, &self.mount_path, &self.key_name)
                 .await?
                 .keys
                 .into(),
@@ -120,7 +126,7 @@ impl Client {
     pub async fn request_encryption(&self, data: &str) -> Result<String, VaultError> {
         debug!("Requesting encryption, data: {}", data);
         Ok(
-            transit::data::encrypt(&self.client, TRANSIT_MOUNT, &self.key_name, data, None)
+            transit::data::encrypt(&self.client, &self.mount_path, &self.key_name, data, None)
                 .await?
                 .ciphertext,
         )
@@ -130,7 +136,7 @@ impl Client {
     pub async fn request_decryption(&self, data: &str) -> Result<String, VaultError> {
         debug!("Requesting decryption, data: {}", data);
         Ok(
-            transit::data::decrypt(&self.client, TRANSIT_MOUNT, &self.key_name, data, None)
+            transit::data::decrypt(&self.client, &self.mount_path, &self.key_name, data, None)
                 .await?
                 .plaintext,
         )
