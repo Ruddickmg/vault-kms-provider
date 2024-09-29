@@ -1,3 +1,4 @@
+use crate::configuration::authentication::{Authentication, Credentials};
 use crate::configuration::vault::VaultConfiguration;
 use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
@@ -6,7 +7,6 @@ use tonic::{async_trait, Code, Status};
 use tracing::{debug, instrument, warn};
 use vaultrs::client::{Client as ClientTrait, VaultClient};
 use vaultrs::{api::AuthInfo, error::ClientError, transit};
-use crate::configuration::authentication::{Authentication, Credentials};
 
 const TRANSIT_MOUNT: &str = "transit";
 const KUBERNETES_AUTH_MOUNT: &str = "kubernetes";
@@ -62,7 +62,10 @@ impl Client {
         match self.auth.clone() {
             Authentication::Token(token) => Ok(token),
             Authentication::Kubernetes(path) => Ok(self.request_token_with_jwt(&path).await?),
-            Authentication::Credentials(credentials) => Ok(self.request_token_with_credentials(&credentials).await?.client_token),
+            Authentication::Credentials(credentials) => Ok(self
+                .request_token_with_credentials(&credentials)
+                .await?
+                .client_token),
             Authentication::None => Err(ClientError::APIError {
                 code: 500,
                 errors: vec!["No token found".to_string()],
@@ -80,9 +83,18 @@ impl Client {
     }
 
     #[instrument(skip(self, credentials))]
-    pub async fn request_token_with_credentials(&self, credentials: &Credentials) -> Result<AuthInfo, ClientError> {
+    pub async fn request_token_with_credentials(
+        &self,
+        credentials: &Credentials,
+    ) -> Result<AuthInfo, ClientError> {
         debug!("Logging in with credentials: {:?}", credentials);
-        Ok(vaultrs::auth::userpass::login(&self.client, &credentials.path, &credentials.username, &credentials.password).await?)
+        Ok(vaultrs::auth::userpass::login(
+            &self.client,
+            &credentials.path,
+            &credentials.username,
+            &credentials.password,
+        )
+        .await?)
     }
 
     #[instrument(skip(self, jwt))]

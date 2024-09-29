@@ -1,5 +1,6 @@
 extern crate lib;
 
+use lib::configuration::authentication::Authentication;
 use lib::{
     configuration::{socket::SocketConfiguration, tls, vault::VaultConfiguration},
     kms::key_management_service_server::KeyManagementServiceServer,
@@ -10,7 +11,6 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tonic::transport::Server;
 use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
-use lib::configuration::authentication::Authentication;
 
 mod checks;
 
@@ -44,10 +44,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .await
                 .map_err(|error| std::io::Error::other(error.to_string()))
         },
-        watcher::watch(match vault_config.auth {
-            Authentication::Kubernetes(path) => Some(path),
-            _ => None
-        }, client),
+        watcher::watch(
+            match vault_config.auth {
+                Authentication::Kubernetes(path) => Some(path),
+                _ => None,
+            },
+            client
+        ),
     )?;
     Ok(())
 }
