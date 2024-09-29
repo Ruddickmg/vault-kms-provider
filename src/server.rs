@@ -5,11 +5,13 @@ use lib::{
     kms::key_management_service_server::KeyManagementServiceServer,
     utilities::{logging, socket::create_unix_socket, watcher},
     vault,
+
 };
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tonic::transport::Server;
 use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
+use lib::configuration::authentication::Auth;
 
 mod checks;
 
@@ -43,7 +45,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .await
                 .map_err(|error| std::io::Error::other(error.to_string()))
         },
-        watcher::watch(vault_config.jwt_path.clone(), client),
+        watcher::watch(match vault_config.auth {
+            Auth::Kubernetes(path) => Some(path),
+            _ => None
+        }, client),
     )?;
     Ok(())
 }

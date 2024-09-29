@@ -1,37 +1,24 @@
-use crate::utilities::env::{get_env, get_env_option};
+use crate::configuration::authentication::Auth;
+use crate::utilities::env::get_env;
 
 const DEFAULT_VAULT_ADDRESS: &str = "https://vault.vault.svc.cluster.local:8200";
 const DEFAULT_VAULT_TRANSIT_KEY: &str = "vault-kms-provider";
 const DEFAULT_VAULT_ROLE: &str = "vault-kms-provider";
-const DEFAULT_USER: &str = "vault-kms-provider";
-
-#[derive(Clone, Debug)]
-pub struct Credentials {
-    pub username: String,
-    pub password: String,
-}
 
 pub struct VaultConfiguration {
+    pub auth: Auth,
     pub vault_role: String,
     pub vault_address: String,
-    pub jwt_path: Option<String>,
-    pub vault_token: Option<String>,
     pub vault_transit_key: String,
-    pub vault_user_credentials: Option<Credentials>,
 }
 
 impl VaultConfiguration {
     pub fn new() -> Self {
         Self {
+            auth: Auth::get(),
             vault_role: get_env("VAULT_ROLE", DEFAULT_VAULT_ROLE),
-            vault_token: get_env_option("VAULT_TOKEN"),
-            jwt_path: get_env_option("VAULT_TOKEN_PATH"),
             vault_address: get_env("VAULT_ADDRESS", DEFAULT_VAULT_ADDRESS),
             vault_transit_key: get_env("VAULT_TRANSIT_KEY", DEFAULT_VAULT_TRANSIT_KEY),
-            vault_user_credentials: get_env_option("VAULT_PASSWORD").map(|password| Credentials {
-                username: get_env("VAULT_USER", DEFAULT_USER),
-                password,
-            }),
         }
     }
 }

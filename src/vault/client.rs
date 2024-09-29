@@ -1,4 +1,4 @@
-use crate::configuration::vault::{Credentials, VaultConfiguration};
+use crate::configuration::vault::VaultConfiguration;
 use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
 use std::{fs, string::ToString};
@@ -6,6 +6,7 @@ use tonic::{async_trait, Code, Status};
 use tracing::{debug, instrument, warn};
 use vaultrs::client::{Client as ClientTrait, VaultClient};
 use vaultrs::{api::AuthInfo, error::ClientError, transit};
+use crate::configuration::authentication::{Auth, Credentials};
 
 const TRANSIT_MOUNT: &str = "transit";
 const KUBERNETES_AUTH_MOUNT: &str = "kubernetes";
@@ -28,9 +29,7 @@ impl From<ClientError> for VaultError {
 pub struct Client {
     pub key_name: String,
     role: String,
-    token: Option<String>,
-    jwt_path: Option<String>,
-    credentials: Option<Credentials>,
+    auth: Auth,
     client: VaultClient,
 }
 
@@ -60,17 +59,14 @@ impl Client {
 
     #[instrument(skip(self))]
     async fn get_token(&self) -> Result<String, ClientError> {
-        if let Some(path) = self.jwt_path.clone() {
-            Ok(self.request_token_with_jwt(&path).await?)
-        } else if let Some(credentials) = self.credentials.clone() {
-            Ok(self.request_token_with_credentials(&credentials).await?.client_token)
-        } else if let Some(token) = self.token.clone() {
-            Ok(token)
-        } else {
-            Err(ClientError::APIError {
+        match self.auth.clone() {
+            Auth::Token(token) => Ok(token),
+            Auth::Kubernetes(path) => Ok(self.request_token_with_jwt(&path).await?),
+            Auth::Credentials(credentials) => Ok(self.request_token_with_credentials(&credentials).await?.client_token),
+            Auth::None => Err(ClientError::APIError {
                 code: 500,
                 errors: vec!["No token found".to_string()],
-            })
+            }),
         }
     }
 
@@ -78,9 +74,7 @@ impl Client {
         Self {
             role: config.vault_role.to_string(),
             key_name: config.vault_transit_key.to_string(),
-            jwt_path: config.jwt_path.clone(),
-            token: config.vault_token.clone(),
-            credentials: config.vault_user_credentials.clone(),
+            auth: config.auth.clone(),
             client,
         }
     }
