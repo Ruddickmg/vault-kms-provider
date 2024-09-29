@@ -3,6 +3,13 @@ use crate::utilities::env::{get_env, get_env_option};
 const DEFAULT_VAULT_ADDRESS: &str = "https://vault.vault.svc.cluster.local:8200";
 const DEFAULT_VAULT_TRANSIT_KEY: &str = "vault-kms-provider";
 const DEFAULT_VAULT_ROLE: &str = "vault-kms-provider";
+const DEFAULT_USER: &str = "vault-kms-provider";
+
+#[derive(Clone, Debug)]
+pub struct Credentials {
+    pub username: String,
+    pub password: String,
+}
 
 pub struct VaultConfiguration {
     pub vault_role: String,
@@ -10,6 +17,7 @@ pub struct VaultConfiguration {
     pub jwt_path: Option<String>,
     pub vault_token: Option<String>,
     pub vault_transit_key: String,
+    pub vault_user_credentials: Option<Credentials>,
 }
 
 impl VaultConfiguration {
@@ -20,6 +28,10 @@ impl VaultConfiguration {
             jwt_path: get_env_option("VAULT_TOKEN_PATH"),
             vault_address: get_env("VAULT_ADDRESS", DEFAULT_VAULT_ADDRESS),
             vault_transit_key: get_env("VAULT_TRANSIT_KEY", DEFAULT_VAULT_TRANSIT_KEY),
+            vault_user_credentials: get_env_option("VAULT_PASSWORD").map(|password| Credentials {
+                username: get_env("VAULT_USER", DEFAULT_USER),
+                password,
+            }),
         }
     }
 }

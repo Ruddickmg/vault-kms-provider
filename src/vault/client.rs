@@ -1,4 +1,4 @@
-use crate::configuration::vault::VaultConfiguration;
+use crate::configuration::vault::{Credentials, VaultConfiguration};
 use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
 use std::{fs, string::ToString};
@@ -30,6 +30,7 @@ pub struct Client {
     role: String,
     token: Option<String>,
     jwt_path: Option<String>,
+    credentials: Option<Credentials>,
     client: VaultClient,
 }
 
@@ -53,7 +54,7 @@ impl Client {
             source: error,
             path: path.to_string(),
         })?;
-        debug!("Using mounted jwt of length: {}", jwt.len());
+        debug!("Logging in via JWT: {}", jwt.len());
         Ok(self.jwt_auth(&jwt).await?.client_token)
     }
 
@@ -61,6 +62,8 @@ impl Client {
     async fn get_token(&self) -> Result<String, ClientError> {
         if let Some(path) = self.jwt_path.clone() {
             Ok(self.request_token_with_jwt(&path).await?)
+        } else if let Some(credentials) = self.credentials.clone() {
+            Ok(self.request_token_with_credentials(&credentials).await?.client_token)
         } else if let Some(token) = self.token.clone() {
             Ok(token)
         } else {
@@ -77,8 +80,15 @@ impl Client {
             key_name: config.vault_transit_key.to_string(),
             jwt_path: config.jwt_path.clone(),
             token: config.vault_token.clone(),
+            credentials: config.vault_user_credentials.clone(),
             client,
         }
+    }
+
+    #[instrument(skip(self, credentials))]
+    pub async fn request_token_with_credentials(&self, credentials: &Credentials) -> Result<AuthInfo, ClientError> {
+        debug!("Logging in with credentials: {:?}", credentials);
+        Ok(vaultrs::auth::userpass::login(&self.client, "auth", &credentials.username, &credentials.password).await?)
     }
 
     #[instrument(skip(self, jwt))]
@@ -122,6 +132,7 @@ impl Client {
 
     #[instrument(skip(self, token))]
     pub fn set_token(&mut self, token: &str) -> () {
+        debug!("Setting token: {}", token);
         self.client.set_token(token);
     }
 }
