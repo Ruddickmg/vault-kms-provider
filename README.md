@@ -39,7 +39,8 @@ cargo test --bins --lib
 ### Integration
 Integration tests will be located in the `tests` directory at the root of the project, they require some set up locally.
 
-First you will need to run the vault service using docker compose by running the following command in the root directory:
+#### Running Vault & The KMS provider
+First, you will need to run the vault service using docker compose by running the following command in the root directory:
 ```shell
 docker compose up vault -d
 ```
@@ -53,6 +54,24 @@ After the transit has been enabled you can start the kms provider
 ```shell
 docker compose up vault-kms-provider -d
 ```
+
+#### Setting up Authentication
+
+You'll also need to enable the authentication methods which are tested via integration tests
+
+Enable userpass authentication
+```shell
+docker compose exec vault vault auth enable userpass
+```
+
+Create user & password for userpass authentication
+```shell
+docker compose exec vault vault write auth/userpass/users/vault-kms-provider \
+    password=password \
+    policies=default
+```
+
+#### Tests
 
 Then finally you can run the integration tests with the following command
 ```shell

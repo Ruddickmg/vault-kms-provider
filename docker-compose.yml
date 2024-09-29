@@ -19,8 +19,9 @@ services:
       - -config=/mnt/tls-config.hcl
     networks:
       - vault-kms-provider
-    expose:
-      - 8400:8400
+    ports:
+      - "8200:8400"
+      - "8400:8400"
 
   vault-kms-provider:
     environment:

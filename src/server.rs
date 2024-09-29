@@ -5,13 +5,12 @@ use lib::{
     kms::key_management_service_server::KeyManagementServiceServer,
     utilities::{logging, socket::create_unix_socket, watcher},
     vault,
-
 };
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tonic::transport::Server;
 use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
-use lib::configuration::authentication::Auth;
+use lib::configuration::authentication::Authentication;
 
 mod checks;
 
@@ -23,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let vault_config = VaultConfiguration::new();
     let tls_config = tls::TlsConfiguration::new();
     let settings = VaultClientSettingsBuilder::default()
-        .address(&vault_config.vault_address)
+        .address(&vault_config.address)
         .ca_certs(tls_config.certs())
         .build()?;
     let client = Arc::new(RwLock::new(vault::Client::new(
@@ -46,7 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .map_err(|error| std::io::Error::other(error.to_string()))
         },
         watcher::watch(match vault_config.auth {
-            Auth::Kubernetes(path) => Some(path),
+            Authentication::Kubernetes(path) => Some(path),
             _ => None
         }, client),
     )?;

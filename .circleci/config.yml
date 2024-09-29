@@ -365,6 +365,15 @@ jobs:
           name: Start KMS provider
           command: docker compose up vault-kms-provider -d
       - run:
+          name: Enable userpass authentication
+          command: docker compose exec vault vault auth enable userpass
+      - run:
+          name: Add user for userpass authentication
+          command: |
+            docker compose exec vault vault write auth/userpass/users/vault-kms-provider \
+                password=password \
+                policies=default
+      - run:
           name: Run integration tests
           command: cargo test --test '*'
 

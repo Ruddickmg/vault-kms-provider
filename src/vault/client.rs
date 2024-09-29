@@ -6,7 +6,7 @@ use tonic::{async_trait, Code, Status};
 use tracing::{debug, instrument, warn};
 use vaultrs::client::{Client as ClientTrait, VaultClient};
 use vaultrs::{api::AuthInfo, error::ClientError, transit};
-use crate::configuration::authentication::{Auth, Credentials};
+use crate::configuration::authentication::{Authentication, Credentials};
 
 const TRANSIT_MOUNT: &str = "transit";
 const KUBERNETES_AUTH_MOUNT: &str = "kubernetes";
@@ -29,7 +29,7 @@ impl From<ClientError> for VaultError {
 pub struct Client {
     pub key_name: String,
     role: String,
-    auth: Auth,
+    auth: Authentication,
     client: VaultClient,
 }
 
@@ -58,12 +58,12 @@ impl Client {
     }
 
     #[instrument(skip(self))]
-    async fn get_token(&self) -> Result<String, ClientError> {
+    pub async fn get_token(&self) -> Result<String, ClientError> {
         match self.auth.clone() {
-            Auth::Token(token) => Ok(token),
-            Auth::Kubernetes(path) => Ok(self.request_token_with_jwt(&path).await?),
-            Auth::Credentials(credentials) => Ok(self.request_token_with_credentials(&credentials).await?.client_token),
-            Auth::None => Err(ClientError::APIError {
+            Authentication::Token(token) => Ok(token),
+            Authentication::Kubernetes(path) => Ok(self.request_token_with_jwt(&path).await?),
+            Authentication::Credentials(credentials) => Ok(self.request_token_with_credentials(&credentials).await?.client_token),
+            Authentication::None => Err(ClientError::APIError {
                 code: 500,
                 errors: vec!["No token found".to_string()],
             }),
@@ -72,8 +72,8 @@ impl Client {
 
     pub fn new(client: VaultClient, config: &VaultConfiguration) -> Self {
         Self {
-            role: config.vault_role.to_string(),
-            key_name: config.vault_transit_key.to_string(),
+            role: config.role.to_string(),
+            key_name: config.transit_key.to_string(),
             auth: config.auth.clone(),
             client,
         }
@@ -82,7 +82,7 @@ impl Client {
     #[instrument(skip(self, credentials))]
     pub async fn request_token_with_credentials(&self, credentials: &Credentials) -> Result<AuthInfo, ClientError> {
         debug!("Logging in with credentials: {:?}", credentials);
-        Ok(vaultrs::auth::userpass::login(&self.client, "auth", &credentials.username, &credentials.password).await?)
+        Ok(vaultrs::auth::userpass::login(&self.client, &credentials.path, &credentials.username, &credentials.password).await?)
     }
 
     #[instrument(skip(self, jwt))]
