@@ -30,6 +30,8 @@
                      
                      <ul>
                        
+                         <li><a href=/configuration/authentication/>Authentication</a></li>
+                       
                          <li><a href=/configuration/kubernetes/>Kubernetes</a></li>
                        
                          <li><a href=/configuration/provider/>Provider</a></li>
@@ -74,11 +76,11 @@
                      
                      <ul>
                        
+                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
+                       
                          <li><a href=/benchmarks/encryption/>Encryption</a></li>
                        
                          <li><a href=/benchmarks/health/>Health</a></li>
-                       
-                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
                        
                      </ul>
                    </div>
@@ -94,6 +96,40 @@
 </div>
 <div class="content-body">
     
+
+<h2>Authentication</h2>
+<p>Currently, the following authentication methods are supported</p>
+<ul>
+<li><a href="https://developer.hashicorp.com/vault/api-docs/auth/token">Token</a></li>
+<li><a href="https://developer.hashicorp.com/vault/docs/auth/kubernetes">Kubernetes</a></li>
+<li><a href="https://developer.hashicorp.com/vault/docs/auth/userpass">Userpass</a></li>
+</ul>
+<p>Configuration of auth methods is done using the environment variables listed below.</p>
+<pre class="language-hcl"><code class="language-hcl"><span class="token comment"># Path defined for the authentication route, ex: auth/custom-auth-path/...</span>
+<span class="token comment">#  if not set, will default to the associated auth method, ex: auth/userpass/.. or auth/kubernetes/..</span>
+<span class="token property">VAULT_AUTH_PATH</span> <span class="token punctuation">=</span> <span class="token string">"custom-auth-path"</span>
+
+<span class="token comment"># Vault token for vault access</span>
+<span class="token property">VAULT_TOKEN</span> <span class="token punctuation">=</span> <span class="token string">"SiQOECxwSDCeQt1r0n5kqQCr"</span>
+
+<span class="token comment"># user and password for userpass authentication</span>
+<span class="token property">VAULT_USER</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
+<span class="token property">VAULT_PASSWORD</span> <span class="token punctuation">=</span> <span class="token string">"some-password"</span>
+
+<span class="token comment"># path to mounted JWT for kubernetes auth</span>
+<span class="token property">VAULT_JWT_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/vault.jwt"</span></code></pre>
+<p>Environment variables can be configured using the <code>env</code> property in the values.yaml, ex:</p>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">env</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> VAULT_TOKEN
+    <span class="token key atrule">valueFrom</span><span class="token punctuation">:</span>
+      <span class="token key atrule">secretKeyRef</span><span class="token punctuation">:</span>
+        <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>token<span class="token punctuation">-</span>secret
+        <span class="token key atrule">key</span><span class="token punctuation">:</span> token</code></pre>
+<p>The <code>envFrom</code> property is also configurable in the values.yaml file, allowing configMaps, etc to be added. ex:</p>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">envFrom</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">configMapRef</span><span class="token punctuation">:</span>
+    <span class="token key atrule">name</span><span class="token punctuation">:</span> my<span class="token punctuation">-</span>custom<span class="token punctuation">-</span>config<span class="token punctuation">-</span>map</code></pre>
+
 
 <h2>Configure Kubernetes</h2>
 <div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>Kubernetes documentation on setting up encryption can be found <a href="https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file">here</a></p>
@@ -149,11 +185,25 @@
 <span class="token comment"># The string identifier used to store the encryption keys in the vault transit gateway</span>
 <span class="token property">VAULT_TRANSIT_KEY</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
 
-<span class="token comment"># Used for authenticating with vault, only use if token authentication is desired.</span>
-<span class="token property">VAULT_TOKEN</span> <span class="token punctuation">=</span> <span class="token string">""</span>
+<span class="token comment"># path defined for the transit gateway, ex: auth/transit/... or auth/transit-path/...</span>
+<span class="token property">VAULT_TRANSIT_PATH</span> <span class="token punctuation">=</span> <span class="token string">"transit"</span>
 
 <span class="token comment"># The endpoint that the health checks will listen on</span>
-<span class="token property">HEALTH_ENDPOINT</span> <span class="token punctuation">=</span> <span class="token string">"0.0.0.0:8080"</span></code></pre>
+<span class="token property">HEALTH_ENDPOINT</span> <span class="token punctuation">=</span> <span class="token string">"0.0.0.0:8080"</span>
+
+<span class="token comment"># Path defined for the authentication route, ex: auth/custom-auth-path/...</span>
+<span class="token comment">#  if not set, will default to the associated auth method, ex: auth/userpass/.. or auth/kubernetes/..</span>
+<span class="token property">VAULT_AUTH_PATH</span> <span class="token punctuation">=</span> null
+
+<span class="token comment"># Vault token for vault access</span>
+<span class="token property">VAULT_TOKEN</span> <span class="token punctuation">=</span> null
+
+<span class="token comment"># user and password for userpass authentication</span>
+<span class="token property">VAULT_USER</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
+<span class="token property">VAULT_PASSWORD</span> <span class="token punctuation">=</span> null
+
+<span class="token comment"># path to mounted JWT for kubernetes auth</span>
+<span class="token property">VAULT_JWT_PATH</span> <span class="token punctuation">=</span> null</code></pre>
 
 
 <h2>Set up TLS communication</h2>

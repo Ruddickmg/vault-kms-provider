@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Vault KMS Provider</title>
+        <link rel="stylesheet" href="/css/index.css">
+        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <link href="https://unpkg.com/prismjs@1.20.0/themes/prism-solarizedlight.css" rel="stylesheet"/>
+    </head>
+    <body style="background-color: #ffffff">
+        
+<div class="homepage">
+    <div class="sidebar">
+       <div class="navbar">
+           <div>
+             <a href="/">
+               <h2>Quick Start</h2>
+             </a>
+           </div>
+           
+               
+                   
+               
+           
+               
+                   
+                   <div>
+                     
+                       <a href="/configuration"><h2>Configuration</h2></a>
+                     
+                     <ul>
+                       
+                         <li><a href=/configuration/authentication/>Authentication</a></li>
+                       
+                         <li><a href=/configuration/kubernetes/>Kubernetes</a></li>
+                       
+                         <li><a href=/configuration/provider/>Provider</a></li>
+                       
+                         <li><a href=/configuration/tls/>Tls</a></li>
+                       
+                         <li><a href=/configuration/vault/>Vault</a></li>
+                       
+                     </ul>
+                   </div>
+                   
+               
+           
+               
+                   
+               
+           
+               
+                   
+                   <div>
+                     
+                       <a href="/installation"><h2>Installation</h2></a>
+                     
+                     <ul>
+                       
+                         <li><a href=/installation/docker/>Docker</a></li>
+                       
+                         <li><a href=/installation/helm/>Helm</a></li>
+                       
+                         <li><a href=/installation/repository/>Repository</a></li>
+                       
+                     </ul>
+                   </div>
+                   
+               
+           
+               
+                   
+                   <div>
+                     
+                       <h2>Benchmarks</h2>
+                     
+                     <ul>
+                       
+                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
+                       
+                         <li><a href=/benchmarks/encryption/>Encryption</a></li>
+                       
+                         <li><a href=/benchmarks/health/>Health</a></li>
+                       
+                     </ul>
+                   </div>
+                   
+               
+           
+       </div>
+    </div>
+    <div class="content">
+        
+<div class="content-header">
+    <h1>Configuration</h1>
+</div>
+<div class="content-body">
+    <h2>Authentication</h2>
+<p>Currently, the following authentication methods are supported</p>
+<ul>
+<li><a href="https://developer.hashicorp.com/vault/api-docs/auth/token">Token</a></li>
+<li><a href="https://developer.hashicorp.com/vault/docs/auth/kubernetes">Kubernetes</a></li>
+<li><a href="https://developer.hashicorp.com/vault/docs/auth/userpass">Userpass</a></li>
+</ul>
+<p>Configuration of auth methods is done using the environment variables listed below.</p>
+<pre class="language-hcl"><code class="language-hcl"><span class="token comment"># Path defined for the authentication route, ex: auth/custom-auth-path/...</span>
+<span class="token comment">#  if not set, will default to the associated auth method, ex: auth/userpass/.. or auth/kubernetes/..</span>
+<span class="token property">VAULT_AUTH_PATH</span> <span class="token punctuation">=</span> <span class="token string">"custom-auth-path"</span>
+
+<span class="token comment"># Vault token for vault access</span>
+<span class="token property">VAULT_TOKEN</span> <span class="token punctuation">=</span> <span class="token string">"SiQOECxwSDCeQt1r0n5kqQCr"</span>
+
+<span class="token comment"># user and password for userpass authentication</span>
+<span class="token property">VAULT_USER</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
+<span class="token property">VAULT_PASSWORD</span> <span class="token punctuation">=</span> <span class="token string">"some-password"</span>
+
+<span class="token comment"># path to mounted JWT for kubernetes auth</span>
+<span class="token property">VAULT_JWT_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/vault.jwt"</span></code></pre>
+<p>Environment variables can be configured using the <code>env</code> property in the values.yaml, ex:</p>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">env</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> VAULT_TOKEN
+    <span class="token key atrule">valueFrom</span><span class="token punctuation">:</span>
+      <span class="token key atrule">secretKeyRef</span><span class="token punctuation">:</span>
+        <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>token<span class="token punctuation">-</span>secret
+        <span class="token key atrule">key</span><span class="token punctuation">:</span> token</code></pre>
+<p>The <code>envFrom</code> property is also configurable in the values.yaml file, allowing configMaps, etc to be added. ex:</p>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">envFrom</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">configMapRef</span><span class="token punctuation">:</span>
+    <span class="token key atrule">name</span><span class="token punctuation">:</span> my<span class="token punctuation">-</span>custom<span class="token punctuation">-</span>config<span class="token punctuation">-</span>map</code></pre>
+
+</div>
+
+    </div>
+</div>
+    </body>
+</html>

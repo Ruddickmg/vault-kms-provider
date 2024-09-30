@@ -30,6 +30,8 @@
                      
                      <ul>
                        
+                         <li><a href=/configuration/authentication/>Authentication</a></li>
+                       
                          <li><a href=/configuration/kubernetes/>Kubernetes</a></li>
                        
                          <li><a href=/configuration/provider/>Provider</a></li>
@@ -74,11 +76,11 @@
                      
                      <ul>
                        
+                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
+                       
                          <li><a href=/benchmarks/encryption/>Encryption</a></li>
                        
                          <li><a href=/benchmarks/health/>Health</a></li>
-                       
-                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
                        
                      </ul>
                    </div>
@@ -118,11 +120,25 @@
 <span class="token comment"># The string identifier used to store the encryption keys in the vault transit gateway</span>
 <span class="token property">VAULT_TRANSIT_KEY</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
 
-<span class="token comment"># Used for authenticating with vault, only use if token authentication is desired.</span>
-<span class="token property">VAULT_TOKEN</span> <span class="token punctuation">=</span> <span class="token string">""</span>
+<span class="token comment"># path defined for the transit gateway, ex: auth/transit/... or auth/transit-path/...</span>
+<span class="token property">VAULT_TRANSIT_PATH</span> <span class="token punctuation">=</span> <span class="token string">"transit"</span>
 
 <span class="token comment"># The endpoint that the health checks will listen on</span>
-<span class="token property">HEALTH_ENDPOINT</span> <span class="token punctuation">=</span> <span class="token string">"0.0.0.0:8080"</span></code></pre>
+<span class="token property">HEALTH_ENDPOINT</span> <span class="token punctuation">=</span> <span class="token string">"0.0.0.0:8080"</span>
+
+<span class="token comment"># Path defined for the authentication route, ex: auth/custom-auth-path/...</span>
+<span class="token comment">#  if not set, will default to the associated auth method, ex: auth/userpass/.. or auth/kubernetes/..</span>
+<span class="token property">VAULT_AUTH_PATH</span> <span class="token punctuation">=</span> null
+
+<span class="token comment"># Vault token for vault access</span>
+<span class="token property">VAULT_TOKEN</span> <span class="token punctuation">=</span> null
+
+<span class="token comment"># user and password for userpass authentication</span>
+<span class="token property">VAULT_USER</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
+<span class="token property">VAULT_PASSWORD</span> <span class="token punctuation">=</span> null
+
+<span class="token comment"># path to mounted JWT for kubernetes auth</span>
+<span class="token property">VAULT_JWT_PATH</span> <span class="token punctuation">=</span> null</code></pre>
 
 </div>
 
