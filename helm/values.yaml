@@ -1,28 +1,26 @@
-replicaCount: 1
-
+# Configuration for the KMS provider image
 image:
+  # KMS provider repository
   repository: ruddickmg/vault-kms-provider
+  # Pull policy, ensure we are always using the most up-to-date image
   pullPolicy: Always
+  # Image tag
   tag: latest
 
 # configurations for connecting to vault
 vault:
   # the url to the running vault instance
   address: https://vault.vault.svc.cluster.local:8200
-  # the key with which the encryption records will be initialized
-  transitKey: vault-kms-provider
-  # details for a secret that contains a vault token for vault authorization
-  token:
-    # if set to true the value of the secret below will be added to the vault-kms-provider containers environment variables
-    set: false
-    # if set to true a secret will be created with the value, name and key below. It is not secure to directly create a secret via this helm chart but this can be used for testing/debugging if necessary
-    create: false
-    # It is not secure to set this value directly but this can be used for testing/debugging purposes
-    value: ""
-    # name of the secret to be used or created, if create is set to false, the secret must be manually created by the user, this is a secure way of using the vault token directly
-    name: vault-auth-token
-    # the key/path within the secret where the vault token is stored
-    key: token
+  # configurations for the transit gateway
+  transit:
+    # the key with which the encryption records will be initialized
+    key: vault-kms-provider
+    # the path at which the transit record is set
+    path: transit
+  # authentication configuration
+  authentication:
+    # path at which authentication is set, if set will override default paths
+    path: ""
   # configuration for tls communication with vault
   ca:
     # path to CA certificate file
@@ -32,46 +30,62 @@ vault:
 
 # Configuration for logging
 logging:
-  # level of logs to print, can be: none, error, warn, info, debug, or trace
+  # Level of logs to print, can be: none, error, warn, info, debug, or trace
   level: "info"
-  # log formats, can be: json, pretty, etc..
+  # Log formats, can be: json, pretty, etc..
   format: "json"
 
+# Configurations for the default config map
 configMap:
+  # Name of the default config map
   name: vault-kms-provider-configuration
 
-nodeLabel:
-  key: &labelKey node-role.kubernetes.io/control-plane
-  value: &labelValue "true"
-
+# Configurations of the socket used for communication between kubernetes and the KMS provider
 socket:
+  # Name of the socket file
   name: vault-kms-provider.sock
+  # Path to the directory where the socket will be created inside the container
   path: /run/sockets
-  hostPath: /mnt
+  # File permissions set on the socket file
   permissions: any
 
+# Service configurations, used for health checks
 service:
+  # Health check port
   port: &healthCheckPort 8080
+  # Health check host address
   host: 0.0.0.0
 
+# Configuration for the volume used to create/share the socket with the host machine/Kubernetes api server
 socketVolume:
+  # Name of the volume
   name: vault-kms-provider-socket-volume
+  # Name for the persistent volume claim
   claim: socket-volume
+  # Name for the storage class assigned to the volume
   storageClass: unix-socket-storage
-  size: 300mi
+  # Path to the directory where the volume will be mounted on the host machine
+  hostPath: /mnt
 
+# Configurations for node affinity, ensuring the KMS Provider is run on the control plane
+nodeLabel:
+  # The key for "matchExpressions", the label used in the node selector
+  key: &labelKey node-role.kubernetes.io/control-plane
+  # The value of the label used in the node selector
+  value: &labelValue "true"
+
+# Node selector configuration, ensuring the KMS Provider is run on the control plane
 nodeSelector:
   *labelKey: *labelValue
 
+# Tolerations allow the KMS Provider to run on the control plane in spite of normal anti affinity rules
 tolerations:
   - key: *labelKey
     operator: "Equal"
     value: *labelValue
     effect: "NoSchedule"
 
-local:
-  path: /mnt
-
+# Defines the priority of the pod for the Kubernetes scheduler
 priorityClassName: system-cluster-critical
 
 podSecurityContext:
@@ -116,11 +130,14 @@ serviceAccount:
   automount: false
   annotations: {}
   token:
-    name: vault-token
+    name: vault-jwt
     path: /var/run/secrets/tokens
 
+# Kubernetes role configuration
 role:
+  # Role name
   name: vault-kms-access
+  # Kubernetes role permissions configuration
   rules: []
 
 # for use in templating an encryption file, "output" should be always be false unless the intention is to generate a compatible encryption configuration
@@ -128,6 +145,12 @@ encryption:
   output: false
   fallback: true
   enabled: true
+
+# environment variables for the container
+envFrom: {}
+
+# environment variables for the container
+env: {}
 
 volumes: {}
 volumeMounts: {}

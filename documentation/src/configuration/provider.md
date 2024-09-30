@@ -41,9 +41,23 @@ SOCKET_PERMISSIONS = "any"
 # The string identifier used to store the encryption keys in the vault transit gateway
 VAULT_TRANSIT_KEY = "vault-kms-provider"
 
-# Used for authenticating with vault, only use if token authentication is desired.
-VAULT_TOKEN = ""
+# path defined for the transit gateway, ex: auth/transit/... or auth/transit-path/...
+VAULT_TRANSIT_PATH = "transit"
 
 # The endpoint that the health checks will listen on
 HEALTH_ENDPOINT = "0.0.0.0:8080"
+
+# Path defined for the authentication route, ex: auth/custom-auth-path/...
+#  if not set, will default to the associated auth method, ex: auth/userpass/.. or auth/kubernetes/..
+VAULT_AUTH_PATH = null
+
+# Vault token for vault access
+VAULT_TOKEN = null
+
+# user and password for userpass authentication
+VAULT_USER = "vault-kms-provider"
+VAULT_PASSWORD = null
+
+# path to mounted JWT for kubernetes auth
+VAULT_JWT_PATH = null
 ```

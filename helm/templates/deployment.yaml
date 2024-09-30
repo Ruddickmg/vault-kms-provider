@@ -57,17 +57,17 @@ spec:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
-          {{- if .Values.vault.token.set }}
+          {{- with .Values.env }}
           env:
-            - name: VAULT_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.vault.token.name }}
-                  key: {{ .Values.vault.token.key }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           envFrom:
+            {{- if .Values.envFrom }}
+              {{- toYaml .Values.envFrom | nindent 12 }}
+            {{- else }}
             - configMapRef:
                 name: {{ .Values.configMap.name }}
+            {{- end }}
           volumeMounts:
             - name: {{ .Values.socketVolume.name }}
               mountPath: {{ .Values.socket.path }}

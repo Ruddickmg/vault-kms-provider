@@ -1,5 +1,6 @@
 extern crate lib;
 
+use lib::configuration::authentication::Credentials;
 use lib::{
     configuration::{socket::SocketConfiguration, tls, vault::VaultConfiguration},
     kms::key_management_service_server::KeyManagementServiceServer,
@@ -21,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let vault_config = VaultConfiguration::new();
     let tls_config = tls::TlsConfiguration::new();
     let settings = VaultClientSettingsBuilder::default()
-        .address(&vault_config.vault_address)
+        .address(&vault_config.address)
         .ca_certs(tls_config.certs())
         .build()?;
     let client = Arc::new(RwLock::new(vault::Client::new(
@@ -43,7 +44,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .await
                 .map_err(|error| std::io::Error::other(error.to_string()))
         },
-        watcher::watch(vault_config.jwt_path.clone(), client),
+        watcher::watch(
+            match vault_config.credentials {
+                Credentials::Kubernetes(credentials) => Some(credentials.file_path),
+                _ => None,
+            },
+            client
+        ),
     )?;
     Ok(())
 }

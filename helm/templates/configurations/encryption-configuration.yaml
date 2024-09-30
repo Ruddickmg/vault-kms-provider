@@ -9,7 +9,7 @@ resources:
       - kms:
           apiVersion: v2
           name: vault-kms-provider
-          endpoint: unix://{{ .Values.socket.hostPath }}/{{ .Values.socket.name }}
+          endpoint: unix://{{ .Values.socketVolume.hostPath }}/{{ .Values.socket.name }}
           timeout: 3s
       {{- end }}
       {{- if .Values.encryption.fallback }}

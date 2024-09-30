@@ -7,38 +7,12 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
 See usage [documentation here](https://vault-kms-provider.io/)
 
 ### RoadMap:
-- [x] Create grpc server from the [kubernetes proto file](https://kubernetes.io/docs/tasks/administer-cluster/kms-provider/#developing-a-kms-plugin-gRPC-server-kms-v2)
-    - [x] Generate rust code from k8s proto
-    - [x] Provide implementations for generated traits
-    - [x] Get server in a running state
-- [x] Create vault client for performing KMS actions
-    - [x] Create all methods required for KMS service
-    - [x] Test encryption with vault
-    - [x] Test decryption with vault
-    - [x] Test status checks (key info retrieval) with vault
-- [x] Set up socket communication
-    - [x] Connect to kubernetes kms provider via socket
-    - [x] Secure Socket connection
-    - [x] Test socket communication
-- [x] Create docker container for plugin
-- [x] Set up ci for deployment
 - [ ] Set up Authentication
     - [x] Kubernetes
     - [x] Token
-    - [ ] User & Password
+    - [x] User & Password
     - [ ] App Role
     - [ ] Tls certs
-- [x] Cache vault token
-- [x] Update vault token on mounted jwt file changes
-- [x] Test Token rotation
-- [x] Set up application benchmarks
-- [x] Create a docs page on GitHub pages
-- [x] Allow Tls for http communication
-- [x] Document manual integration steps
-- [x] Create Helm Chart for easy deployment
-- [x] Set up helm char repository via GitHub pages
-- [x] Set up logging
-- [ ] Remove logs for imported libraries
 
 ## Kubernetes authentication
 
@@ -65,7 +39,8 @@ cargo test --bins --lib
 ### Integration
 Integration tests will be located in the `tests` directory at the root of the project, they require some set up locally.
 
-First you will need to run the vault service using docker compose by running the following command in the root directory:
+#### Running Vault & The KMS provider
+First, you will need to run the vault service using docker compose by running the following command in the root directory:
 ```shell
 docker compose up vault -d
 ```
@@ -79,6 +54,24 @@ After the transit has been enabled you can start the kms provider
 ```shell
 docker compose up vault-kms-provider -d
 ```
+
+#### Setting up Authentication
+
+You'll also need to enable the authentication methods which are tested via integration tests
+
+Enable userpass authentication
+```shell
+docker compose exec vault vault auth enable userpass
+```
+
+Create user & password for userpass authentication
+```shell
+docker compose exec vault vault write auth/userpass/users/vault-kms-provider \
+    password=password \
+    policies=default
+```
+
+#### Tests
 
 Then finally you can run the integration tests with the following command
 ```shell

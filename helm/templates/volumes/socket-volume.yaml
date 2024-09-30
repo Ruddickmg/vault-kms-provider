@@ -11,7 +11,7 @@ spec:
   persistentVolumeReclaimPolicy: Delete
   storageClassName: {{ .Values.socketVolume.storageClass }}
   local:
-    path: {{ .Values.local.path }}
+    path: {{ .Values.socketVolume.hostPath }}
   nodeAffinity:
     required:
       nodeSelectorTerms:
