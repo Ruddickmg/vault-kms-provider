@@ -1,8 +1,10 @@
 mod kubernetes;
 mod user_pass;
+mod app_role;
 
 pub use kubernetes::Kubernetes;
 pub use user_pass::UserPass;
+use crate::configuration::authentication::app_role::AppRole;
 
 use crate::utilities::env::{get_env, get_env_option};
 
@@ -10,6 +12,7 @@ const DEFAULT_USER: &str = "vault-kms-provider";
 
 #[derive(Clone, Debug)]
 pub enum Credentials {
+    AppRole(AppRole),
     UserPass(UserPass),
     Kubernetes(Kubernetes),
     Token(String),
@@ -29,6 +32,8 @@ impl Credentials {
                 password,
                 auth_path,
             ))
+        } else if let Some((role_id, secret_id)) = get_env_option("VAULT_ROLE_ID").zip(get_env_option("VAULT_SECRET_ID")) {
+            Self::AppRole(AppRole::new(role_id, secret_id, auth_path))
         } else {
             Self::None
         }
