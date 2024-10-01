@@ -12,7 +12,7 @@ impl AppRole {
         Self {
             role_id,
             secret_id,
-            mount_path: mount_path.unwrap_(DEFAULT_MOUNT_PATH.to_string()),
+            mount_path: mount_path.unwrap_or(DEFAULT_MOUNT_PATH.to_string()),
         }
     }
 }
