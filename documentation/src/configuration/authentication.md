@@ -26,6 +26,10 @@ VAULT_PASSWORD = "some-password"
 
 # path to mounted JWT for kubernetes auth
 VAULT_JWT_PATH = "/path/to/vault.jwt"
+
+# role_id and secret_id for approle authentication
+VAULT_ROLE_ID = "role"
+VAULT_SECRET_ID = "secret"
 ```
 
 Environment variables can be configured using the `env` property in the values.yaml, ex:
