@@ -11,7 +11,7 @@ See usage [documentation here](https://vault-kms-provider.io/)
     - [x] Kubernetes
     - [x] Token
     - [x] User & Password
-    - [ ] App Role
+    - [x] App Role
     - [ ] Tls certs
 
 ## Kubernetes authentication
