@@ -8,7 +8,8 @@ Currently, the following authentication methods are supported
 
 - [Token](https://developer.hashicorp.com/vault/api-docs/auth/token)
 - [Kubernetes](https://developer.hashicorp.com/vault/docs/auth/kubernetes)
-- [Userpass](https://developer.hashicorp.com/vault/docs/auth/userpass)
+- [UserPass](https://developer.hashicorp.com/vault/docs/auth/userpass)
+- [AppRole](https://developer.hashicorp.com/vault/docs/auth/approle)
 
 Configuration of auth methods is done using the environment variables listed below.
 

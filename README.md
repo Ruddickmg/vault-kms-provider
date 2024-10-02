@@ -8,11 +8,13 @@ See usage [documentation here](https://vault-kms-provider.io/)
 
 ### RoadMap:
 - [ ] Set up Authentication
-    - [x] Kubernetes
-    - [x] Token
-    - [x] User & Password
-    - [x] App Role
-    - [ ] Tls certs
+  - [ ] Make optional file path or value for each secret
+  - [x] Kubernetes
+  - [x] Token
+  - [x] User & Password
+  - [x] App Role
+  - [ ] Tls certs
+  - [ ] JWT/OIDC
 
 ## Kubernetes authentication
 
@@ -69,6 +71,31 @@ Create user & password for userpass authentication
 docker compose exec vault vault write auth/userpass/users/vault-kms-provider \
     password=password \
     policies=default
+```
+
+Enable app role authentication
+```shell
+docker compose exec vault vault auth enable approle
+```
+
+Generate a role id
+```shell
+docker compose exec vault vault write auth/approle/role/vault-kms-provider \
+    token_type=batch \
+    secret_id_ttl=10m \
+    token_ttl=20m \
+    token_max_ttl=30m \
+    secret_id_num_uses=40
+```
+
+Output the role id to a file
+```shell
+docker compose exec vault vault read auth/approle/role/vault-kms-provider/role-id -format="json" | jq -r .data.role_id > ./test_files/role_id
+```
+
+Output the secret id to a file
+```shell
+docker compose exec vault vault write -f auth/approle/role/vault-kms-provider/secret-id -format="json" | jq -r .data.secret_id > ./test_files/secret_id
 ```
 
 #### Tests

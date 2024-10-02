@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod authentication {
+    use std::fs;
     use lib::configuration::authentication::{AppRole, Credentials, UserPass};
     use lib::configuration::vault::VaultConfiguration;
     use lib::vault::Client;
@@ -31,14 +32,16 @@ mod authentication {
 
     #[tokio::test]
     async fn login_with_app_role() {
+        let role_id = fs::read_to_string("./test_files/role_id").unwrap();
+        let secret_id = fs::read_to_string("./test_files/secret_id").unwrap();
         let config: VaultConfiguration = VaultConfiguration {
             role: "vault-kms-provider".to_string(),
             address: "https://127.0.0.1:8400".to_string(),
             transit_key: "vault-kms-provider".to_string(),
             mount_path: "transit".to_string(),
             credentials: Credentials::AppRole(AppRole::new(
-                "role".to_string(),
-                "secret".to_string(),
+                role_id,
+                secret_id,
                 None,
             )),
         };
