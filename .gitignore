@@ -4,3 +4,5 @@
 sockets
 node_modules
 documentation/dist
+test_files/role_id
+test_files/secret_id

@@ -8,13 +8,14 @@ See usage [documentation here](https://vault-kms-provider.io/)
 
 ### RoadMap:
 - [ ] Set up Authentication
-  - [ ] Make optional file path or value for each secret
+  - [x] Make optional file path or value for each secret
   - [x] Kubernetes
   - [x] Token
   - [x] User & Password
   - [x] App Role
+  - [ ] JWT
   - [ ] Tls certs
-  - [ ] JWT/OIDC
+  - [ ] OIDC
 
 ## Kubernetes authentication
 
