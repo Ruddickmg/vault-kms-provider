@@ -1,4 +1,4 @@
-use crate::configuration::authentication::{Credentials, Kubernetes, UserPass};
+use crate::configuration::authentication::{AppRole, Credentials, Kubernetes, UserPass};
 use crate::configuration::vault::VaultConfiguration;
 use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
@@ -74,6 +74,10 @@ impl Client {
                 .user_pass_authentication(credentials)
                 .await?
                 .client_token),
+            Credentials::AppRole(credentials) => Ok(self
+                .app_role_authentication(credentials)
+                .await?
+                .client_token),
             Credentials::None => Err(ClientError::APIError {
                 code: 500,
                 errors: vec!["No token found".to_string()],
@@ -96,12 +100,27 @@ impl Client {
         &self,
         credentials: &UserPass,
     ) -> Result<AuthInfo, ClientError> {
-        debug!("Logging in with credentials: {:?}", credentials);
+        debug!("Logging in with UserPass credentials: {:?}", credentials);
         Ok(vaultrs::auth::userpass::login(
             &self.client,
             &credentials.mount_path,
             &credentials.username,
             &credentials.password,
+        )
+        .await?)
+    }
+
+    #[instrument(skip(self, credentials))]
+    pub async fn app_role_authentication(
+        &self,
+        credentials: &AppRole,
+    ) -> Result<AuthInfo, ClientError> {
+        debug!("Logging in with AppRole credentials: {:?}", credentials);
+        Ok(vaultrs::auth::approle::login(
+            &self.client,
+            &credentials.mount_path,
+            &credentials.role_id,
+            &credentials.secret_id,
         )
         .await?)
     }

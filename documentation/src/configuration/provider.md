@@ -60,4 +60,8 @@ VAULT_PASSWORD = null
 
 # path to mounted JWT for kubernetes auth
 VAULT_JWT_PATH = null
+
+# role_id and secret_id for approle authentication
+VAULT_ROLE_ID = null
+VAULT_SECRET_ID = null
 ```
