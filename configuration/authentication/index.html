@@ -100,7 +100,8 @@
 <ul>
 <li><a href="https://developer.hashicorp.com/vault/api-docs/auth/token">Token</a></li>
 <li><a href="https://developer.hashicorp.com/vault/docs/auth/kubernetes">Kubernetes</a></li>
-<li><a href="https://developer.hashicorp.com/vault/docs/auth/userpass">Userpass</a></li>
+<li><a href="https://developer.hashicorp.com/vault/docs/auth/userpass">UserPass</a></li>
+<li><a href="https://developer.hashicorp.com/vault/docs/auth/approle">AppRole</a></li>
 </ul>
 <p>Configuration of auth methods is done using the environment variables listed below.</p>
 <pre class="language-hcl"><code class="language-hcl"><span class="token comment"># Path defined for the authentication route, ex: auth/custom-auth-path/...</span>
@@ -115,7 +116,11 @@
 <span class="token property">VAULT_PASSWORD</span> <span class="token punctuation">=</span> <span class="token string">"some-password"</span>
 
 <span class="token comment"># path to mounted JWT for kubernetes auth</span>
-<span class="token property">VAULT_JWT_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/vault.jwt"</span></code></pre>
+<span class="token property">VAULT_JWT_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/vault.jwt"</span>
+
+<span class="token comment"># role_id and secret_id for approle authentication</span>
+<span class="token property">VAULT_ROLE_ID</span> <span class="token punctuation">=</span> <span class="token string">"role"</span>
+<span class="token property">VAULT_SECRET_ID</span> <span class="token punctuation">=</span> <span class="token string">"secret"</span></code></pre>
 <p>Environment variables can be configured using the <code>env</code> property in the values.yaml, ex:</p>
 <pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">env</span><span class="token punctuation">:</span>
   <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> VAULT_TOKEN
