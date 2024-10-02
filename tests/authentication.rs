@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod authentication {
-    use std::fs;
     use lib::configuration::authentication::{AppRole, Credentials, UserPass};
     use lib::configuration::vault::VaultConfiguration;
     use lib::vault::Client;
+    use std::fs;
     use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
 
     #[tokio::test]
@@ -39,11 +39,7 @@ mod authentication {
             address: "https://127.0.0.1:8400".to_string(),
             transit_key: "vault-kms-provider".to_string(),
             mount_path: "transit".to_string(),
-            credentials: Credentials::AppRole(AppRole::new(
-                role_id,
-                secret_id,
-                None,
-            )),
+            credentials: Credentials::AppRole(AppRole::new(role_id, secret_id, None)),
         };
         let settings = VaultClientSettingsBuilder::default()
             .address(&config.address)
