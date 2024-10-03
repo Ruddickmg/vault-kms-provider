@@ -125,7 +125,7 @@ mod environment {
     #[test]
     fn or_returns_a_default_value_if_no_variable_exists() {
         let default = "default";
-        let retrieved = Environment::VaultPasswordPath.or(default);
+        let retrieved = Environment::HttpAddress.or(default);
         assert_eq!(default, retrieved);
     }
 
