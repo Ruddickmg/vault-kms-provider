@@ -46,7 +46,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
         watcher::watch(
             match vault_config.credentials {
-                Credentials::Kubernetes(credentials) => Some(credentials.file_path),
+                Credentials::Kubernetes(credentials) => credentials.jwt.path(),
+                Credentials::AppRole(role) => role.secret_id.path(),
+                Credentials::Token(token) => token.path(),
+                Credentials::UserPass(credentials) => credentials.password.path(),
                 _ => None,
             },
             client

@@ -49,7 +49,7 @@ HEALTH_ENDPOINT = "0.0.0.0:8080"
 
 # Path defined for the authentication route, ex: auth/custom-auth-path/...
 #  if not set, will default to the associated auth method, ex: auth/userpass/.. or auth/kubernetes/..
-VAULT_AUTH_PATH = null
+VAULT_AUTH_MOUNT = null
 
 # Vault token for vault access
 VAULT_TOKEN = null
@@ -59,7 +59,7 @@ VAULT_USER = "vault-kms-provider"
 VAULT_PASSWORD = null
 
 # path to mounted JWT for kubernetes auth
-VAULT_JWT_PATH = null
+VAULT_KUBERNETES_JWT = null
 
 # role_id and secret_id for approle authentication
 VAULT_ROLE_ID = null
