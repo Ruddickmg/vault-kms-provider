@@ -6,3 +6,5 @@ node_modules
 documentation/dist
 test_files/role_id
 test_files/secret_id
+test_files/source_test
+test_files/jwt
