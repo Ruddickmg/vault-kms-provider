@@ -2,8 +2,7 @@ use crate::configuration::authentication::{AppRole, Credentials, Kubernetes, Use
 use crate::configuration::vault::VaultConfiguration;
 use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
-use std::{fs, string::ToString};
-use std::error::Error;
+use std::string::ToString;
 use tonic::{async_trait, Code, Status};
 use tracing::{debug, instrument, warn};
 use vaultrs::client::{Client as ClientTrait, VaultClient};
@@ -11,15 +10,6 @@ use vaultrs::{api::AuthInfo, error::ClientError, transit};
 
 #[derive(Debug)]
 pub struct VaultError(pub ClientError);
-
-impl From<std::io::Error> for VaultError {
-    fn from(value: std::io::Error) -> Self {
-        VaultError(ClientError::APIError {
-            code: 500,
-            errors: vec![value.to_string()],
-        })
-    }
-}
 
 impl From<VaultError> for Status {
     fn from(value: VaultError) -> Self {

@@ -1,6 +1,5 @@
-use tracing::{debug, instrument};
-use tracing_subscriber::fmt::format;
 use crate::configuration::authentication::Source;
+use tracing::{debug, instrument};
 
 #[instrument(skip(var_name, default))]
 pub fn get_env(var_name: &str, default: &str) -> String {
@@ -29,7 +28,9 @@ pub fn get_env_option(var_name: &str) -> Option<String> {
 
 #[instrument(skip(var_name))]
 pub fn get_env_source_option(var_name: &str) -> Option<Source> {
-    get_env_option(var_name).map(Source::Value).or(get_env_option(&format!("{}_PATH", var_name)).map(Source::FilePath))
+    get_env_option(var_name)
+        .map(Source::Value)
+        .or(get_env_option(&format!("{}_PATH", var_name)).map(Source::FilePath))
 }
 
 #[cfg(test)]

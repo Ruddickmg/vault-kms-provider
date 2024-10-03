@@ -2,10 +2,11 @@ mod app_role;
 mod kubernetes;
 mod user_pass;
 
-use std::{fs, io};
 pub use app_role::AppRole;
 pub use kubernetes::Kubernetes;
+use std::fs;
 pub use user_pass::UserPass;
+use vaultrs::error::ClientError;
 
 use crate::utilities::env::{get_env, get_env_option, get_env_source_option};
 
@@ -18,10 +19,15 @@ pub enum Source {
 }
 
 impl Source {
-    pub fn value(&self) -> io::Result<String> {
+    pub fn value(&self) -> Result<String, ClientError> {
         match self {
             Self::Value(value) => Ok(value.to_string()),
-            Self::FilePath(path) => fs::read_to_string(path)
+            Self::FilePath(path) => {
+                fs::read_to_string(path).map_err(|error| ClientError::FileReadError {
+                    source: error,
+                    path: path.to_string(),
+                })
+            }
         }
     }
 
