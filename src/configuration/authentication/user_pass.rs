@@ -1,14 +1,16 @@
+use crate::utilities::source::Source;
+
 const DEFAULT_USER_PASS_AUTH_PATH: &str = "userpass";
 
 #[derive(Clone, Debug)]
 pub struct UserPass {
     pub username: String,
-    pub password: String,
+    pub password: Source,
     pub mount_path: String,
 }
 
 impl UserPass {
-    pub fn new(username: String, password: String, mount_path: Option<String>) -> Self {
+    pub fn new(username: String, password: Source, mount_path: Option<String>) -> Self {
         Self {
             username,
             password,

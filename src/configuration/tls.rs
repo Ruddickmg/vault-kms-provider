@@ -1,9 +1,6 @@
-use crate::utilities::env;
+use crate::utilities::environment::Environment;
 use std::fs;
 use tracing::{debug, info};
-
-const VAULT_CA_PATH: &str = "VAULT_CA_PATH";
-const VAULT_CA_CERTIFICATE: &str = "VAULT_CA_CERT";
 
 pub struct TlsConfiguration {
     directory: Option<String>,
@@ -13,8 +10,8 @@ pub struct TlsConfiguration {
 impl TlsConfiguration {
     pub fn new() -> Self {
         Self {
-            directory: env::get_env_option(VAULT_CA_PATH),
-            file: env::get_env_option(VAULT_CA_CERTIFICATE),
+            directory: Environment::VaultCaPath.get(),
+            file: Environment::VaultCaCert.get(),
         }
     }
 

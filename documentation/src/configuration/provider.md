@@ -23,11 +23,14 @@ helm install vault-kms-provider --set "serviceAccount.create=false"
 
 ### Environment variables
 
-Below are all the environment variables and their defaults for configuration of the KMS provider
+Below are some general environment variables and their defaults for configuration of the KMS provider
 
 ```hcl
 # Url of the vault service
 VAULT_ADDRESS = "https://vault.vault.svc.cluster.local:8200"
+
+# The endpoint that the health checks will listen on
+HEALTH_ENDPOINT = "0.0.0.0:8080"
 
 # Path to the socket used for communication with the Kubernetes API server
 SOCKET_PATH = "./sockets/vault-kms-provider.sock"
@@ -42,26 +45,5 @@ SOCKET_PERMISSIONS = "any"
 VAULT_TRANSIT_KEY = "vault-kms-provider"
 
 # path defined for the transit gateway, ex: auth/transit/... or auth/transit-path/...
-VAULT_TRANSIT_PATH = "transit"
-
-# The endpoint that the health checks will listen on
-HEALTH_ENDPOINT = "0.0.0.0:8080"
-
-# Path defined for the authentication route, ex: auth/custom-auth-path/...
-#  if not set, will default to the associated auth method, ex: auth/userpass/.. or auth/kubernetes/..
-VAULT_AUTH_PATH = null
-
-# Vault token for vault access
-VAULT_TOKEN = null
-
-# user and password for userpass authentication
-VAULT_USER = "vault-kms-provider"
-VAULT_PASSWORD = null
-
-# path to mounted JWT for kubernetes auth
-VAULT_JWT_PATH = null
-
-# role_id and secret_id for approle authentication
-VAULT_ROLE_ID = null
-VAULT_SECRET_ID = null
+VAULT_TRANSIT_MOUNT = "transit"
 ```

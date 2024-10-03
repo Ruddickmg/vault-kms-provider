@@ -1,4 +1,4 @@
-use crate::utilities::env::get_env;
+use crate::utilities::environment::Environment;
 use tracing::Level;
 
 const DEFAULT_LOG_LEVEL: &str = "info";
@@ -22,8 +22,8 @@ impl LoggingConfiguration {
 
     pub fn new() -> Self {
         Self {
-            level: Self::str_to_log_level(get_env("LOG_LEVEL", DEFAULT_LOG_LEVEL).as_str()),
-            format: get_env("LOG_FORMAT", DEFAULT_LOG_FORMAT),
+            level: Self::str_to_log_level(Environment::LogLevel.or(DEFAULT_LOG_LEVEL).as_str()),
+            format: Environment::LogFormat.or(DEFAULT_LOG_FORMAT),
         }
     }
 }

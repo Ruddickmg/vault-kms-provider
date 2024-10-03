@@ -6,7 +6,7 @@ pub use app_role::AppRole;
 pub use kubernetes::Kubernetes;
 pub use user_pass::UserPass;
 
-use crate::utilities::env::{get_env, get_env_option};
+use crate::utilities::{environment::Environment, source::Source};
 
 const DEFAULT_USER: &str = "vault-kms-provider";
 
@@ -15,27 +15,28 @@ pub enum Credentials {
     AppRole(AppRole),
     UserPass(UserPass),
     Kubernetes(Kubernetes),
-    Token(String),
+    Token(Source),
     None,
 }
 
 impl Credentials {
     pub fn from_env() -> Self {
-        let auth_path = get_env_option("VAULT_AUTH_PATH");
-        if let Some(token) = get_env_option("VAULT_TOKEN") {
+        let auth_mount = Environment::VaultAuthMount.get();
+        if let Some(token) = Environment::VaultToken.source() {
             Self::Token(token)
-        } else if let Some(file_path) = get_env_option("VAULT_JWT_PATH") {
-            Self::Kubernetes(Kubernetes::new(file_path, auth_path))
-        } else if let Some(password) = get_env_option("VAULT_PASSWORD") {
+        } else if let Some(jwt) = Environment::VaultKubernetesJwt.source() {
+            Self::Kubernetes(Kubernetes::new(jwt, auth_mount))
+        } else if let Some(password) = Environment::VaultPassword.source() {
             Self::UserPass(UserPass::new(
-                get_env("VAULT_USER", DEFAULT_USER),
+                Environment::VaultUser.or(DEFAULT_USER),
                 password,
-                auth_path,
+                auth_mount,
             ))
-        } else if let Some((role_id, secret_id)) =
-            get_env_option("VAULT_ROLE_ID").zip(get_env_option("VAULT_SECRET_ID"))
+        } else if let Some((role_id, secret_id)) = Environment::VaultRoleId
+            .get()
+            .zip(Environment::VaultSecretId.source())
         {
-            Self::AppRole(AppRole::new(role_id, secret_id, auth_path))
+            Self::AppRole(AppRole::new(role_id, secret_id, auth_mount))
         } else {
             Self::None
         }

@@ -2,7 +2,7 @@ use crate::configuration::authentication::{AppRole, Credentials, Kubernetes, Use
 use crate::configuration::vault::VaultConfiguration;
 use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
-use std::{fs, string::ToString};
+use std::string::ToString;
 use tonic::{async_trait, Code, Status};
 use tracing::{debug, instrument, warn};
 use vaultrs::client::{Client as ClientTrait, VaultClient};
@@ -49,27 +49,21 @@ impl Client {
     async fn kubernetes_authentication(
         &self,
         credentials: &Kubernetes,
-    ) -> Result<String, ClientError> {
-        let jwt = fs::read_to_string(&credentials.file_path).map_err(|error| {
-            ClientError::FileReadError {
-                source: error,
-                path: credentials.file_path.to_string(),
-            }
-        })?;
-        debug!("Logging in via JWT: {}", jwt.len());
+    ) -> Result<AuthInfo, ClientError> {
+        debug!("Logging in with kubernetes auth: {:?}", credentials);
         Ok(self
-            .jwt_auth(&credentials.mount_path, &jwt)
-            .await?
-            .client_token)
+            .jwt_auth(&credentials.mount_path, &credentials.jwt.value()?)
+            .await?)
     }
 
     #[instrument(skip(self))]
     pub async fn get_token(&self) -> Result<String, ClientError> {
         match &self.auth {
-            Credentials::Token(token) => Ok(token.to_string()),
-            Credentials::Kubernetes(credentials) => {
-                Ok(self.kubernetes_authentication(credentials).await?)
-            }
+            Credentials::Token(token) => Ok(token.value()?),
+            Credentials::Kubernetes(credentials) => Ok(self
+                .kubernetes_authentication(credentials)
+                .await?
+                .client_token),
             Credentials::UserPass(credentials) => Ok(self
                 .user_pass_authentication(credentials)
                 .await?
@@ -105,7 +99,7 @@ impl Client {
             &self.client,
             &credentials.mount_path,
             &credentials.username,
-            &credentials.password,
+            &credentials.password.value()?,
         )
         .await?)
     }
@@ -120,7 +114,7 @@ impl Client {
             &self.client,
             &credentials.mount_path,
             &credentials.role_id,
-            &credentials.secret_id,
+            &credentials.secret_id.value()?,
         )
         .await?)
     }

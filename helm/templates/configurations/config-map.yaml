@@ -13,10 +13,10 @@ data:
   VAULT_TRANSIT_KEY: "{{ .Values.vault.transit.key }}"
   VAULT_TRANSIT_PATH: "{{ .Values.vault.transit.path }}"
   {{- if .Values.vault.authentication.path }}
-  VAULT_AUTH_PATH: "{{ .Values.vault.authentication.path }}"
+  VAULT_AUTH_MOUNT: {{ .Values.vault.authentication.path }}
   {{- end }}
   {{- if and .Values.serviceAccount.token.path .Values.serviceAccount.token.name }}
-  VAULT_JWT_PATH: "{{ .Values.serviceAccount.token.path }}/{{ .Values.serviceAccount.token.name }}"
+  VAULT_KUBERNETES_JWT_PATH: "{{ .Values.serviceAccount.token.path }}/{{ .Values.serviceAccount.token.name }}"
   {{- end }}
   {{- if .Values.vault.ca.file }}
   VAULT_CA_CERT: {{ .Values.vault.ca.file }}
