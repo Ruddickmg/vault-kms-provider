@@ -1,4 +1,4 @@
-use crate::configuration::authentication::{AppRole, Credentials, Kubernetes, UserPass};
+use crate::configuration::authentication::{AppRole, Credentials, Jwt, UserPass};
 use crate::configuration::vault::VaultConfiguration;
 use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
@@ -46,14 +46,27 @@ impl Refresh for Client {
 
 impl Client {
     #[instrument(skip(self, credentials))]
-    async fn kubernetes_authentication(
-        &self,
-        credentials: &Kubernetes,
-    ) -> Result<AuthInfo, ClientError> {
+    async fn kubernetes_authentication(&self, credentials: &Jwt) -> Result<AuthInfo, ClientError> {
         debug!("Logging in with kubernetes auth: {:?}", credentials);
-        Ok(self
-            .jwt_auth(&credentials.mount_path, &credentials.jwt.value()?)
-            .await?)
+        Ok(vaultrs::auth::kubernetes::login(
+            &self.client,
+            &credentials.mount_path,
+            &self.role,
+            &credentials.jwt.value()?,
+        )
+        .await?)
+    }
+
+    #[instrument(skip(self, credentials))]
+    async fn jwt_authentication(&self, credentials: &Jwt) -> Result<AuthInfo, ClientError> {
+        debug!("Logging in with JWT authentication: {:?}", credentials);
+        Ok(vaultrs::auth::oidc::login(
+            &self.client,
+            &credentials.mount_path,
+            &credentials.jwt.value()?,
+            Some(self.role.clone()),
+        )
+        .await?)
     }
 
     #[instrument(skip(self))]
@@ -72,6 +85,7 @@ impl Client {
                 .app_role_authentication(credentials)
                 .await?
                 .client_token),
+            Credentials::Jwt(jwt) => Ok(self.jwt_authentication(jwt).await?.client_token),
             Credentials::None => Err(ClientError::APIError {
                 code: 500,
                 errors: vec!["No token found".to_string()],
@@ -117,12 +131,6 @@ impl Client {
             &credentials.secret_id.value()?,
         )
         .await?)
-    }
-
-    #[instrument(skip(self, jwt))]
-    pub async fn jwt_auth(&self, path: &str, jwt: &str) -> Result<AuthInfo, ClientError> {
-        debug!("Logging in to vault as: {}", self.role);
-        Ok(vaultrs::auth::kubernetes::login(&self.client, path, &self.role, &jwt).await?)
     }
 
     #[instrument(skip(self))]
