@@ -1,4 +1,4 @@
-use crate::configuration::authentication::Source;
+use crate::utilities::source::Source;
 
 const DEFAULT_USER_PASS_AUTH_PATH: &str = "userpass";
 

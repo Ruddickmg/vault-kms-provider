@@ -1,4 +1,4 @@
-use crate::configuration::authentication::Source;
+use crate::utilities::source::Source;
 
 const DEFAULT_KUBERNETES_AUTH_PATH: &str = "kubernetes";
 

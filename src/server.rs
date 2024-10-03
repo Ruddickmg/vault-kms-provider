@@ -1,8 +1,9 @@
 extern crate lib;
 
-use lib::configuration::authentication::Credentials;
 use lib::{
-    configuration::{socket::SocketConfiguration, tls, vault::VaultConfiguration},
+    configuration::{
+        authentication::Credentials, socket::SocketConfiguration, tls, vault::VaultConfiguration,
+    },
     kms::key_management_service_server::KeyManagementServiceServer,
     utilities::{logging, socket::create_unix_socket, watcher},
     vault,

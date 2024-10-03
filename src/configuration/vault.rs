@@ -1,5 +1,5 @@
 use crate::configuration::authentication::Credentials;
-use crate::utilities::env::get_env;
+use crate::utilities::environment::Environment;
 
 const DEFAULT_VAULT_ADDRESS: &str = "https://vault.vault.svc.cluster.local:8200";
 const DEFAULT_VAULT_TRANSIT_KEY: &str = "vault-kms-provider";
@@ -19,10 +19,10 @@ impl VaultConfiguration {
     pub fn new() -> Self {
         Self {
             credentials: Credentials::from_env(),
-            role: get_env("VAULT_ROLE", DEFAULT_VAULT_ROLE),
-            address: get_env("VAULT_ADDRESS", DEFAULT_VAULT_ADDRESS),
-            transit_key: get_env("VAULT_TRANSIT_KEY", DEFAULT_VAULT_TRANSIT_KEY),
-            mount_path: get_env("VAULT_TRANSIT_PATH", DEFAULT_TRANSIT_MOUNT_PATH),
+            role: Environment::VaultRole.or(DEFAULT_VAULT_ROLE),
+            address: Environment::VaultAddress.or(DEFAULT_VAULT_ADDRESS),
+            transit_key: Environment::VaultTransitKey.or(DEFAULT_VAULT_TRANSIT_KEY),
+            mount_path: Environment::VaultTransitMount.or(DEFAULT_TRANSIT_MOUNT_PATH),
         }
     }
 }

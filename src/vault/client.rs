@@ -49,21 +49,21 @@ impl Client {
     async fn kubernetes_authentication(
         &self,
         credentials: &Kubernetes,
-    ) -> Result<String, ClientError> {
+    ) -> Result<AuthInfo, ClientError> {
         debug!("Logging in with kubernetes auth: {:?}", credentials);
         Ok(self
             .jwt_auth(&credentials.mount_path, &credentials.jwt.value()?)
-            .await?
-            .client_token)
+            .await?)
     }
 
     #[instrument(skip(self))]
     pub async fn get_token(&self) -> Result<String, ClientError> {
         match &self.auth {
             Credentials::Token(token) => Ok(token.value()?),
-            Credentials::Kubernetes(credentials) => {
-                Ok(self.kubernetes_authentication(credentials).await?)
-            }
+            Credentials::Kubernetes(credentials) => Ok(self
+                .kubernetes_authentication(credentials)
+                .await?
+                .client_token),
             Credentials::UserPass(credentials) => Ok(self
                 .user_pass_authentication(credentials)
                 .await?

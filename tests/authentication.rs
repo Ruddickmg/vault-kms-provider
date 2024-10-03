@@ -1,7 +1,8 @@
 #[cfg(test)]
 mod authentication {
-    use lib::configuration::authentication::{AppRole, Credentials, Source, UserPass};
+    use lib::configuration::authentication::{AppRole, Credentials, UserPass};
     use lib::configuration::vault::VaultConfiguration;
+    use lib::utilities::source::Source;
     use lib::vault::Client;
     use std::fs;
     use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};

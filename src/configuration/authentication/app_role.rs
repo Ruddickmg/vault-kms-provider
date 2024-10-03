@@ -1,4 +1,4 @@
-use crate::configuration::authentication::Source;
+use crate::utilities::source::Source;
 
 const DEFAULT_MOUNT_PATH: &str = "approle";
 

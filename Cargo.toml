@@ -21,6 +21,9 @@ tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["json", "ansi", "env-filter"] }
 vaultrs = "0.7.2"
 futures = "0.3.30"
+convert_case = "0.6.0"
+strum = "0.26.3"
+strum_macros = "0.26.4"
 
 [dev-dependencies]
 pretty_assertions = "1.4.1"

@@ -1,3 +1,5 @@
+extern crate core;
+
 use crate::configuration::socket::SocketConfiguration;
 use crate::kms::key_management_service_client::KeyManagementServiceClient;
 use crate::utilities::socket;

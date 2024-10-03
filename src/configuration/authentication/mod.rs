@@ -6,39 +6,9 @@ pub use app_role::AppRole;
 pub use kubernetes::Kubernetes;
 pub use user_pass::UserPass;
 
-use vaultrs::error::ClientError;
-use std::fs;
-use crate::utilities::env::{get_env, get_env_option, get_env_source_option};
+use crate::utilities::{environment::Environment, source::Source};
 
 const DEFAULT_USER: &str = "vault-kms-provider";
-
-#[derive(Clone, Debug)]
-pub enum Source {
-    Value(String),
-    FilePath(String),
-}
-
-impl Source {
-    pub fn value(&self) -> Result<String, ClientError> {
-        match self {
-            Self::Value(value) => Ok(value.to_string()),
-            Self::FilePath(path) => {
-                fs::read_to_string(path).map_err(|error| ClientError::FileReadError {
-                    source: error,
-                    path: path.to_string(),
-                })
-            }
-        }
-    }
-
-    pub fn path(&self) -> Option<String> {
-        if let Self::FilePath(path) = self {
-            Some(path.to_string())
-        } else {
-            None
-        }
-    }
-}
 
 #[derive(Clone, Debug)]
 pub enum Credentials {
@@ -51,19 +21,20 @@ pub enum Credentials {
 
 impl Credentials {
     pub fn from_env() -> Self {
-        let auth_mount = get_env_option("VAULT_AUTH_MOUNT");
-        if let Some(token) = get_env_source_option("VAULT_TOKEN") {
+        let auth_mount = Environment::VaultAuthMount.get();
+        if let Some(token) = Environment::VaultToken.source() {
             Self::Token(token)
-        } else if let Some(jwt) = get_env_source_option("VAULT_KUBERNETES_JWT") {
+        } else if let Some(jwt) = Environment::VaultKubernetesJwt.source() {
             Self::Kubernetes(Kubernetes::new(jwt, auth_mount))
-        } else if let Some(password) = get_env_source_option("VAULT_PASSWORD") {
+        } else if let Some(password) = Environment::VaultPassword.source() {
             Self::UserPass(UserPass::new(
-                get_env("VAULT_USER", DEFAULT_USER),
+                Environment::VaultUser.or(DEFAULT_USER),
                 password,
                 auth_mount,
             ))
-        } else if let Some((role_id, secret_id)) =
-            get_env_option("VAULT_ROLE_ID").zip(get_env_source_option("VAULT_SECRET_ID"))
+        } else if let Some((role_id, secret_id)) = Environment::VaultRoleId
+            .get()
+            .zip(Environment::VaultSecretId.source())
         {
             Self::AppRole(AppRole::new(role_id, secret_id, auth_mount))
         } else {
