@@ -4,10 +4,10 @@ mod user_pass;
 
 pub use app_role::AppRole;
 pub use kubernetes::Kubernetes;
-use std::fs;
 pub use user_pass::UserPass;
-use vaultrs::error::ClientError;
 
+use vaultrs::error::ClientError;
+use std::fs;
 use crate::utilities::env::{get_env, get_env_option, get_env_source_option};
 
 const DEFAULT_USER: &str = "vault-kms-provider";
