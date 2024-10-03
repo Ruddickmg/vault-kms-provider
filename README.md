@@ -13,7 +13,7 @@ See usage [documentation here](https://vault-kms-provider.io/)
   - [x] Token
   - [x] User & Password
   - [x] App Role
-  - [ ] JWT
+  - [x] JWT
   - [ ] Tls certs
   - [ ] OIDC
 
