@@ -1,11 +1,12 @@
 default: set_up_environment set_up_authentication
 
 set_up_environment: start_vault enable_transit start_kms_provider
-set_up_authentication: set_up_userpass_auth set_up_approle_auth set_up_jwt_auth
+set_up_authentication: set_up_userpass_auth set_up_approle_auth set_up_jwt_auth set_up_cert_auth
 
 set_up_jwt_auth: enable_jwt_authentication configure_jwt_authentication set_up_jwt_role
 set_up_approle_auth: enable_approle_authentication confiugre_approle_authentication
 set_up_userpass_auth: enable_userpass_authentication configure_userpass_authentication
+set_up_cert_auth: enable_cert_authentication configure_cert_authentication
 
 start_vault:
   docker compose up vault -d
@@ -52,3 +53,13 @@ set_up_jwt_role:
 
 configure_jwt_authentication:
   docker compose exec vault vault write auth/jwt/config jwt_supported_algs=RS256 jwt_validation_pubkeys="$(cat ./test_files/jwt/public_key.pem)"
+
+enable_cert_authentication:
+  docker compose exec vault vault auth enable cert
+
+configure_cert_authentication:
+  docker compose exec vault vault write auth/cert/certs/vault-kms-provider \
+    display_name=vault-kms-provider \
+    policies=default \
+    certificate="$(cat ./test_files/certs/tls.crt)" \
+    ttl=3600

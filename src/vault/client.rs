@@ -1,4 +1,6 @@
-use crate::configuration::authentication::{AppRole, Credentials, Jwt, Kubernetes, UserPass};
+use crate::configuration::authentication::{
+    AppRole, Certificate, Credentials, Jwt, Kubernetes, UserPass,
+};
 use crate::configuration::vault::VaultConfiguration;
 use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
@@ -71,6 +73,18 @@ impl Client {
         .await?)
     }
 
+    #[instrument(skip(self, credentials))]
+    async fn cert_authentication(
+        &self,
+        credentials: &Certificate,
+    ) -> Result<AuthInfo, ClientError> {
+        debug!("Logging in with JWT authentication: {:?}", credentials);
+        Ok(
+            vaultrs::auth::cert::login(&self.client, &credentials.mount_path, &credentials.name)
+                .await?,
+        )
+    }
+
     #[instrument(skip(self))]
     pub async fn get_token(&self) -> Result<String, ClientError> {
         match &self.auth {
@@ -88,6 +102,9 @@ impl Client {
                 .await?
                 .client_token),
             Credentials::Jwt(jwt) => Ok(self.jwt_authentication(jwt).await?.client_token),
+            Credentials::Certificate(credentials) => {
+                Ok(self.cert_authentication(credentials).await?.client_token)
+            }
             Credentials::None => Err(ClientError::APIError {
                 code: 500,
                 errors: vec!["No token found".to_string()],
