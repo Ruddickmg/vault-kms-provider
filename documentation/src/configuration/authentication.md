@@ -51,6 +51,8 @@ VAULT_JWT_PATH = "/path/to/jwt"
 # role for jwt, optional
 VAULT_JWT_ROLE = "vault-kms-provider"
 
+# name of the trusted certificate created in vault for authentication
+VAULT_CERTIFICATE_NAME = "vault-kms-provider"
 # path to client cert and key for certificate authentication
 VAULT_CLIENT_CERT = "/path/to/client/public.crt"
 VAULT_CLIENT_KEY = "/path/to/client/private.key"
