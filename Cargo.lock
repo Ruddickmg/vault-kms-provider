@@ -1080,6 +1080,7 @@ checksum = "4569e456d394deccd22ce1c1913e6ea0e54519f577285001215d33557431afe4"
 dependencies = [
  "hermit-abi 0.3.9",
  "libc",
+ "log",
  "wasi",
  "windows-sys 0.52.0",
 ]
@@ -1800,18 +1801,18 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.63"
+version = "1.0.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0342370b38b6a11b6cc11d6a805569958d54cfa061a29969c3b5ce2ea405724"
+checksum = "d50af8abc119fb8bb6dbabcfa89656f46f84aa0ac7688088608076ad2b459a84"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.63"
+version = "1.0.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4558b58466b9ad7ca0f102865eccc95938dca1a74a856f2b57b6629050da261"
+checksum = "08904e7672f5eb876eaaf87e0ce17857500934f4981c4a0ab2b4aa98baac7fc3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2114,9 +2115,15 @@ checksum = "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493"
 
 [[package]]
 name = "unicode-xid"
-version = "0.2.5"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "229730647fbc343e3a80e463c1db7f78f3855d3f3739bee0dda773c9a037c90a"
+checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
+
+[[package]]
+name = "unix_mode"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b55eedc365f81a3c32aea49baf23fa965e3cd85bcc28fb8045708c7388d124ef"
 
 [[package]]
 name = "untrusted"
@@ -2143,7 +2150,7 @@ checksum = "830b7e5d4d90034032940e4ace0d9a9a057e7a45cd94e6c007832e39edb82f6d"
 
 [[package]]
 name = "vault_kms_provider"
-version = "0.10.0"
+version = "1.0.0"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -2154,6 +2161,7 @@ dependencies = [
  "http-body-util",
  "hyper 1.4.1",
  "hyper-util",
+ "mio 1.0.1",
  "notify",
  "pretty_assertions",
  "prost",
@@ -2168,6 +2176,7 @@ dependencies = [
  "tower 0.5.1",
  "tracing",
  "tracing-subscriber",
+ "unix_mode",
  "vaultrs",
 ]
 

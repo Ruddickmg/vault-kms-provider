@@ -32,14 +32,12 @@ VAULT_ADDRESS = "https://vault.vault.svc.cluster.local:8200"
 # The endpoint that the health checks will listen on
 HEALTH_ENDPOINT = "0.0.0.0:8080"
 
-# Path to the socket used for communication with the Kubernetes API server
+# Path to the socket used for communication with the Kubernetes API server. Can be either abstract (@path/to/abstract.sock) or file path.
+# Abstract socket paths must be prefixed with the "@" symbol
 SOCKET_PATH = "./sockets/vault-kms-provider.sock"
 
-# The level of permissions granted to the socket, choices are:
-#   - any: equivalent to 666
-#   - user: equivalent to 600
-#   - group: equivalent to 660
-SOCKET_PERMISSIONS = "any"
+# The level of permissions granted to the socket (does not apply to abstract sockets)
+SOCKET_PERMISSIONS = "666"
 
 # The string identifier used to store the encryption keys in the vault transit gateway
 VAULT_TRANSIT_KEY = "vault-kms-provider"
