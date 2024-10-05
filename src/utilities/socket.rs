@@ -1,5 +1,5 @@
-use std::ffi::{OsStr, OsString};
 use hyper_util::rt::TokioIo;
+use std::ffi::{OsStr, OsString};
 use std::fs::Permissions;
 use std::os::unix::ffi::OsStrExt;
 use std::os::unix::fs::PermissionsExt;
@@ -97,9 +97,9 @@ impl Socket {
 
 #[cfg(test)]
 mod socket_permissions {
-    use std::fs;
-    use pretty_assertions::assert_eq;
     use super::*;
+    use pretty_assertions::assert_eq;
+    use std::fs;
 
     #[test]
     fn can_parse_a_string_into_a_permissions_u32() {
@@ -130,7 +130,10 @@ mod socket_permissions {
         let path: &str = "./test_files/test.sock";
         let socket = Socket::new("777");
         let _stream = socket.listen(path).unwrap();
-        let result = Socket::connect(path).await;
+        let result = Socket::connect(path).await.map_err(|e| {
+            println!("error: {:?}", e);
+            e
+        });
         assert!(result.is_ok());
     }
 }

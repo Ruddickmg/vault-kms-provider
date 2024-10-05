@@ -159,7 +159,7 @@ mod environment {
 
     #[test]
     fn get_returns_none_if_no_variable_exists() {
-        assert_eq!(Environment::VaultPasswordPath.get(), None);
+        assert_eq!(Environment::VaultKubernetesRole.get(), None);
     }
 
     #[test]
