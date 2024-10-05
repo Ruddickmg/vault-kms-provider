@@ -29,7 +29,7 @@ mod jwt_configuration {
     #[test]
     fn initialization_defaults_to_kubernetes_mount_path() {
         assert_eq!(
-            Kubernetes::kubernetes(Source::Value("hello!".to_string()), None).mount_path,
+            Kubernetes::new(Source::Value("hello!".to_string()), None, None).mount_path,
             DEFAULT_KUBERNETES_AUTH_MOUNT.to_string()
         );
     }
@@ -38,8 +38,12 @@ mod jwt_configuration {
     fn initialization_will_use_custom_mount_path() {
         let path = "/hello/world";
         assert_eq!(
-            Kubernetes::kubernetes(Source::Value("hello!".to_string()), Some(path.to_string()))
-                .mount_path,
+            Kubernetes::new(
+                Source::Value("hello!".to_string()),
+                None,
+                Some(path.to_string())
+            )
+            .mount_path,
             path.to_string()
         );
     }
