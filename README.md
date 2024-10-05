@@ -16,7 +16,7 @@ See usage [documentation here](https://vault-kms-provider.io/)
   - [x] User & Password
   - [x] App Role
   - [x] JWT/OIDC
-  - [ ] Tls certs
+  - [x] Tls certs
 
 ## Kubernetes authentication
 
