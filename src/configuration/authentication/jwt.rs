@@ -1,36 +1,35 @@
 use crate::utilities::source::Source;
 
-const DEFAULT_KUBERNETES_AUTH_MOUNT: &str = "kubernetes";
-const DEFAULT_VAULT_ROLE: &str = "vault-kms-provider";
+const DEFAULT_JWT_AUTH_MOUNT: &str = "jwt";
 
 #[derive(Clone, Debug)]
-pub struct Kubernetes {
-    pub role: String,
+pub struct Jwt {
+    pub role: Option<String>,
     pub jwt: Source,
     pub mount_path: String,
 }
 
-impl Kubernetes {
+impl Jwt {
     pub fn new(source: Source, role: Option<String>, mount_path: Option<String>) -> Self {
         Self {
-            role: role.unwrap_or(DEFAULT_VAULT_ROLE.to_string()),
+            role,
             jwt: source,
-            mount_path: mount_path.unwrap_or(DEFAULT_KUBERNETES_AUTH_MOUNT.to_string()),
+            mount_path: mount_path.unwrap_or(DEFAULT_JWT_AUTH_MOUNT.to_string()),
         }
     }
 }
 
 #[cfg(test)]
 mod jwt_configuration {
-    use super::{Kubernetes, DEFAULT_KUBERNETES_AUTH_MOUNT};
+    use super::{Jwt, DEFAULT_JWT_AUTH_MOUNT};
     use crate::utilities::source::Source;
     use pretty_assertions::assert_eq;
 
     #[test]
-    fn initialization_defaults_to_kubernetes_mount_path() {
+    fn initialization_via_new_defaults_to_jwt_mount_path() {
         assert_eq!(
-            Kubernetes::new(Source::Value("hello!".to_string()), None, None).mount_path,
-            DEFAULT_KUBERNETES_AUTH_MOUNT.to_string()
+            Jwt::new(Source::Value("hello!".to_string()), None, None).mount_path,
+            DEFAULT_JWT_AUTH_MOUNT.to_string()
         );
     }
 
@@ -38,7 +37,7 @@ mod jwt_configuration {
     fn initialization_will_use_custom_mount_path() {
         let path = "/hello/world";
         assert_eq!(
-            Kubernetes::new(
+            Jwt::new(
                 Source::Value("hello!".to_string()),
                 None,
                 Some(path.to_string())

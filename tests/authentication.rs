@@ -1,24 +1,19 @@
 #[cfg(test)]
 mod authentication {
-    use lib::configuration::authentication::{AppRole, Credentials, UserPass};
+    use lib::configuration::authentication::{AppRole, Credentials, Jwt, UserPass};
     use lib::configuration::vault::VaultConfiguration;
     use lib::utilities::source::Source;
     use lib::vault::Client;
     use std::fs;
     use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
+    use vaultrs::error::ClientError;
 
-    #[tokio::test]
-    async fn login_with_username_and_password() {
+    async fn login_with_credentials(credentials: Credentials) -> Result<String, ClientError> {
         let config: VaultConfiguration = VaultConfiguration {
-            role: "vault-kms-provider".to_string(),
             address: "https://127.0.0.1:8400".to_string(),
             transit_key: "vault-kms-provider".to_string(),
             mount_path: "transit".to_string(),
-            credentials: Credentials::UserPass(UserPass {
-                username: "vault-kms-provider".to_string(),
-                password: Source::Value("password".to_string()),
-                mount_path: "userpass".to_string(),
-            }),
+            credentials,
         };
         let settings = VaultClientSettingsBuilder::default()
             .address(&config.address)
@@ -27,7 +22,20 @@ mod authentication {
             .unwrap();
         let vault_client = VaultClient::new(settings).unwrap();
         let client = Client::new(vault_client, &config);
-        let result = client.get_token().await;
+        client.get_token().await.map_err(|error| {
+            println!("Error retrieving token: {:?}", error);
+            error
+        })
+    }
+
+    #[tokio::test]
+    async fn login_with_username_and_password() {
+        let result = login_with_credentials(Credentials::UserPass(UserPass {
+            username: "vault-kms-provider".to_string(),
+            password: Source::Value("password".to_string()),
+            mount_path: "userpass".to_string(),
+        }))
+        .await;
         assert!(result.is_ok());
     }
 
@@ -35,24 +43,22 @@ mod authentication {
     async fn login_with_app_role() {
         let role_id = fs::read_to_string("./test_files/role_id").unwrap();
         let secret_id = Source::FilePath("./test_files/secret_id".to_string());
-        let config: VaultConfiguration = VaultConfiguration {
-            role: "vault-kms-provider".to_string(),
-            address: "https://127.0.0.1:8400".to_string(),
-            transit_key: "vault-kms-provider".to_string(),
-            mount_path: "transit".to_string(),
-            credentials: Credentials::AppRole(AppRole::new(role_id, secret_id, None)),
-        };
-        let settings = VaultClientSettingsBuilder::default()
-            .address(&config.address)
-            .ca_certs(vec!["./test_files/certs/ca.crt".to_string()])
-            .build()
-            .unwrap();
-        let vault_client = VaultClient::new(settings).unwrap();
-        let client = Client::new(vault_client, &config);
-        let result = client.get_token().await.map_err(|e| {
-            println!("{:?}", e);
-            e
-        });
+        let result =
+            login_with_credentials(Credentials::AppRole(AppRole::new(role_id, secret_id, None)))
+                .await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn login_with_jwt() {
+        let jwt = fs::read_to_string("./test_files/jwt/token").unwrap();
+        let result = login_with_credentials(Credentials::Jwt(Jwt::new(
+            Source::Value(jwt.to_string()),
+            Some("vault-kms-provider".to_string()),
+            None,
+        )))
+        .await;
+
         assert!(result.is_ok());
     }
 }

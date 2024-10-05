@@ -10,6 +10,7 @@ Currently, the following authentication methods are supported
 - [Kubernetes](https://developer.hashicorp.com/vault/docs/auth/kubernetes)
 - [UserPass](https://developer.hashicorp.com/vault/docs/auth/userpass)
 - [AppRole](https://developer.hashicorp.com/vault/docs/auth/approle)
+- [JWT/OIDC](https://developer.hashicorp.com/vault/docs/auth/jwt)
 
 Configuration of auth methods is done using the environment variables listed below.
 
@@ -33,12 +34,21 @@ VAULT_PASSWORD_PATH = "/path/to/vault/password"
 VAULT_KUBERNETES_JWT_PATH = "/path/to/vault.jwt"
 # jwt for kubernetes auth
 VAULT_KUBERNETES_JWT = "jwt"
+# role for kubernetes auth 
+VAULT_KUBERNETES_ROLE = "vault-kms-provider"
 
 # role_id and secret_id for approle authentication
 VAULT_ROLE_ID = "role"
 VAULT_SECRET_ID = "secret"
 # path to file containing secret id
 VAULT_SECRET_ID_PATH = "/path/to/secret/id"
+
+# jwt for jwt auth
+VAULT_JWT = "jwt"
+# path to mounted jwt for jwt auth
+VAULT_JWT_PATH = "/path/to/jwt"
+# role for jwt, optional
+VAULT_JWT_ROLE = "vault-kms-provider"
 ```
 
 Environment variables can be configured using the `env` property in the values.yaml, ex:

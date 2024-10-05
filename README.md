@@ -7,15 +7,16 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
 See usage [documentation here](https://vault-kms-provider.io/)
 
 ### RoadMap:
+- [ ] Allow user to set permissions in any way they like on socket (avoid "any", "group", etc)
+- [ ] Add/configure renovate to update dependencies
+- [ ] Smoke test documentation
 - [ ] Set up Authentication
-  - [x] Make optional file path or value for each secret
   - [x] Kubernetes
   - [x] Token
   - [x] User & Password
   - [x] App Role
-  - [ ] JWT
+  - [x] JWT/OIDC
   - [ ] Tls certs
-  - [ ] OIDC
 
 ## Kubernetes authentication
 
@@ -42,75 +43,20 @@ cargo test --bins --lib
 ### Integration
 Integration tests will be located in the `tests` directory at the root of the project, they require some set up locally.
 
-#### Running Vault & The KMS provider
-First, you will need to run the vault service using docker compose by running the following command in the root directory:
+Make sure just is installed on your system
 ```shell
-docker compose up vault -d
+cargo install just
 ```
 
-Second you will need to enable transit in vault
+Run the justfile to set up the environment
 ```shell
-docker compose exec vault vault secrets enable transit
+just
 ```
 
-After the transit has been enabled you can start the kms provider
-```shell
-docker compose up vault-kms-provider -d
-```
-
-#### Setting up Authentication
-
-You'll also need to enable the authentication methods which are tested via integration tests
-
-Enable userpass authentication
-```shell
-docker compose exec vault vault auth enable userpass
-```
-
-Create user & password for userpass authentication
-```shell
-docker compose exec vault vault write auth/userpass/users/vault-kms-provider \
-    password=password \
-    policies=default
-```
-
-Enable app role authentication
-```shell
-docker compose exec vault vault auth enable approle
-```
-
-Generate a role id
-```shell
-docker compose exec vault vault write auth/approle/role/vault-kms-provider \
-    token_type=batch \
-    secret_id_ttl=10m \
-    token_ttl=20m \
-    token_max_ttl=30m \
-    secret_id_num_uses=40
-```
-
-Output the role id to a file
-```shell
-docker compose exec vault vault read auth/approle/role/vault-kms-provider/role-id -format="json" | jq -r .data.role_id > ./test_files/role_id
-```
-
-Output the secret id to a file
-```shell
-docker compose exec vault vault write -f auth/approle/role/vault-kms-provider/secret-id -format="json" | jq -r .data.secret_id > ./test_files/secret_id
-```
-
-#### Tests
-
-Then finally you can run the integration tests with the following command
+Then you can run the integration tests with the following command
 ```shell
 cargo test --test *
 ```
-
-> [!NOTE]
-> you can output logs for debugging vault into console by running the following command
-> ```shell
-> docker compose exec vault vault audit enable file file_path=stdout
-> ```
 
 ### End to end
 End to end tests are implemented using helm's testing library, you can find the tests themselves in the `helm/templates/tests` directory. There are also some files used for testing located in the `helm/test_files` directory.

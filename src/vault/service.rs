@@ -36,10 +36,7 @@ impl VaultKmsServer {
                 let error = format!("Failed to initialize: {}", error.0.to_string());
                 std::io::Error::new(ErrorKind::Other, error.as_str())
             })?;
-        info!(
-            "Encryption key: \"{}\" has been initialized in vault",
-            client.key_name
-        );
+        info!("Vault encryption has been initialized");
         Ok(())
     }
 }

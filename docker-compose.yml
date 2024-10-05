@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   vault:
     image: hashicorp/vault:latest
@@ -30,7 +28,7 @@ services:
       VAULT_CA_PATH: /etc/ssl/certs
       VAULT_CA_CERT: /etc/ssl/certs/ca.crt
       SOCKET_PATH: /sockets/vault-kms-provider.sock
-      LOG_LEVEL: info
+      LOG_LEVEL: debug
     build:
       args:
         UID: 0

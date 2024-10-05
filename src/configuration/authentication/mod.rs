@@ -1,8 +1,10 @@
 mod app_role;
+mod jwt;
 mod kubernetes;
 mod user_pass;
 
 pub use app_role::AppRole;
+pub use jwt::Jwt;
 pub use kubernetes::Kubernetes;
 pub use user_pass::UserPass;
 
@@ -16,6 +18,7 @@ pub enum Credentials {
     UserPass(UserPass),
     Kubernetes(Kubernetes),
     Token(Source),
+    Jwt(Jwt),
     None,
 }
 
@@ -25,7 +28,11 @@ impl Credentials {
         if let Some(token) = Environment::VaultToken.source() {
             Self::Token(token)
         } else if let Some(jwt) = Environment::VaultKubernetesJwt.source() {
-            Self::Kubernetes(Kubernetes::new(jwt, auth_mount))
+            Self::Kubernetes(Kubernetes::new(
+                jwt,
+                Environment::VaultKubernetesRole.get(),
+                auth_mount,
+            ))
         } else if let Some(password) = Environment::VaultPassword.source() {
             Self::UserPass(UserPass::new(
                 Environment::VaultUser.or(DEFAULT_USER),
@@ -37,6 +44,8 @@ impl Credentials {
             .zip(Environment::VaultSecretId.source())
         {
             Self::AppRole(AppRole::new(role_id, secret_id, auth_mount))
+        } else if let Some(jwt) = Environment::VaultJwt.source() {
+            Self::Jwt(Jwt::new(jwt, Environment::VaultJwtRole.get(), auth_mount))
         } else {
             Self::None
         }
