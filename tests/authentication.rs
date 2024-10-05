@@ -22,7 +22,7 @@ mod authentication {
             .unwrap();
         let vault_client = VaultClient::new(settings).unwrap();
         let client = Client::new(vault_client, &config);
-        client.get_token().await.map_err(| error | {
+        client.get_token().await.map_err(|error| {
             println!("Error retrieving token: {:?}", error);
             error
         })

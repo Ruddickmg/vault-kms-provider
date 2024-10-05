@@ -24,12 +24,15 @@ pub enum Credentials {
 
 impl Credentials {
     pub fn from_env() -> Self {
-        let role = Environment::VaultRole.get();
         let auth_mount = Environment::VaultAuthMount.get();
         if let Some(token) = Environment::VaultToken.source() {
             Self::Token(token)
         } else if let Some(jwt) = Environment::VaultKubernetesJwt.source() {
-            Self::Kubernetes(Kubernetes::new(jwt, role, auth_mount))
+            Self::Kubernetes(Kubernetes::new(
+                jwt,
+                Environment::VaultKubernetesRole.get(),
+                auth_mount,
+            ))
         } else if let Some(password) = Environment::VaultPassword.source() {
             Self::UserPass(UserPass::new(
                 Environment::VaultUser.or(DEFAULT_USER),
@@ -42,7 +45,7 @@ impl Credentials {
         {
             Self::AppRole(AppRole::new(role_id, secret_id, auth_mount))
         } else if let Some(jwt) = Environment::VaultJwt.source() {
-            Self::Jwt(Jwt::new(jwt, role, auth_mount))
+            Self::Jwt(Jwt::new(jwt, Environment::VaultJwtRole.get(), auth_mount))
         } else {
             Self::None
         }
