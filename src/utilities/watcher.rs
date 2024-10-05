@@ -92,7 +92,7 @@ mod watch {
 
     #[tokio::test]
     async fn refreshes_token_when_file_changes() -> Result<(), Box<dyn std::error::Error>> {
-        let path = "./test_files/jwt";
+        let path = "./test_files/test_watched_file";
         let mock_client = Arc::new(RwLock::new(Mock::new()));
         std::fs::write(&path, "Hello World!").unwrap();
         tokio::select! {

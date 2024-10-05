@@ -1,9 +1,11 @@
 mod app_role;
 mod jwt;
+mod kubernetes;
 mod user_pass;
 
 pub use app_role::AppRole;
 pub use jwt::Jwt;
+pub use kubernetes::Kubernetes;
 pub use user_pass::UserPass;
 
 use crate::utilities::{environment::Environment, source::Source};
@@ -14,7 +16,7 @@ const DEFAULT_USER: &str = "vault-kms-provider";
 pub enum Credentials {
     AppRole(AppRole),
     UserPass(UserPass),
-    Kubernetes(Jwt),
+    Kubernetes(Kubernetes),
     Token(Source),
     Jwt(Jwt),
     None,
@@ -22,11 +24,12 @@ pub enum Credentials {
 
 impl Credentials {
     pub fn from_env() -> Self {
+        let role = Environment::VaultRole.get();
         let auth_mount = Environment::VaultAuthMount.get();
         if let Some(token) = Environment::VaultToken.source() {
             Self::Token(token)
         } else if let Some(jwt) = Environment::VaultKubernetesJwt.source() {
-            Self::Kubernetes(Jwt::kubernetes(jwt, auth_mount))
+            Self::Kubernetes(Kubernetes::new(jwt, role, auth_mount))
         } else if let Some(password) = Environment::VaultPassword.source() {
             Self::UserPass(UserPass::new(
                 Environment::VaultUser.or(DEFAULT_USER),
@@ -39,7 +42,7 @@ impl Credentials {
         {
             Self::AppRole(AppRole::new(role_id, secret_id, auth_mount))
         } else if let Some(jwt) = Environment::VaultJwt.source() {
-            Self::Jwt(Jwt::new(jwt, auth_mount))
+            Self::Jwt(Jwt::new(jwt, role, auth_mount))
         } else {
             Self::None
         }

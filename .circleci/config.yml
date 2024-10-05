@@ -354,35 +354,13 @@ jobs:
     executor: ubuntu
     steps:
       - checkout_write
-      - run:
-          name: Start vault
-          command: docker compose up vault -d
       - rust/install
       - run:
-          name: Enable transit
-          command: docker compose exec vault vault secrets enable transit
+          name: Install just
+          command: cargo install just
       - run:
-          name: Start KMS provider
-          command: docker compose up vault-kms-provider -d
-      - run:
-          name: Enable username & password authentication
-          command: |
-            docker compose exec vault vault auth enable userpass
-            docker compose exec vault vault write auth/userpass/users/vault-kms-provider \
-                password=password \
-                policies=default
-      - run:
-          name: Enable app role authentication
-          command: |
-            docker compose exec vault vault auth enable approle
-            docker compose exec vault vault write auth/approle/role/vault-kms-provider \
-                token_type=batch \
-                secret_id_ttl=10m \
-                token_ttl=20m \
-                token_max_ttl=30m \
-                secret_id_num_uses=40
-            docker compose exec vault vault read auth/approle/role/vault-kms-provider/role-id -format="json" | jq -r .data.role_id > ./test_files/role_id
-            docker compose exec vault vault write -f auth/approle/role/vault-kms-provider/secret-id -format="json" | jq -r .data.secret_id > ./test_files/secret_id
+          name: Set up environment
+          command: just
       - run:
           name: Run integration tests
           command: cargo test --test '*'

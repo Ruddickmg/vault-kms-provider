@@ -1,4 +1,4 @@
-use crate::configuration::authentication::{AppRole, Credentials, Jwt, UserPass};
+use crate::configuration::authentication::{AppRole, Credentials, Jwt, Kubernetes, UserPass};
 use crate::configuration::vault::VaultConfiguration;
 use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
@@ -24,8 +24,7 @@ impl From<ClientError> for VaultError {
 }
 
 pub struct Client {
-    pub key_name: String,
-    role: String,
+    key_name: String,
     auth: Credentials,
     client: VaultClient,
     mount_path: String,
@@ -46,12 +45,15 @@ impl Refresh for Client {
 
 impl Client {
     #[instrument(skip(self, credentials))]
-    async fn kubernetes_authentication(&self, credentials: &Jwt) -> Result<AuthInfo, ClientError> {
+    async fn kubernetes_authentication(
+        &self,
+        credentials: &Kubernetes,
+    ) -> Result<AuthInfo, ClientError> {
         debug!("Logging in with kubernetes auth: {:?}", credentials);
         Ok(vaultrs::auth::kubernetes::login(
             &self.client,
             &credentials.mount_path,
-            &self.role,
+            &credentials.role,
             &credentials.jwt.value()?,
         )
         .await?)
@@ -64,7 +66,7 @@ impl Client {
             &self.client,
             &credentials.mount_path,
             &credentials.jwt.value()?,
-            Some(self.role.clone()),
+            credentials.role.clone(),
         )
         .await?)
     }
@@ -95,7 +97,6 @@ impl Client {
 
     pub fn new(client: VaultClient, config: &VaultConfiguration) -> Self {
         Self {
-            role: config.role.to_string(),
             key_name: config.transit_key.to_string(),
             auth: config.credentials.clone(),
             mount_path: config.mount_path.clone(),
