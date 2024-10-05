@@ -21,10 +21,15 @@ impl TlsConfiguration {
 
     pub fn identity(&self) -> Option<reqwest::Identity> {
         if let Some((key, cert)) = self.cert.clone().zip(self.key.clone()) {
-            if let Some(pem) = fs::read(cert).ok().zip(fs::read(key).ok()).map(|(mut raw_cert, mut raw_key)| {
-                raw_cert.append(&mut raw_key);
-                raw_cert
-            }) {
+            if let Some(pem) =
+                fs::read(cert)
+                    .ok()
+                    .zip(fs::read(key).ok())
+                    .map(|(mut raw_cert, mut raw_key)| {
+                        raw_cert.append(&mut raw_key);
+                        raw_cert
+                    })
+            {
                 reqwest::Identity::from_pem(pem.as_slice()).ok()
             } else {
                 None

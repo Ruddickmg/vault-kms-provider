@@ -1,13 +1,13 @@
 #[cfg(test)]
 mod authentication {
     use lib::configuration::authentication::{AppRole, Certificate, Credentials, Jwt, UserPass};
+    use lib::configuration::tls;
     use lib::configuration::vault::VaultConfiguration;
     use lib::utilities::source::Source;
     use lib::vault::Client;
     use std::fs;
     use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
     use vaultrs::error::ClientError;
-    use lib::configuration::tls;
 
     async fn login_with_credentials(credentials: Credentials) -> Result<String, ClientError> {
         let config: VaultConfiguration = VaultConfiguration {
