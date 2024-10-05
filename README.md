@@ -10,13 +10,6 @@ See usage [documentation here](https://vault-kms-provider.io/)
 - [ ] Allow user to set permissions in any way they like on socket (avoid "any", "group", etc)
 - [ ] Add/configure renovate to update dependencies
 - [ ] Smoke test documentation
-- [ ] Set up Authentication
-  - [x] Kubernetes
-  - [x] Token
-  - [x] User & Password
-  - [x] App Role
-  - [x] JWT/OIDC
-  - [x] Tls certs
 
 ## Kubernetes authentication
 
@@ -59,7 +52,7 @@ cargo test --test *
 ```
 
 ### End to end
-End to end tests are implemented using helm's testing library, you can find the tests themselves in the `helm/templates/tests` directory. There are also some files used for testing located in the `helm/test_files` directory.
+End to end tests are implemented using helm's testing library, you can find the tests themselves in the `helm/templates/tests` directory. There are also some files used for testing located in the `test_files` directory.
 
 In order to run the tests you will need to deploy a vault server and the helm chart for this repository, you can do this using their respective helm charts
 

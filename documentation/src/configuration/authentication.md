@@ -11,6 +11,7 @@ Currently, the following authentication methods are supported
 - [UserPass](https://developer.hashicorp.com/vault/docs/auth/userpass)
 - [AppRole](https://developer.hashicorp.com/vault/docs/auth/approle)
 - [JWT/OIDC](https://developer.hashicorp.com/vault/docs/auth/jwt)
+- [Certificate](https://developer.hashicorp.com/vault/docs/auth/cert)
 
 Configuration of auth methods is done using the environment variables listed below.
 
@@ -49,6 +50,10 @@ VAULT_JWT = "jwt"
 VAULT_JWT_PATH = "/path/to/jwt"
 # role for jwt, optional
 VAULT_JWT_ROLE = "vault-kms-provider"
+
+# path to client cert and key for certificate authentication
+VAULT_CLIENT_CERT = "/path/to/client/public.crt"
+VAULT_CLIENT_KEY = "/path/to/client/private.key"
 ```
 
 Environment variables can be configured using the `env` property in the values.yaml, ex:
