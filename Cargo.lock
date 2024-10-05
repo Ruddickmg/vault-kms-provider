@@ -2158,6 +2158,7 @@ dependencies = [
  "pretty_assertions",
  "prost",
  "prost-derive",
+ "reqwest",
  "strum",
  "strum_macros",
  "tokio",

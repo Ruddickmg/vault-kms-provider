@@ -8,6 +8,7 @@ use tracing::{debug, instrument};
 
 #[derive(Debug, Clone, Copy, PartialEq, EnumIter)]
 pub enum Environment {
+    VaultCertificateName,
     VaultJwt,
     VaultJwtPath,
     VaultJwtRole,
@@ -30,6 +31,8 @@ pub enum Environment {
     SocketPermissions,
     VaultCaPath,
     VaultCaCert,
+    VaultClientCert,
+    VaultClientKey,
     VaultAddress,
     VaultTransitKey,
     VaultTransitMount,

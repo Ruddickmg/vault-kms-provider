@@ -24,6 +24,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let tls_config = tls::TlsConfiguration::new();
     let settings = VaultClientSettingsBuilder::default()
         .address(&vault_config.address)
+        .identity(tls_config.identity())
         .ca_certs(tls_config.certs())
         .build()?;
     let client = Arc::new(RwLock::new(vault::Client::new(

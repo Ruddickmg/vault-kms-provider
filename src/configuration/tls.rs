@@ -3,21 +3,40 @@ use std::fs;
 use tracing::{debug, info};
 
 pub struct TlsConfiguration {
-    directory: Option<String>,
-    file: Option<String>,
+    pub cert: Option<String>,
+    pub key: Option<String>,
+    pub ca: Option<String>,
+    pub directory: Option<String>,
 }
 
 impl TlsConfiguration {
     pub fn new() -> Self {
         Self {
             directory: Environment::VaultCaPath.get(),
-            file: Environment::VaultCaCert.get(),
+            cert: Environment::VaultClientCert.get(),
+            key: Environment::VaultClientKey.get(),
+            ca: Environment::VaultCaCert.get(),
+        }
+    }
+
+    pub fn identity(&self) -> Option<reqwest::Identity> {
+        if let Some((key, cert)) = self.cert.clone().zip(self.key.clone()) {
+            if let Some(pem) = fs::read(cert).ok().zip(fs::read(key).ok()).map(|(mut raw_cert, mut raw_key)| {
+                raw_cert.append(&mut raw_key);
+                raw_cert
+            }) {
+                reqwest::Identity::from_pem(pem.as_slice()).ok()
+            } else {
+                None
+            }
+        } else {
+            None
         }
     }
 
     pub fn certs(&self) -> Vec<String> {
         let mut certs = self.certs_from_dir();
-        if let Some(file_path) = self.file.clone() {
+        if let Some(file_path) = self.ca.clone() {
             if !certs.contains(&file_path) {
                 certs.push(file_path);
             }

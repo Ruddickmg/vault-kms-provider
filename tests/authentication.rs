@@ -1,12 +1,13 @@
 #[cfg(test)]
 mod authentication {
-    use lib::configuration::authentication::{AppRole, Credentials, Jwt, UserPass};
+    use lib::configuration::authentication::{AppRole, Certificate, Credentials, Jwt, UserPass};
     use lib::configuration::vault::VaultConfiguration;
     use lib::utilities::source::Source;
     use lib::vault::Client;
     use std::fs;
     use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
     use vaultrs::error::ClientError;
+    use lib::configuration::tls;
 
     async fn login_with_credentials(credentials: Credentials) -> Result<String, ClientError> {
         let config: VaultConfiguration = VaultConfiguration {
@@ -15,9 +16,16 @@ mod authentication {
             mount_path: "transit".to_string(),
             credentials,
         };
+        let tls_config = tls::TlsConfiguration {
+            cert: Some("./test_files/certs/tls.crt".to_string()),
+            key: Some("./test_files/certs/tls.key".to_string()),
+            ca: Some("./test_files/certs/ca.crt".to_string()),
+            directory: None,
+        };
         let settings = VaultClientSettingsBuilder::default()
             .address(&config.address)
-            .ca_certs(vec!["./test_files/certs/ca.crt".to_string()])
+            .identity(tls_config.identity())
+            .ca_certs(tls_config.certs())
             .build()
             .unwrap();
         let vault_client = VaultClient::new(settings).unwrap();
@@ -55,6 +63,17 @@ mod authentication {
         let result = login_with_credentials(Credentials::Jwt(Jwt::new(
             Source::Value(jwt.to_string()),
             Some("vault-kms-provider".to_string()),
+            None,
+        )))
+        .await;
+
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn login_with_certificate() {
+        let result = login_with_credentials(Credentials::Certificate(Certificate::new(
+            "vault-kms-provider".to_string(),
             None,
         )))
         .await;
