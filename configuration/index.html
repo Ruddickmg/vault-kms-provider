@@ -114,6 +114,7 @@
 <li><a href="https://developer.hashicorp.com/vault/docs/auth/userpass">UserPass</a></li>
 <li><a href="https://developer.hashicorp.com/vault/docs/auth/approle">AppRole</a></li>
 <li><a href="https://developer.hashicorp.com/vault/docs/auth/jwt">JWT/OIDC</a></li>
+<li><a href="https://developer.hashicorp.com/vault/docs/auth/cert">Certificate</a></li>
 </ul>
 <p>Configuration of auth methods is done using the environment variables listed below.</p>
 <pre class="language-hcl"><code class="language-hcl"><span class="token comment"># Path defined for the authentication route, ex: auth/custom-auth-path/...</span>
@@ -149,7 +150,13 @@
 <span class="token comment"># path to mounted jwt for jwt auth</span>
 <span class="token property">VAULT_JWT_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/jwt"</span>
 <span class="token comment"># role for jwt, optional</span>
-<span class="token property">VAULT_JWT_ROLE</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span></code></pre>
+<span class="token property">VAULT_JWT_ROLE</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
+
+<span class="token comment"># name of the trusted certificate created in vault for authentication</span>
+<span class="token property">VAULT_CERTIFICATE_NAME</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
+<span class="token comment"># path to client cert and key for certificate authentication</span>
+<span class="token property">VAULT_CLIENT_CERT</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/client/public.crt"</span>
+<span class="token property">VAULT_CLIENT_KEY</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/client/private.key"</span></code></pre>
 <p>Environment variables can be configured using the <code>env</code> property in the values.yaml, ex:</p>
 <pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">env</span><span class="token punctuation">:</span>
   <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> VAULT_TOKEN
