@@ -7,7 +7,6 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
 See usage [documentation here](https://vault-kms-provider.io/)
 
 ### RoadMap:
-- [ ] Allow user to set permissions in any way they like on socket (avoid "any", "group", etc)
 - [ ] Add/configure renovate to update dependencies
 - [ ] Smoke test documentation
 

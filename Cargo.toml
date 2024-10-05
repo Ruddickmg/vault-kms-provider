@@ -1,11 +1,13 @@
 [package]
 name = "vault_kms_provider"
-version = "0.10.0"
+version = "1.0.0"
 edition = "2021"
 
 [dependencies]
 base64 = "0.22.1"
 bytes = "1.7.2"
+convert_case = "0.6.0"
+futures = "0.3.30"
 http = "1.1.0"
 http-body-util = "0.1.2"
 hyper-util = { version = "0.1.9", features = ["tokio"] }
@@ -13,22 +15,22 @@ hyper = { version = "1.4.1", features = ["http1", "server"] }
 notify = "6.1.1"
 prost = "0.13.3"
 prost-derive = "0.13.3"
+reqwest = { version = "0.11.27", features = ["rustls"], default-features = false }
+strum = "0.26.3"
+strum_macros = "0.26.4"
 tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
 tokio-stream = { version = "0.1.16", features = ["net"] }
 tonic = "0.12.3"
 tower = { version = "0.5.1", features = ["util"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["json", "ansi", "env-filter"] }
+unix_mode = "0.1.4"
 vaultrs = "0.7.2"
-futures = "0.3.30"
-convert_case = "0.6.0"
-strum = "0.26.3"
-strum_macros = "0.26.4"
-reqwest = { version = "0.11.27", features = ["rustls"], default-features = false }
+mio = "1.0.1"
 
 [dev-dependencies]
-pretty_assertions = "1.4.1"
 criterion = { version = "0.5.1", features = ["html_reports", "async_tokio", "async"] }
+pretty_assertions = "1.4.1"
 
 [[bench]]
 name = "main"

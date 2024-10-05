@@ -5,7 +5,7 @@ use lib::{
         authentication::Credentials, socket::SocketConfiguration, tls, vault::VaultConfiguration,
     },
     kms::key_management_service_server::KeyManagementServiceServer,
-    utilities::{logging, socket::create_unix_socket, watcher},
+    utilities::{logging, socket::Socket, watcher},
     vault,
 };
 use std::sync::Arc;
@@ -19,7 +19,8 @@ mod checks;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     logging::initialize();
     let socket_config = SocketConfiguration::new();
-    let socket = create_unix_socket(&socket_config.socket_path, socket_config.permissions)?;
+    let socket = Socket::new(&socket_config.permissions);
+    let stream = socket.listen(&socket_config.socket_path)?;
     let vault_config = VaultConfiguration::new();
     let tls_config = tls::TlsConfiguration::new();
     let settings = VaultClientSettingsBuilder::default()
@@ -37,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         async {
             Server::builder()
                 .add_service(KeyManagementServiceServer::new(vault_kms_server))
-                .serve_with_incoming(socket)
+                .serve_with_incoming(stream)
                 .await
                 .map_err(|error| std::io::Error::other(error.to_string()))
         },

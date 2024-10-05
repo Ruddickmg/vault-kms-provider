@@ -8,3 +8,4 @@ test_files/role_id
 test_files/secret_id
 test_files/source_test
 test_files/test_watched_file
+test_files/test.sock
