@@ -163,7 +163,7 @@ jobs:
             fi
             export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
             export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            if [ "$MAIN_VERSION" == "$CHART_VERSION" ]
+            if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
             then
               echo "No version change, skipping"
             else
@@ -306,7 +306,7 @@ jobs:
             export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
             export COMMIT_MESSAGE="$(git log -1 --pretty=%B)"
             export TRIMMED="${COMMIT_MESSAGE##*( )}"
-            if [ "$MAIN_VERSION" != "$CHART_VERSION" ] || [ "${TRIMMED:0:4}" == "docs" ]
+            if [ "$MAIN_VERSION" != "$BRANCH_VERSION" ] || [ "${TRIMMED:0:4}" == "docs" ]
             then
               gh-pages -a -d dist -m "[skip ci] update documentation"
             fi
@@ -346,7 +346,7 @@ jobs:
           command: |
             export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
             export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            if [ "$MAIN_VERSION" == "$CHART_VERSION" ]
+            if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
             then
               echo "No release needed, skipping"
             else
@@ -362,7 +362,7 @@ jobs:
           command: |
             export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
             export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            if [ "$MAIN_VERSION" == "$CHART_VERSION" ]
+            if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
             then
               echo "No release, skipping"
             else
