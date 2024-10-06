@@ -48,6 +48,14 @@ executors:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 commands:
+  checkout_main:
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+      - run:
+          name: Checkout main
+          command: git clone "git@github.com:Ruddickmg/vault-kms-provider.git"
   checkout_write:
     steps:
       - add_ssh_keys:
@@ -138,9 +146,7 @@ jobs:
     executor: node
     steps:
       - checkout_write
-      - add_ssh_keys:
-          fingerprints:
-            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+      - checkout_main
       - run:
           name: Install rust
           command: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -154,6 +160,13 @@ jobs:
           command: |
             if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
               node version/increment.js "$(git log -1 --pretty=%B)"
+            fi
+            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
+            then
+              echo "No version change, skipping"
+            else
               source $HOME/.cargo/env
               cargo fetch
               git commit -a -m "[skip ci] increment version"
@@ -162,8 +175,6 @@ jobs:
 
   benchmark:
     executor: ubuntu
-    environment:
-      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
     steps:
       - checkout_write
       - run:
@@ -179,9 +190,7 @@ jobs:
       - run:
           name: Build
           command: cargo bench --no-run
-      - run:
-          name: Checkout main
-          command: git clone "$MAIN_BRANCH_URL"
+      - checkout_main
       - restore_cache:
           keys:
             - benchmarks-main-{{ checksum "vault-kms-provider/Cargo.toml" }}
@@ -277,8 +286,23 @@ jobs:
           name: Build documentation
           command: pnpm run build
       - run:
+          name: Increment version
+          command: |
+            if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
+              node version/increment.js "$(git log -1 --pretty=%B)"
+            fi
+      - checkout_main
+      - run:
           name: Release documentation
-          command: gh-pages -a -d dist -m "[skip ci] update documentation"
+          command: |
+            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export COMMIT_MESSAGE="$(git log -1 --pretty=%B)"
+            export TRIMMED="${COMMIT_MESSAGE##*( )}"
+            if [ "$MAIN_VERSION" != "$BRANCH_VERSION" ] || [ "${TRIMMED:0:4}" == "docs" ]
+            then
+              gh-pages -a -d dist -m "[skip ci] update documentation"
+            fi
   release:
     executor: release
     steps:
@@ -305,6 +329,7 @@ jobs:
             if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
               node version/increment.js "$(git log -1 --pretty=%B)"
             fi
+      - checkout_main
       - run:
           name: Package chart
           command: |
@@ -312,21 +337,36 @@ jobs:
       - run:
           name: Release chart
           command: |
-            cr upload --generate-release-notes --skip-existing \
-              --commit $CIRCLE_BRANCH \
-              --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner $CIRCLE_PROJECT_USERNAME \
-              --release-name-template "v{{ .Version }}" \
-              --token $GITHUB_TOKEN
+            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
+            then
+              echo "No release needed, skipping"
+            else
+              cr upload --generate-release-notes --skip-existing \
+                --commit $CIRCLE_BRANCH \
+                --git-repo $CIRCLE_PROJECT_REPONAME \
+                --owner $CIRCLE_PROJECT_USERNAME \
+                --release-name-template "v{{ .Version }}" \
+                --token $GITHUB_TOKEN
+            fi
       - run:
           name: Add chart to gh-pages
           command: |
-            mkdir .cr-index
-            cr index --push \
-              --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner $CIRCLE_PROJECT_USERNAME \
-              --release-name-template "v{{ .Version }}" \
-              --token $GITHUB_TOKEN
+            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
+            then
+              echo "No release, skipping"
+            else
+              mkdir .cr-index
+              cr index --push \
+                --git-repo $CIRCLE_PROJECT_REPONAME \
+                --owner $CIRCLE_PROJECT_USERNAME \
+                --release-name-template "v{{ .Version }}" \
+                --token $GITHUB_TOKEN
+            fi
+
   build:
     executor: rust_app
     steps:
@@ -648,4 +688,3 @@ jobs:
               export TAG="<< parameters.tag >>"
             fi
             docker manifest push "${DOCKERHUB_REPOSITORY}:${TAG}"
-
