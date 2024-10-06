@@ -66,6 +66,7 @@ workflows:
       - check_formatting
       - build
       - unit_tests
+      - increment_version
       - integration_tests
       - e2e_tests:
           requires:
@@ -137,9 +138,6 @@ jobs:
       - run:
           name: Commit changes
           command: git commit -m "[skip ci] increment version"
-      - run:
-          name: Push changes
-          command: git push -f origin main
 
   benchmark:
     executor: ubuntu
