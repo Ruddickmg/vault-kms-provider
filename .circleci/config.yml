@@ -157,8 +157,9 @@ jobs:
               source $HOME/.cargo/env
               cargo fetch
               git commit -a -m "[skip ci] increment version"
-#              git push -f origin main
             fi
+#              git push -f origin main
+#            fi
 
   benchmark:
     executor: ubuntu
