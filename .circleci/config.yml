@@ -130,6 +130,30 @@ workflows:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
+  validate_commit:
+    executor: node
+    steps:
+      - run:
+          name: Check commit message
+          command: node version/checkFileName.js << pipeline.trigger_parameters.github_app.commit_message >>
+
+#  increment_version:
+#    executor: node
+#    steps:
+#      - checkout_write
+#      - add_ssh_keys:
+#          fingerprints:
+#            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+#      - run:
+#          name: Increment version
+#          command: node increment-version.js << pipeline.trigger_parameters.github_app.commit_message >>
+#      - run:
+#          name: Commit changes
+#          command: git commit -m "[skip ci] incrementing version"
+#      - run:
+#          name: Push changes
+#          command:
+
   benchmark:
     executor: ubuntu
     environment:
@@ -278,8 +302,7 @@ jobs:
               --git-repo $CIRCLE_PROJECT_REPONAME \
               --owner $CIRCLE_PROJECT_USERNAME \
               --release-name-template "v{{ .Version }}" \
-              --token $GITHUB_TOKEN \
-              --
+              --token $GITHUB_TOKEN
       - run:
           name: Add chart to gh-pages
           command: |
@@ -289,7 +312,10 @@ jobs:
               --owner $CIRCLE_PROJECT_USERNAME \
               --release-name-template "v{{ .Version }}" \
               --token $GITHUB_TOKEN
-
+      - run:
+          name: Increment version
+          command: |
+            node
   build:
     executor: rust_app
     steps:
