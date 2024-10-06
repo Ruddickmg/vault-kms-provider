@@ -67,11 +67,6 @@ workflows:
       - build
       - unit_tests
       - integration_tests
-      - increment_version:
-          filters:
-            branches:
-              only:
-                - main
       - e2e_tests:
           requires:
             - publish_manifest
@@ -115,7 +110,6 @@ workflows:
                 - main
           requires:
             - publish_latest_manifest
-            - increment_version
       - build_documentation:
           filters:
             branches:
@@ -134,27 +128,6 @@ workflows:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
-  increment_version:
-    executor: node
-    steps:
-      - checkout_write
-      - add_ssh_keys:
-          fingerprints:
-            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
-      - run:
-          name: Configure git
-          command: |
-            git config --global user.email "ruddickmg@gmail.com"
-            git config --global user.name "ruddickmg"
-      - run:
-          name: Increment version
-          command: |
-            if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
-              node version/increment.js "$(git log -1 --pretty=%B)"
-              git commit -a -m "[skip ci] increment version"
-              git push -f origin main
-            fi
-
   benchmark:
     executor: ubuntu
     environment:
@@ -280,6 +253,17 @@ jobs:
       - run:
           name: Install ssh
           command: apk add openssh-client
+      - run:
+          name: Install node
+          command: apk add --update nodejs npm
+      - run:
+          name: Install rust
+          command: |
+            apk add curl
+            apk add gcc
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+            source $HOME/.cargo/env
+            cargo --version
       - add_ssh_keys:
           fingerprints:
             - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
@@ -291,6 +275,15 @@ jobs:
             git config --global --unset url.ssh://git@github.com.insteadof
             git config --global user.email "ruddickmg@gmail.com"
             git config --global user.name "Marcus Ruddick"
+      - run:
+          name: Increment version
+          command: |
+            if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
+              node version/increment.js "$(git log -1 --pretty=%B)"
+              cargo build
+              git commit -a -m "[skip ci] increment version"
+              git push -f origin main
+            fi
       - run:
           name: Package chart
           command: |
@@ -313,10 +306,6 @@ jobs:
               --owner $CIRCLE_PROJECT_USERNAME \
               --release-name-template "v{{ .Version }}" \
               --token $GITHUB_TOKEN
-      - run:
-          name: Increment version
-          command: |
-            node
   build:
     executor: rust_app
     steps:
