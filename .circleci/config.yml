@@ -130,10 +130,10 @@ jobs:
     steps:
       - run:
           name: Update dependencies
-          command: sudo apt update
+          command: apt update
       - run:
           name: Install gh cli
-          command: sudo apt install gh
+          command: apt install gh
       - run:
           name: Check commit message
           command: |
