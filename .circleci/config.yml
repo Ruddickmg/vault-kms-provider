@@ -67,10 +67,11 @@ workflows:
       - build
       - unit_tests
       - integration_tests
-      - increment_version
-#          filters:
-#            branches:
-#              only: main
+      - increment_version:
+          filters:
+            branches:
+              only:
+                - main
       - e2e_tests:
           requires:
             - publish_manifest
@@ -148,16 +149,11 @@ jobs:
       - run:
           name: Increment version
           command: |
-            if [[ "$(git log -1 --pretty=%B)" == *"[skip ci] increment version"* ]]; then
-              echo "increment version"
+            if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
               node version/increment.js "$(git log -1 --pretty=%B)"
+              git commit -a -m "[skip ci] increment version"
+              git push -f origin main
             fi
-      - run:
-          name: Commit changes
-          command: git commit -a -m "[skip ci] increment version"
-#      - run:
-#          name: Push changes
-#          command: git push -f origin main
 
   benchmark:
     executor: ubuntu
