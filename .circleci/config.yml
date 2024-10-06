@@ -330,6 +330,7 @@ jobs:
             if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
               node version/increment.js "$(git log -1 --pretty=%B)"
             fi
+      - checkout_main
       - run:
           name: Package chart
           command: |
@@ -337,21 +338,36 @@ jobs:
       - run:
           name: Release chart
           command: |
-            cr upload --generate-release-notes --skip-existing \
-              --commit $CIRCLE_BRANCH \
-              --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner $CIRCLE_PROJECT_USERNAME \
-              --release-name-template "v{{ .Version }}" \
-              --token $GITHUB_TOKEN
+            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            if [ "$MAIN_VERSION" == "$CHART_VERSION" ]
+            then
+              echo "No release needed, skipping"
+            else
+              cr upload --generate-release-notes --skip-existing \
+                --commit $CIRCLE_BRANCH \
+                --git-repo $CIRCLE_PROJECT_REPONAME \
+                --owner $CIRCLE_PROJECT_USERNAME \
+                --release-name-template "v{{ .Version }}" \
+                --token $GITHUB_TOKEN
+            fi
       - run:
           name: Add chart to gh-pages
           command: |
-            mkdir .cr-index
-            cr index --push \
-              --git-repo $CIRCLE_PROJECT_REPONAME \
-              --owner $CIRCLE_PROJECT_USERNAME \
-              --release-name-template "v{{ .Version }}" \
-              --token $GITHUB_TOKEN
+            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            if [ "$MAIN_VERSION" == "$CHART_VERSION" ]
+            then
+              echo "No release, skipping"
+            else
+              mkdir .cr-index
+              cr index --push \
+                --git-repo $CIRCLE_PROJECT_REPONAME \
+                --owner $CIRCLE_PROJECT_USERNAME \
+                --release-name-template "v{{ .Version }}" \
+                --token $GITHUB_TOKEN
+            fi
+
   build:
     executor: rust_app
     steps:
