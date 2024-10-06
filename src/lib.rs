@@ -14,6 +14,7 @@ pub mod kms {
 
 pub async fn client() -> Result<KeyManagementServiceClient<Channel>, tonic::transport::Error> {
     let config = SocketConfiguration::new();
-    let channel = Socket::connect(&config.socket_path).await?;
+    let socket = Socket::default();
+    let channel = socket.connect(&config.socket_path).await?;
     Ok(KeyManagementServiceClient::new(channel))
 }

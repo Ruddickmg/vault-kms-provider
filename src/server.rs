@@ -19,7 +19,7 @@ mod checks;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     logging::initialize();
     let socket_config = SocketConfiguration::new();
-    let socket = Socket::new(&socket_config.permissions);
+    let socket = Socket::with_permissions(&socket_config.permissions);
     let stream = socket.listen(&socket_config.socket_path)?;
     let vault_config = VaultConfiguration::new();
     let tls_config = tls::TlsConfiguration::new();

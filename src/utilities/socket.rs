@@ -18,30 +18,33 @@ const DEFAULT_SOCKET_PERMISSIONS: u32 = 0o666;
 
 #[derive(Debug, Clone)]
 pub struct Socket {
+    path: &'static OnceLock<OsString>,
     permissions: Permissions,
 }
 
-impl From<&str> for Socket {
-    fn from(value: &str) -> Self {
+impl Default for Socket {
+    fn default() -> Self {
+        Self::new("666", &UNIX_SOCKET_PATH)
+    }
+}
+
+impl Socket {
+    pub fn new(permissions: &str, path: &'static OnceLock<OsString>) -> Self {
         Self {
+            path,
             permissions: Permissions::from_mode(
-                u32::from_str_radix(value, 8)
+                u32::from_str_radix(permissions, 8)
                     .ok()
                     .unwrap_or(DEFAULT_SOCKET_PERMISSIONS),
             ),
         }
     }
-}
-
-impl From<String> for Socket {
-    fn from(value: String) -> Self {
-        (&value).as_str().into()
+    pub fn with_permissions(permissions: &str) -> Self {
+        Self::new(permissions, &UNIX_SOCKET_PATH)
     }
-}
 
-impl Socket {
-    pub fn new(permissions: &str) -> Self {
-        Self::from(permissions)
+    pub fn with_path(path: &'static OnceLock<OsString>) -> Self {
+        Self::new("666", path)
     }
 
     fn format_path(path: &str) -> OsString {
@@ -81,14 +84,14 @@ impl Socket {
     }
 
     #[instrument]
-    pub async fn connect(path: &str) -> Result<Channel, tonic::transport::Error> {
+    pub async fn connect(&self, path: &str) -> Result<Channel, tonic::transport::Error> {
         info!("Server listening to unix socket: \"{}\"", path);
-        UNIX_SOCKET_PATH.get_or_init(|| Self::format_path(path));
+        self.path.get_or_init(|| Self::format_path(path));
         // this url doesn't matter since we are replacing it with the unix stream connection
         Endpoint::try_from("http://[::]:50051")?
             .connect_with_connector(service_fn(|_| async {
                 Ok::<_, std::io::Error>(TokioIo::new(
-                    UnixStream::connect(UNIX_SOCKET_PATH.get().unwrap()).await?,
+                    UnixStream::connect(self.path.get().unwrap()).await?,
                 ))
             }))
             .await
@@ -100,40 +103,42 @@ mod socket_permissions {
     use super::*;
     use pretty_assertions::assert_eq;
     use std::fs;
+    use std::time::Duration;
+    static TEST_ABSTRACT_SOCKET_PATH: OnceLock<OsString> = OnceLock::new();
+    static TEST_ABSTRACT_SOCKET_PATH2: OnceLock<OsString> = OnceLock::new();
+    static TEST_SOCKET_FILE_PATH: OnceLock<OsString> = OnceLock::new();
 
     #[test]
     fn can_parse_a_string_into_a_permissions_u32() {
-        let socket = Socket::from("777");
+        let socket = Socket::with_permissions("777");
         assert_eq!(Permissions::from_mode(0o777), socket.permissions);
     }
 
     #[tokio::test]
     async fn can_create_and_connect_to_abstract_sockets() {
         let path: &str = "@test_files/abstract_test.sock";
-        let socket = Socket::new("777");
+        let socket = Socket::with_path(&TEST_ABSTRACT_SOCKET_PATH);
         let _stream = socket.listen(path).unwrap();
-        let result = Socket::connect(path).await;
+        let result = socket.connect(path).await;
         assert!(result.is_ok());
     }
 
     #[tokio::test]
     async fn does_not_create_abstract_sockets_on_filesystem() {
         let path: &str = "@test_files/abstract_test2.sock";
-        let socket = Socket::new("777");
+        let socket = Socket::with_path(&TEST_ABSTRACT_SOCKET_PATH2);
         let _stream = socket.listen(path).unwrap();
-        let _result = Socket::connect(path).await;
+        let _result = socket.connect(path).await;
         assert!(!fs::exists(path).unwrap());
     }
 
     #[tokio::test]
     async fn can_create_and_connect_to_file_sockets() {
         let path: &str = "./test_files/test.sock";
-        let socket = Socket::new("777");
+        let socket = Socket::with_path(&TEST_SOCKET_FILE_PATH);
         let _stream = socket.listen(path).unwrap();
-        let result = Socket::connect(path).await.map_err(|e| {
-            println!("error: {:?}", e);
-            e
-        });
+        tokio::time::sleep(Duration::from_millis(1000)).await;
+        let result = socket.connect(path).await;
         assert!(result.is_ok());
     }
 }
