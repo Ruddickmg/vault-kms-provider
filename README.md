@@ -7,21 +7,16 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
 See usage [documentation here](https://vault-kms-provider.io/)
 
 ### RoadMap:
-- [ ] Automate versioning
+- [ ] Static deployment
+  - [ ] Support
+  - [ ] Document
+  - [ ] Test
 
-## Kubernetes authentication
+## Contributing
 
-> Official documentation on kubernetes authentication can be found
-> - [here in the vault docs](https://developer.hashicorp.com/vault/docs/auth/kubernetes)
-> - [here in the Kubernetes docs](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens).
+### Versioning
 
-### Service accounts
-
-You can enable the use of local kubernetes authentication in vault using the following commands. [docs](https://developer.hashicorp.com/vault/docs/auth/kubernetes#use-local-service-account-token-as-the-reviewer-jwt)
-```shell
-vault auth enable kubernetes
-vault write auth/kubernetes/config kubernetes_host=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
-```
+All commits must use conventional commit messages to ensure versioning happens correctly. 
 
 ## Testing
 
