@@ -4,7 +4,7 @@
     "color": "EEEEEE"
   },
   "CHECKS": {
-    "prefixes": ["fix:", "feat:", "chore:", "patch:"]
+    "prefixes": ["fix:", "feat:", "chore:", "patch:", "build:", "ci:", "docs:", "style:", "refactor:", "perf:", "test:"]
   },
   "MESSAGES": {
     "success": "All OK",
