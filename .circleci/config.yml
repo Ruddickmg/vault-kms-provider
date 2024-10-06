@@ -108,6 +108,10 @@ workflows:
             - integration_tests
             - e2e_tests
       - release:
+          filters:
+            branches:
+              only:
+                - main
           requires:
             - publish_latest_manifest
             - increment_version
@@ -145,6 +149,7 @@ jobs:
           name: Increment version
           command: |
             if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
+              echo "increment version"
               node version/increment.js "$(git log -1 --pretty=%B)"
             fi
       - run:
