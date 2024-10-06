@@ -138,7 +138,7 @@ jobs:
       - run:
           name: Validate PR title
           command: |
-            if [[ -z "$CIRCLE_PR_NUMBER" && -z "$CIRCLE_PR_USERNAME" && -z "$CIRCLE_PR_REPONAME"]]
+            if [ -z $VAR1 ] && [ -z $VAR2 ] && [ -z $VAR3 ]
             then
               node version/checkPrTitle.js "$(gh pr view $CIRCLE_PR_NUMBER --repo "$CIRCLE_PR_USERNAME/$CIRCLE_PR_REPONAME" | head -n 1)"
             fi
