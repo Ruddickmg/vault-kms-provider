@@ -256,6 +256,14 @@ jobs:
       - run:
           name: Install node
           command: apk add --update nodejs npm
+      - run:
+          name: Install rust
+          command: |
+            apk add curl
+            apk add gcc
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+            source $HOME/.cargo/env
+            cargo --version
       - add_ssh_keys:
           fingerprints:
             - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
@@ -272,6 +280,7 @@ jobs:
           command: |
             if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
               node version/increment.js "$(git log -1 --pretty=%B)"
+              cargo build
               git commit -a -m "[skip ci] increment version"
               git push -f origin main
             fi
