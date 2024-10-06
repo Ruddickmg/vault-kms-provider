@@ -30,25 +30,6 @@
                    
                    <div>
                      
-                       <h2>Benchmarks</h2>
-                     
-                     <ul>
-                       
-                         <li><a href=/benchmarks/health/>Health</a></li>
-                       
-                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
-                       
-                         <li><a href=/benchmarks/encryption/>Encryption</a></li>
-                       
-                     </ul>
-                   </div>
-                   
-               
-           
-               
-                   
-                   <div>
-                     
                        <a href="/configuration"><h2>Configuration</h2></a>
                      
                      <ul>
@@ -85,6 +66,25 @@
                          <li><a href=/installation/helm/>Helm</a></li>
                        
                          <li><a href=/installation/repository/>Repository</a></li>
+                       
+                     </ul>
+                   </div>
+                   
+               
+           
+               
+                   
+                   <div>
+                     
+                       <h2>Benchmarks</h2>
+                     
+                     <ul>
+                       
+                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
+                       
+                         <li><a href=/benchmarks/encryption/>Encryption</a></li>
+                       
+                         <li><a href=/benchmarks/health/>Health</a></li>
                        
                      </ul>
                    </div>
@@ -215,14 +215,12 @@
 <span class="token comment"># The endpoint that the health checks will listen on</span>
 <span class="token property">HEALTH_ENDPOINT</span> <span class="token punctuation">=</span> <span class="token string">"0.0.0.0:8080"</span>
 
-<span class="token comment"># Path to the socket used for communication with the Kubernetes API server</span>
+<span class="token comment"># Path to the socket used for communication with the Kubernetes API server. Can be either abstract (@path/to/abstract.sock) or file path.</span>
+<span class="token comment"># Abstract socket paths must be prefixed with the "@" symbol</span>
 <span class="token property">SOCKET_PATH</span> <span class="token punctuation">=</span> <span class="token string">"./sockets/vault-kms-provider.sock"</span>
 
-<span class="token comment"># The level of permissions granted to the socket, choices are:</span>
-<span class="token comment">#   - any: equivalent to 666</span>
-<span class="token comment">#   - user: equivalent to 600</span>
-<span class="token comment">#   - group: equivalent to 660</span>
-<span class="token property">SOCKET_PERMISSIONS</span> <span class="token punctuation">=</span> <span class="token string">"any"</span>
+<span class="token comment"># The level of permissions granted to the socket (does not apply to abstract sockets)</span>
+<span class="token property">SOCKET_PERMISSIONS</span> <span class="token punctuation">=</span> <span class="token string">"666"</span>
 
 <span class="token comment"># The string identifier used to store the encryption keys in the vault transit gateway</span>
 <span class="token property">VAULT_TRANSIT_KEY</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
