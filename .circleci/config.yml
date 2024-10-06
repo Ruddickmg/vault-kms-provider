@@ -63,7 +63,7 @@ workflows:
       - benchmark
       - chart_formatting
       - generate_tag
-      - validate_commit_message
+      - validate_pr_title
       - check_formatting
       - build
       - unit_tests
@@ -98,7 +98,6 @@ workflows:
             - dockerhub
           requires:
             - generate_tag
-            - check_version
             - chart_formatting
             - check_formatting
             - build
@@ -126,7 +125,7 @@ workflows:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
-  validate_commit_message:
+  validate_pr_title:
     executor: node
     steps:
       - run:
