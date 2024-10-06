@@ -130,8 +130,17 @@ jobs:
     executor: node
     steps:
       - run:
+          name: Update dependencies
+          command: sudo apt update
+      - run:
+          name: Install gh cli
+          command: sudo apt install gh
+      - run:
           name: Check commit message
-          command: node version/checkFileName.js "$(git log --format=%B -n 1 $CIRCLE_SHA1)"
+          command: |
+            if [ -z "$CIRCLE_PR_NUMBER" ] then
+              node version/checkFileName.js "$(gh pr view $CIRCLE_PR_NUMBER --repo $CIRCLE_PR_USERNAME/$CIRCLE_PR_REPONAME | head -n 1)"
+            fi
 
 #  increment_version:
 #    executor: node
