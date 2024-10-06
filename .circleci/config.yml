@@ -136,10 +136,9 @@ jobs:
           name: Install gh cli
           command: apt install gh
       - run:
-          name: Check commit message
+          name: Validate PR title
           command: |
-            if [ -z "$CIRCLE_PR_NUMBER" ]; then
-              node version/checkPrTitle.js "$CIRCLE_PR_USERNAME/$CIRCLE_PR_REPONAME"
+            if [[ -z "$CIRCLE_PR_NUMBER" && -z "$CIRCLE_PR_USERNAME" && -z "$CIRCLE_PR_REPONAME"]]; then
               node version/checkPrTitle.js "$(gh pr view $CIRCLE_PR_NUMBER --repo "$CIRCLE_PR_USERNAME/$CIRCLE_PR_REPONAME" | head -n 1)"
             fi
 
