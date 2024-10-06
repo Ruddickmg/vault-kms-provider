@@ -67,11 +67,11 @@ workflows:
       - build
       - unit_tests
       - integration_tests
-      - increment_version:
-          filters:
-            branches:
-              only:
-                - main
+      - increment_version
+#          filters:
+#            branches:
+#              only:
+#                - main
       - e2e_tests:
           requires:
             - publish_manifest
@@ -155,9 +155,9 @@ jobs:
             if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
               node version/increment.js "$(git log -1 --pretty=%B)"
               source $HOME/.cargo/env
-              cargo install
+              cargo fetch
               git commit -a -m "[skip ci] increment version"
-              git push -f origin main
+#              git push -f origin main
             fi
 
   benchmark:
