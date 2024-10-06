@@ -134,7 +134,8 @@ jobs:
             - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
       - run:
           name: Increment version
-          command: node increment-version.js patch
+          command: |
+            node increment-version.js "feat: testing 123"
       - run:
           name: Commit changes
           command: git commit -m "[skip ci] increment version"
