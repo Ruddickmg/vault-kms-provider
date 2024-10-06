@@ -128,12 +128,10 @@ workflows:
 jobs:
   validate_commit_message:
     executor: node
-    environment:
-      COMMIT_TITLE: << pipeline.trigger_parameters.github_app.commit_title >>
     steps:
       - run:
           name: Check commit message
-          command: node version/checkFileName.js $COMMIT_TITLE
+          command: node version/checkFileName.js "$(git log --format=%B -n 1 $CIRCLE_SHA1)"
 
 #  increment_version:
 #    executor: node
