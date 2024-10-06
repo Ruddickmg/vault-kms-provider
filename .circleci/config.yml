@@ -118,6 +118,12 @@ workflows:
       - release:
           requires:
             - publish-latest-manifest
+      - build-documentation:
+          filters:
+            branches:
+              ignore: main
+          requires:
+            - benchmark
       - document:
           filters:
             branches:
@@ -168,6 +174,39 @@ jobs:
             - decryption
             - encryption
             - health
+
+  build_documentation:
+    executor: node
+    working_directory: ~/app/documentation
+    steps:
+      - checkout:
+          path: ~/app
+      - run:
+          name: Install pnpm
+          command: npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
+      - run:
+          name: Install sass
+          command: npm install -g sass
+      - attach_workspace:
+          at: .
+      - run:
+          name: Copy benchmarks into documentation
+          command: |
+            mv ./encryption/report ./src/benchmarks/encryption
+            mv ./decryption/report ./src/benchmarks/decryption
+            mv ./health/report ./src/benchmarks/health
+      - run:
+          name: Reformat index files
+          command: |
+            mv ./src/benchmarks/encryption/index.html ./src/benchmarks/encryption/index.njk
+            mv ./src/benchmarks/decryption/index.html ./src/benchmarks/decryption/index.njk
+            mv ./src/benchmarks/health/index.html ./src/benchmarks/health/index.njk
+      - run:
+          name: Build documentation
+          command: pnpm run build
 
   document:
     executor: node
