@@ -67,14 +67,14 @@ workflows:
       - build
       - unit_tests
       - integration_tests
+      - increment_version:
+          filters:
+            branches:
+              only:
+                - main
       - e2e_tests:
           requires:
             - publish_manifest
-      - check_version:
-          filters:
-            branches:
-              ignore:
-                - main
       - publish_arm:
           requires:
             - generate_tag
@@ -92,7 +92,7 @@ workflows:
             - publish_amd
             - publish_arm
       - publish_manifest:
-          name: publish-latest-manifest
+          name: publish_latest_manifest
           tag: latest
           filters:
             branches:
@@ -102,7 +102,6 @@ workflows:
             - dockerhub
           requires:
             - generate_tag
-            - check_version
             - chart_formatting
             - check_formatting
             - build
@@ -110,8 +109,13 @@ workflows:
             - integration_tests
             - e2e_tests
       - release:
+          filters:
+            branches:
+              only:
+                - main
           requires:
-            - publish-latest-manifest
+            - publish_latest_manifest
+            - increment_version
       - build_documentation:
           filters:
             branches:
@@ -130,6 +134,27 @@ workflows:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
+  increment_version:
+    executor: node
+    steps:
+      - checkout_write
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+      - run:
+          name: Configure git
+          command: |
+            git config --global user.email "ruddickmg@gmail.com"
+            git config --global user.name "ruddickmg"
+      - run:
+          name: Increment version
+          command: |
+            if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
+              node version/increment.js "$(git log -1 --pretty=%B)"
+              git commit -a -m "[skip ci] increment version"
+              git push -f origin main
+            fi
+
   benchmark:
     executor: ubuntu
     environment:
@@ -278,8 +303,7 @@ jobs:
               --git-repo $CIRCLE_PROJECT_REPONAME \
               --owner $CIRCLE_PROJECT_USERNAME \
               --release-name-template "v{{ .Version }}" \
-              --token $GITHUB_TOKEN \
-              --
+              --token $GITHUB_TOKEN
       - run:
           name: Add chart to gh-pages
           command: |
@@ -289,7 +313,10 @@ jobs:
               --owner $CIRCLE_PROJECT_USERNAME \
               --release-name-template "v{{ .Version }}" \
               --token $GITHUB_TOKEN
-
+      - run:
+          name: Increment version
+          command: |
+            node
   build:
     executor: rust_app
     steps:
@@ -310,34 +337,6 @@ jobs:
           paths:
             - "~/.cargo"
             - "./target"
-
-  check_version:
-    executor: ubuntu
-    environment:
-      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
-    steps:
-      - checkout_write
-      - run:
-          name: Checkout main
-          command: git clone "$MAIN_BRANCH_URL"
-      - run:
-          name: Check that version has changed
-          command: |
-            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export MAIN_CHART_VERSION="$(cat ./vault-kms-provider/helm/Chart.yaml | grep '^version:' | awk '{print $2}')"
-            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export BRANCH_CHART_VERSION="$(cat helm/Chart.yaml | grep '^version:' | awk '{print $2}')"
-            if [ "$MAIN_VERSION" = "$BRANCH_VERSION" ]; then
-              if [ "$MAIN_CHART_VERSION" = "$BRANCH_CHART_VERSION" ]; then exit 1; else exit 0; fi
-            else
-              exit 0;
-            fi
-      - run:
-          name: Check matching app versions
-          command: |
-            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export CHART_APP_VERSION="$(cat helm/Chart.yaml | grep -oP '^appVersion: "\K[^"]+')"
-            if [ "$BRANCH_VERSION" = "$CHART_APP_VERSION" ]; then exit 0; else exit 1; fi
 
   generate_tag:
     executor: ubuntu
