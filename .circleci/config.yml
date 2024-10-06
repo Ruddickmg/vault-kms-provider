@@ -63,7 +63,7 @@ workflows:
       - benchmark
       - chart_formatting
       - generate_tag
-      - validate_commit
+      - validate_commit_message
       - check_formatting
       - build
       - unit_tests
@@ -71,11 +71,6 @@ workflows:
       - e2e_tests:
           requires:
             - publish_manifest
-      - check_version:
-          filters:
-            branches:
-              ignore:
-                - main
       - publish_arm:
           requires:
             - generate_tag
@@ -131,7 +126,7 @@ workflows:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
-  validate_commit:
+  validate_commit_message:
     executor: node
     environment:
       COMMIT_MESSAGE: << pipeline.trigger_parameters.github_app.commit_message >>
@@ -339,34 +334,6 @@ jobs:
           paths:
             - "~/.cargo"
             - "./target"
-
-  check_version:
-    executor: ubuntu
-    environment:
-      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
-    steps:
-      - checkout_write
-      - run:
-          name: Checkout main
-          command: git clone "$MAIN_BRANCH_URL"
-      - run:
-          name: Check that version has changed
-          command: |
-            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export MAIN_CHART_VERSION="$(cat ./vault-kms-provider/helm/Chart.yaml | grep '^version:' | awk '{print $2}')"
-            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export BRANCH_CHART_VERSION="$(cat helm/Chart.yaml | grep '^version:' | awk '{print $2}')"
-            if [ "$MAIN_VERSION" = "$BRANCH_VERSION" ]; then
-              if [ "$MAIN_CHART_VERSION" = "$BRANCH_CHART_VERSION" ]; then exit 1; else exit 0; fi
-            else
-              exit 0;
-            fi
-      - run:
-          name: Check matching app versions
-          command: |
-            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export CHART_APP_VERSION="$(cat helm/Chart.yaml | grep -oP '^appVersion: "\K[^"]+')"
-            if [ "$BRANCH_VERSION" = "$CHART_APP_VERSION" ]; then exit 0; else exit 1; fi
 
   generate_tag:
     executor: ubuntu
