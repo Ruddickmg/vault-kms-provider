@@ -193,6 +193,7 @@ jobs:
       - run:
           name: Get version env variables
           command: cat bash.env >> $BASH_ENV
+      - increment_version
       - run:
           name: Update main
           command: |
