@@ -148,7 +148,7 @@ jobs:
       - run:
           name: Increment version
           command: |
-            if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
+            if [[ "$(git log -1 --pretty=%B)" == *"[skip ci] increment version"* ]]; then
               echo "increment version"
               node version/increment.js "$(git log -1 --pretty=%B)"
             fi
