@@ -124,22 +124,22 @@ workflows:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
-#  increment_version:
-#    executor: node
-#    steps:
-#      - checkout_write
-#      - add_ssh_keys:
-#          fingerprints:
-#            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
-#      - run:
-#          name: Increment version
-#          command: node increment-version.js << pipeline.trigger_parameters.github_app.commit_message >>
-#      - run:
-#          name: Commit changes
-#          command: git commit -m "[skip ci] incrementing version"
-#      - run:
-#          name: Push changes
-#          command:
+  increment_version:
+    executor: node
+    steps:
+      - checkout_write
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+      - run:
+          name: Increment version
+          command: node increment-version.js patch
+      - run:
+          name: Commit changes
+          command: git commit -m "[skip ci] increment version"
+      - run:
+          name: Push changes
+          command: git push -f origin main
 
   benchmark:
     executor: ubuntu
