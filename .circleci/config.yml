@@ -167,10 +167,12 @@ jobs:
             then
               echo "No version change, skipping"
             else
-              cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+'
-              cat ./Cargo.toml | grep -oP '^version = "\K[^"]+'
               source $HOME/.cargo/env
               cargo fetch
+              echo $MAIN_VERSION > test_file
+              echo $CHART_VERSION >> test_file
+              cat test_file
+              echo "log test file"
               git commit -a -m "[skip ci] increment version"
             fi
 
