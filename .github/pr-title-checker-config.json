@@ -1,0 +1,14 @@
+{
+  "LABEL": {
+    "name": "Title requires valid semver prefix",
+    "color": "EEEEEE"
+  },
+  "CHECKS": {
+    "prefixes": ["fix:", "feat:", "chore:", "patch:"]
+  },
+  "MESSAGES": {
+    "success": "All OK",
+    "failure": "Invalid PR title",
+    "notice": ""
+  }
+}

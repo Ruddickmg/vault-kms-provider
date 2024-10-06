@@ -125,21 +125,6 @@ workflows:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
-  validate_pr_title:
-    executor: node
-    steps:
-      - checkout_write
-      - run:
-          name: Update dependencies
-          command: apt update
-      - run:
-          name: Install gh cli
-          command: apt install gh
-      - run:
-          name: Validate PR title
-          command: |
-            node version/checkPrTitle.js "$(gh pr view $CIRCLE_PULL_REQUEST | head -n 1)"
-
 #  increment_version:
 #    executor: node
 #    steps:
