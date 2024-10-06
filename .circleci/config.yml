@@ -76,10 +76,10 @@ workflows:
       - unit_tests
       - integration_tests
       - increment_version
-#          filters:
-#            branches:
-#              only:
-#                - main
+      #          filters:
+      #            branches:
+      #              only:
+      #                - main
       - e2e_tests:
           requires:
             - publish_manifest
@@ -170,7 +170,6 @@ jobs:
               source $HOME/.cargo/env
               cargo fetch
               git commit -a -m "[skip ci] increment version"
-#              git push -f origin main
             fi
 
   benchmark:
