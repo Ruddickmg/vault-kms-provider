@@ -133,10 +133,12 @@ workflows:
 jobs:
   validate_commit:
     executor: node
+    environment:
+      COMMIT_MESSAGE: << pipeline.trigger_parameters.github_app.commit_message >>
     steps:
       - run:
           name: Check commit message
-          command: node version/checkFileName.js << pipeline.trigger_parameters.github_app.commit_message >>
+          command: node version/checkFileName.js $COMMIT_MESSAGE
 
 #  increment_version:
 #    executor: node
