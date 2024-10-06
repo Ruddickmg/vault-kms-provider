@@ -76,7 +76,6 @@ commands:
 workflows:
   ci_cd:
     jobs:
-      - store_branch_versions
       - benchmark
       - chart_formatting
       - generate_tag
@@ -84,6 +83,11 @@ workflows:
       - build
       - unit_tests
       - integration_tests
+      - store_branch_versions:
+          filters:
+            branches:
+              only:
+                - main
       - increment_version:
           requires:
             - store_branch_versions
