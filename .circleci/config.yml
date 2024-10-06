@@ -63,7 +63,6 @@ workflows:
       - benchmark
       - chart_formatting
       - generate_tag
-      - validate_pr_title
       - check_formatting
       - build
       - unit_tests
