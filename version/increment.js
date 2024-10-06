@@ -1,6 +1,6 @@
 const fs = require('fs/promises');
 
-const patchTypes = ['chore', 'patch', 'fix'];
+const patchTypes = ['fix', 'chore', 'patch', 'build', 'ci', 'docs', 'style', 'refactor', 'perf', 'test'];
 
 const increment = (version, target) => {
   const [major, minor, patch] = version.split('.').map(Number);
