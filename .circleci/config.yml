@@ -137,7 +137,7 @@ jobs:
       - run:
           name: Check commit message
           command: |
-            if [ -z "$CIRCLE_PR_NUMBER" ] then
+            if [ -z "$CIRCLE_PR_NUMBER" ]; then
               node version/checkFileName.js "$(gh pr view $CIRCLE_PR_NUMBER --repo $CIRCLE_PR_USERNAME/$CIRCLE_PR_REPONAME | head -n 1)"
             fi
 
