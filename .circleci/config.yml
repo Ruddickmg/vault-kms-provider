@@ -63,6 +63,7 @@ workflows:
       - benchmark
       - chart_formatting
       - generate_tag
+      - validate_commit
       - check_formatting
       - build
       - unit_tests
