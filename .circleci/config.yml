@@ -49,15 +49,13 @@ executors:
 
 commands:
   checkout_main:
-    environment:
-      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
     steps:
       - add_ssh_keys:
           fingerprints:
             - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
       - run:
           name: Checkout main
-          command: git clone "$MAIN_BRANCH_URL"
+          command: git clone "git@github.com:Ruddickmg/vault-kms-provider.git"
   checkout_write:
     steps:
       - add_ssh_keys:
@@ -689,4 +687,3 @@ jobs:
               export TAG="<< parameters.tag >>"
             fi
             docker manifest push "${DOCKERHUB_REPOSITORY}:${TAG}"
-
