@@ -4,8 +4,8 @@
   "automerge": true,
   "automergeType": "pr",
   "automergeStrategy": "squash",
-  "bumpVersion": "patch",
   "configMigration": true,
+  "branchConcurrentLimit": 2,
   "extends": [
     "config:recommended"
   ]
