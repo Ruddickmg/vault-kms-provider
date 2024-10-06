@@ -128,6 +128,7 @@ jobs:
   validate_pr_title:
     executor: node
     steps:
+      - checkout_write
       - run:
           name: Update dependencies
           command: apt update
@@ -138,7 +139,7 @@ jobs:
           name: Check commit message
           command: |
             if [ -z "$CIRCLE_PR_NUMBER" ]; then
-              node version/checkFileName.js "$(gh pr view $CIRCLE_PR_NUMBER --repo $CIRCLE_PR_USERNAME/$CIRCLE_PR_REPONAME | head -n 1)"
+              node version/checkPrTitle.js "$(gh pr view $CIRCLE_PR_NUMBER --repo $CIRCLE_PR_USERNAME/$CIRCLE_PR_REPONAME | head -n 1)"
             fi
 
 #  increment_version:
