@@ -138,10 +138,8 @@ jobs:
       - run:
           name: Validate PR title
           command: |
-            node version/checkPrTitle.js "$CIRCLE_PULL_REQUEST"
             if [ -n "$CIRCLE_PULL_REQUEST" ]
             then
-              echo "doing a thing"
               node version/checkPrTitle.js "$(gh pr view $CIRCLE_PULL_REQUEST | head -n 1)"
             fi
 
