@@ -66,8 +66,11 @@ workflows:
       - check_formatting
       - build
       - unit_tests
-      - increment_version
       - integration_tests
+      - increment_version
+#          filters:
+#            branches:
+#              only: main
       - e2e_tests:
           requires:
             - publish_manifest
@@ -140,10 +143,13 @@ jobs:
       - run:
           name: Increment version
           command: |
-            node version/increment.js "feat: testing 123"
+            node version/increment.js "$(git log -1 --pretty=%B)"
       - run:
           name: Commit changes
           command: git commit -a -m "[skip ci] increment version"
+#      - run:
+#          name: Push changes
+#          command: git push -f origin main
 
   benchmark:
     executor: ubuntu
