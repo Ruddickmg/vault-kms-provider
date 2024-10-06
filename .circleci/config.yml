@@ -133,6 +133,11 @@ jobs:
           fingerprints:
             - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
       - run:
+          name: Configure git
+          command: |
+            git config --global user.email "ruddickmg@gmail.com"
+            git config --global user.name "ruddickmg"
+      - run:
           name: Increment version
           command: |
             node version/increment.js "feat: testing 123"
