@@ -48,6 +48,16 @@ executors:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 commands:
+  checkout_main:
+    environment:
+      MAIN_BRANCH_URL: git@github.com:Ruddickmg/vault-kms-provider.git
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:ikYE/tBNMyIEGqxtAetAV3NW80GFZoioglYDTbyiNG0"
+      - run:
+          name: Checkout main
+          command: git clone "$MAIN_BRANCH_URL"
   checkout_write:
     steps:
       - add_ssh_keys:
@@ -277,8 +287,23 @@ jobs:
           name: Build documentation
           command: pnpm run build
       - run:
+          name: Increment version
+          command: |
+            if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
+              node version/increment.js "$(git log -1 --pretty=%B)"
+            fi
+      - checkout_main
+      - run:
           name: Release documentation
-          command: gh-pages -a -d dist -m "[skip ci] update documentation"
+          command: |
+            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
+            export COMMIT_MESSAGE="$(git log -1 --pretty=%B)"
+            export TRIMMED="${COMMIT_MESSAGE##*( )}"
+            if [ "$MAIN_VERSION" != "$CHART_VERSION" ] || [ "${TRIMMED:0:4}" == "docs" ]
+            then
+              gh-pages -a -d dist -m "[skip ci] update documentation"
+            fi
   release:
     executor: release
     steps:

@@ -1,17 +1,26 @@
 const fs = require('fs/promises');
 
-const patchTypes = ['fix', 'chore', 'patch', 'build', 'ci', 'docs', 'style', 'refactor', 'perf', 'test'];
+const Increment = Object.freeze({
+  Major: 'major',
+  Minor: 'minor',
+  Patch: 'patch',
+});
+
+const nonIncrementalTypes = ['build', 'ci', 'docs', 'perf', 'test'];
+const patchTypes = ['fix', 'chore', 'patch', 'style', 'refactor'];
 const minorTypes = ['feat'];
-const allTypes = patchTypes.concat(minorTypes);
+const allTypes = patchTypes.concat(minorTypes).concat(nonIncrementalTypes);
 
 const increment = (version, target) => {
   const [major, minor, patch] = version.split('.').map(Number);
-  if (target === 'major') {
+  if (target === Increment.Major) {
     return `${major + 1}.${minor}.${patch}`;
-  } else if (target === 'minor') {
+  } else if (target === Increment.Minor) {
     return `${major}.${minor + 1}.${patch}`;
+  } else if (target === Increment.Patch) {
+    return `${major}.${minor}.${patch + 1}`;
   }
-  return `${major}.${minor}.${patch + 1}`;
+  return version;
 };
 
 const findAndReplace = (file, pattern, replace) => file.split('\n').map((line) => line.startsWith(pattern) ? replace(line) : line).join('\n');
@@ -38,9 +47,10 @@ const updateFiles = async (target) => {
 const parseTarget = (message) => {
   const [commitType] = message.split(/[^A-Za-z]/i);
   if (!allTypes.includes(commitType)) throw new Error(`Invalid commit type, must be one of: ${allTypes.map(s => `"${s}"`).join(', ')}`)
-  if (message.toLowerCase().includes('breaking change')) return 'major';
-  if (minorTypes.includes(commitType)) return 'minor';
-  return 'patch';
+  if (message.toLowerCase().includes('breaking change')) return Increment.Major;
+  if (minorTypes.includes(commitType)) return Increment.Minor;
+  if (patchTypes.includes(commitType)) return Increment.Patch;
+  return 'ignore';
 };
 
 (async () => {
