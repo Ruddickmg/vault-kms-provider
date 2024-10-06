@@ -1,6 +1,6 @@
 const fs = require('fs/promises');
 
-const patchTypes = ['fix', 'chore', 'patch', 'build', 'ci', 'docs', 'style', 'refactor', 'perf', 'test'];
+const minorTypes = ['feat'];
 
 const increment = (version, target) => {
   const [major, minor, patch] = version.split('.').map(Number);
@@ -38,17 +38,14 @@ const parseTarget = (message) => {
     return 'major';
   }
   const [commitType] = message.split(/[^A-Za-z]/i);
-  if (patchTypes.includes(commitType)) {
-    return 'patch';
+  if (minorTypes.includes(commitType)) {
+    return 'minor';
   }
-  return 'minor';
+  return 'patch';
 };
 
 (async () => {
   const [_node, _file, commitMessage] = process.argv;
   const target = parseTarget(commitMessage);
-  if (!['patch', 'major', 'minor'].includes(target)) {
-    throw new Error(`Invalid target: ${target}`);
-  }
   await updateFiles(target);
 })().catch(console.error);
