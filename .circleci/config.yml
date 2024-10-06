@@ -14,7 +14,7 @@ executors:
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
-  chart-test:
+  chart_test:
     docker:
       - image: 'quay.io/helmpack/chart-testing:latest'
   release:
@@ -23,13 +23,13 @@ executors:
   node:
     docker:
       - image: node:lts
-  rust-app:
+  rust_app:
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
     docker:
       - image: cimg/rust:1.79.0
-  arm-builder:
+  arm_builder:
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
@@ -37,12 +37,6 @@ executors:
       image: ubuntu-2204:2024.05.1
       resource_class: arm.medium
       docker_layer_caching: true
-  docker-publisher:
-    environment:
-      PIPELINE_NUM: << pipeline.number >>
-      TZ: "America/Los_Angeles"
-    docker:
-      - image: circleci/buildpack-deps:stretch
   ubuntu:
     environment:
       PIPELINE_NUM: << pipeline.number >>
@@ -64,7 +58,7 @@ commands:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 workflows:
-  ci-cd:
+  ci_cd:
     jobs:
       - benchmark
       - chart_formatting
@@ -75,29 +69,29 @@ workflows:
       - integration_tests
       - e2e_tests:
           requires:
-            - publish-manifest
+            - publish_manifest
       - check_version:
           filters:
             branches:
               ignore:
                 - main
-      - publish-arm:
+      - publish_arm:
           requires:
             - generate_tag
           context:
             - dockerhub
-      - publish-amd:
+      - publish_amd:
           requires:
             - generate_tag
           context:
             - dockerhub
-      - publish-manifest:
+      - publish_manifest:
           context:
             - dockerhub
           requires:
-            - publish-amd
-            - publish-arm
-      - publish-manifest:
+            - publish_amd
+            - publish_arm
+      - publish_manifest:
           name: publish-latest-manifest
           tag: latest
           filters:
@@ -118,6 +112,12 @@ workflows:
       - release:
           requires:
             - publish-latest-manifest
+      - build_documentation:
+          filters:
+            branches:
+              ignore: main
+          requires:
+            - benchmark
       - document:
           filters:
             branches:
@@ -168,6 +168,39 @@ jobs:
             - decryption
             - encryption
             - health
+
+  build_documentation:
+    executor: node
+    working_directory: ~/app/documentation
+    steps:
+      - checkout:
+          path: ~/app
+      - run:
+          name: Install pnpm
+          command: npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
+      - run:
+          name: Install sass
+          command: npm install -g sass
+      - attach_workspace:
+          at: .
+      - run:
+          name: Copy benchmarks into documentation
+          command: |
+            mv ./encryption/report ./src/benchmarks/encryption
+            mv ./decryption/report ./src/benchmarks/decryption
+            mv ./health/report ./src/benchmarks/health
+      - run:
+          name: Reformat index files
+          command: |
+            mv ./src/benchmarks/encryption/index.html ./src/benchmarks/encryption/index.njk
+            mv ./src/benchmarks/decryption/index.html ./src/benchmarks/decryption/index.njk
+            mv ./src/benchmarks/health/index.html ./src/benchmarks/health/index.njk
+      - run:
+          name: Build documentation
+          command: pnpm run build
 
   document:
     executor: node
@@ -258,7 +291,7 @@ jobs:
               --token $GITHUB_TOKEN
 
   build:
-    executor: rust-app
+    executor: rust_app
     steps:
       - checkout_write
       - run:
@@ -326,7 +359,7 @@ jobs:
             - docker_tag
 
   check_formatting:
-    executor: rust-app
+    executor: rust_app
     steps:
       - checkout_write
       - run:
@@ -334,7 +367,7 @@ jobs:
           command: cargo fmt -- --check
 
   chart_formatting:
-    executor: chart-test
+    executor: chart_test
     steps:
       - checkout_write
       - run:
@@ -507,7 +540,7 @@ jobs:
           command: |
             helm test vault-kms-provider -n vault --logs
 
-  publish-amd:
+  publish_amd:
     executor: ubuntu
     environment:
       ARCH: amd64
@@ -533,8 +566,8 @@ jobs:
             TAG="$(cat /tmp/workspace/docker_tag)"
             docker push "${DOCKERHUB_REPOSITORY}:${TAG}-${ARCH}"
 
-  publish-arm:
-    executor: arm-builder
+  publish_arm:
+    executor: arm_builder
     environment:
       ARCH: arm64
       PLATFORM: linux/arm64
@@ -559,7 +592,7 @@ jobs:
             TAG="$(cat /tmp/workspace/docker_tag)"
             docker push "${DOCKERHUB_REPOSITORY}:${TAG}-${ARCH}"
 
-  publish-manifest:
+  publish_manifest:
     executor: ubuntu
     environment:
       DOCKER_CLI_EXPERIMENTAL: enabled

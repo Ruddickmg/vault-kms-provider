@@ -8,7 +8,6 @@ See usage [documentation here](https://vault-kms-provider.io/)
 
 ### RoadMap:
 - [ ] Add/configure renovate to update dependencies
-- [ ] Smoke test documentation
 
 ## Kubernetes authentication
 
