@@ -1,6 +1,8 @@
 const fs = require('fs/promises');
 
+const patchTypes = ['fix', 'chore', 'patch', 'build', 'ci', 'docs', 'style', 'refactor', 'perf', 'test'];
 const minorTypes = ['feat'];
+const allTypes = patchTypes.concat(minorTypes);
 
 const increment = (version, target) => {
   const [major, minor, patch] = version.split('.').map(Number);
@@ -34,13 +36,10 @@ const updateFiles = async (target) => {
 }
 
 const parseTarget = (message) => {
-  if (message.toLowerCase().includes('breaking change')) {
-    return 'major';
-  }
   const [commitType] = message.split(/[^A-Za-z]/i);
-  if (minorTypes.includes(commitType)) {
-    return 'minor';
-  }
+  if (!allTypes.includes(commitType)) throw new Error(`Invalid commit type, must be one of: ${allTypes.map(s => `"${s}"`).join(', ')}`)
+  if (message.toLowerCase().includes('breaking change')) return 'major';
+  if (minorTypes.includes(commitType)) return 'minor';
   return 'patch';
 };
 
