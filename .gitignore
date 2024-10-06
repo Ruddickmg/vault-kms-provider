@@ -4,6 +4,7 @@
 sockets
 node_modules
 documentation/dist
+vault-kms-provider
 test_files/role_id
 test_files/secret_id
 test_files/source_test
