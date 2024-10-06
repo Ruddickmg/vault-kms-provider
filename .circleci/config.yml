@@ -48,6 +48,14 @@ executors:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 commands:
+  increment_version:
+    steps:
+      - run:
+          name: Increment version
+          command: |
+            if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
+              node version/increment.js "$(git log -1 --pretty=%B)"
+            fi
   checkout_main:
     steps:
       - add_ssh_keys:
@@ -75,7 +83,14 @@ workflows:
       - build
       - unit_tests
       - integration_tests
+      - store_branch_versions:
+          filters:
+            branches:
+              only:
+                - main
       - increment_version:
+          requires:
+            - store_branch_versions
           filters:
             branches:
               only:
@@ -122,6 +137,7 @@ workflows:
               only:
                 - main
           requires:
+            - store_branch_versions
             - publish_latest_manifest
             - increment_version
       - build_documentation:
@@ -136,17 +152,34 @@ workflows:
               only:
                 - main
           requires:
+            - store_branch_versions
             - release
             - benchmark
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
-  increment_version:
+  store_branch_versions:
     executor: node
     steps:
       - checkout_write
       - checkout_main
+      - increment_version
+      - run:
+         name: Store versions
+         command: |
+           echo "export MAIN_VERSION=$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')" >> $BASH_ENV
+           echo "export BRANCH_VERSION=$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')" >> $BASH_ENV
+      - run: cp $BASH_ENV bash.env
+      - persist_to_workspace:
+          root: .
+          paths:
+            - bash.env
+
+  increment_version:
+    executor: node
+    steps:
+      - checkout_write
       - run:
           name: Install rust
           command: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -155,14 +188,14 @@ jobs:
           command: |
             git config --global user.email "ruddickmg@gmail.com"
             git config --global user.name "ruddickmg"
+      - attach_workspace:
+          at: .
       - run:
-          name: Increment version
+          name: Get version env variables
+          command: cat bash.env >> $BASH_ENV
+      - run:
+          name: Update main
           command: |
-            if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
-              node version/increment.js "$(git log -1 --pretty=%B)"
-            fi
-            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
             if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
             then
               echo "No version change, skipping"
@@ -289,14 +322,16 @@ jobs:
           name: Increment version
           command: |
             if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
-              node version/increment.js "$(git log -1 --pretty=%B)"
+              cd ~ && node version/increment.js "$(git log -1 --pretty=%B)"
             fi
-      - checkout_main
+      - attach_workspace:
+          at: .
+      - run:
+          name: Get version env variables
+          command: cat bash.env >> $BASH_ENV
       - run:
           name: Release documentation
           command: |
-            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
             export COMMIT_MESSAGE="$(git log -1 --pretty=%B)"
             export TRIMMED="${COMMIT_MESSAGE##*( )}"
             if [ "$MAIN_VERSION" != "$BRANCH_VERSION" ] || [ "${TRIMMED:0:4}" == "docs" ]
@@ -323,22 +358,19 @@ jobs:
             git config --global --unset url.ssh://git@github.com.insteadof
             git config --global user.email "ruddickmg@gmail.com"
             git config --global user.name "Marcus Ruddick"
-      - run:
-          name: Increment version
-          command: |
-            if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
-              node version/increment.js "$(git log -1 --pretty=%B)"
-            fi
-      - checkout_main
+      - increment_version
       - run:
           name: Package chart
           command: |
             cr package ./helm
+      - attach_workspace:
+          at: .
+      - run:
+          name: Get version env variables
+          command: cat bash.env >> $BASH_ENV
       - run:
           name: Release chart
           command: |
-            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
             if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
             then
               echo "No release needed, skipping"
@@ -353,8 +385,6 @@ jobs:
       - run:
           name: Add chart to gh-pages
           command: |
-            export MAIN_VERSION="$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')"
-            export BRANCH_VERSION="$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')"
             if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
             then
               echo "No release, skipping"
