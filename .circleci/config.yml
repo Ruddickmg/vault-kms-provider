@@ -393,9 +393,9 @@ jobs:
       - run:
           name: Get version env variables
           command: |
-            cat /etc/profile
             cat bash.env >> /etc/profile
-            cat bash.env
+            cat /etc/profile
+            cat bash.env >> $BASH_ENV
             ls
             echo "print"
             printenv BASH_ENV
