@@ -14,9 +14,9 @@ const allTypes = patchTypes.concat(minorTypes).concat(nonIncrementalTypes);
 const increment = (version, target) => {
   const [major, minor, patch] = version.split('.').map(Number);
   if (target === Increment.Major) {
-    return `${major + 1}.${minor}.${patch}`;
+    return `${major + 1}.0.0`;
   } else if (target === Increment.Minor) {
-    return `${major}.${minor + 1}.${patch}`;
+    return `${major}.${minor + 1}.0`;
   } else if (target === Increment.Patch) {
     return `${major}.${minor}.${patch + 1}`;
   }
