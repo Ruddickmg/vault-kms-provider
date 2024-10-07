@@ -392,6 +392,8 @@ jobs:
       - run:
           name: Release chart
           command: |
+            printenv MAIN_VERSION
+            printenv BRANCH_VERSION
             if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
             then
               echo "No release needed, skipping"
