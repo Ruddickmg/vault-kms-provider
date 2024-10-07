@@ -11,24 +11,39 @@ executors:
   deployment:
     docker:
       - image: 'cimg/base:stable'
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
   chart_test:
     docker:
       - image: 'quay.io/helmpack/chart-testing:latest'
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
   release:
     docker:
       - image: 'quay.io/helmpack/chart-releaser:latest'
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
   node:
     docker:
       - image: node:lts
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
   rust_app:
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
     docker:
       - image: cimg/rust:1.81.0
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
   arm_builder:
     environment:
       PIPELINE_NUM: << pipeline.number >>
