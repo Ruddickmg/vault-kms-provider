@@ -91,85 +91,85 @@ commands:
 workflows:
   ci_cd:
     jobs:
-      #      - benchmark
-      #      - chart_formatting
-      #      - generate_tag
-      #      - check_formatting
-      #      - build
-      #      - unit_tests
-      #      - integration_tests
-      - store_branch_versions
-      #          filters:
-      #            branches:
-      #              only:
-      #                - main
-      - increment_version:
-          requires:
-            - store_branch_versions
-          #            - release
+      - benchmark
+      - chart_formatting
+      - generate_tag
+      - check_formatting
+      - build
+      - unit_tests
+      - integration_tests
+      - store_branch_versions:
           filters:
             branches:
               only:
                 - main
-      #      - e2e_tests:
-      #          requires:
-      #            - publish_manifest
-      #      - publish_arm:
-      #          requires:
-      #            - generate_tag
-      #          context:
-      #            - dockerhub
-      #      - publish_amd:
-      #          requires:
-      #            - generate_tag
-      #          context:
-      #            - dockerhub
-      #      - publish_manifest:
-      #          context:
-      #            - dockerhub
-      #          requires:
-      #            - publish_amd
-      #            - publish_arm
-      #      - publish_manifest:
-      #          name: publish_latest_manifest
-      #          tag: latest
-      #          filters:
-      #            branches:
-      #              only:
-      #                - main
-      #          context:
-      #            - dockerhub
-      #          requires:
-      #            - generate_tag
-      #            - chart_formatting
-      #            - check_formatting
-      #            - build
-      #            - unit_tests
-      #            - integration_tests
-      #            - e2e_tests
+      - increment_version:
+          requires:
+            - store_branch_versions
+            - release
+          filters:
+            branches:
+              only:
+                - main
+      - e2e_tests:
+          requires:
+            - publish_manifest
+      - publish_arm:
+          requires:
+            - generate_tag
+          context:
+            - dockerhub
+      - publish_amd:
+          requires:
+            - generate_tag
+          context:
+            - dockerhub
+      - publish_manifest:
+          context:
+            - dockerhub
+          requires:
+            - publish_amd
+            - publish_arm
+      - publish_manifest:
+          name: publish_latest_manifest
+          tag: latest
+          filters:
+            branches:
+              only:
+                - main
+          context:
+            - dockerhub
+          requires:
+            - generate_tag
+            - chart_formatting
+            - check_formatting
+            - build
+            - unit_tests
+            - integration_tests
+            - e2e_tests
       - release:
-#          filters:
-#            branches:
-#              only:
-#                - main
+          filters:
+            branches:
+              only:
+                - main
           requires:
             - store_branch_versions
-#                  - publish_latest_manifest
-      #      - build_documentation:
-      #          filters:
-      #            branches:
-      #              ignore: main
-      #          requires:
-      #            - benchmark
+            - publish_latest_manifest
+      - build_documentation:
+          filters:
+            branches:
+              ignore: main
+          requires:
+            - benchmark
       - document:
-          #          filters:
-          #            branches:
-          #              only:
-          #                - main
+          filters:
+            branches:
+              only:
+                - main
           requires:
             - store_branch_versions
-            #            - release
-#            - benchmark
+            - release
+            - benchmark
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -323,18 +323,18 @@ jobs:
           command: npm install -g sass
       - attach_workspace:
           at: .
-#      - run:
-#          name: Copy benchmarks into documentation
-#          command: |
-#            mv ./encryption/report ./src/benchmarks/encryption
-#            mv ./decryption/report ./src/benchmarks/decryption
-#            mv ./health/report ./src/benchmarks/health
-#      - run:
-#          name: Reformat index files
-#          command: |
-#            mv ./src/benchmarks/encryption/index.html ./src/benchmarks/encryption/index.njk
-#            mv ./src/benchmarks/decryption/index.html ./src/benchmarks/decryption/index.njk
-#            mv ./src/benchmarks/health/index.html ./src/benchmarks/health/index.njk
+      - run:
+          name: Copy benchmarks into documentation
+          command: |
+            mv ./encryption/report ./src/benchmarks/encryption
+            mv ./decryption/report ./src/benchmarks/decryption
+            mv ./health/report ./src/benchmarks/health
+      - run:
+          name: Reformat index files
+          command: |
+            mv ./src/benchmarks/encryption/index.html ./src/benchmarks/encryption/index.njk
+            mv ./src/benchmarks/decryption/index.html ./src/benchmarks/decryption/index.njk
+            mv ./src/benchmarks/health/index.html ./src/benchmarks/health/index.njk
       - run:
           name: Build documentation
           command: pnpm run build
@@ -346,22 +346,16 @@ jobs:
             fi
       - run:
           name: Get version env variables
-          command: |
-            cat bash.env >> $BASH_ENV
-            cat bash.env
-            ls
+          command: cat bash.env >> $BASH_ENV
       - run:
           name: Release documentation
           command: |
             export COMMIT_MESSAGE="$(git log -1 --pretty=%B)"
             export TRIMMED="${COMMIT_MESSAGE##*( )}"
             if [ "$MAIN_VERSION" != "$BRANCH_VERSION" ] || [ "${TRIMMED:0:4}" == "docs" ]
-            then      
-               echo "update docs!"
-               cat bash.env
+            then
+              gh-pages -a -d dist -m "[skip ci] update documentation"
             fi
-#              gh-pages -a -d dist -m "[skip ci] update documentation"
-#            fi
 
   release:
     executor: release
@@ -399,9 +393,7 @@ jobs:
       - run:
           name: Get version env variables
           shell: "/bin/bash -eo pipefail"
-          command: |
-            cat bash.env >> $BASH_ENV
-            cat $BASH_ENV
+          command: cat bash.env >> $BASH_ENV
       - run:
           name: Release chart
           shell: "/bin/bash -eo pipefail"
@@ -410,15 +402,13 @@ jobs:
             then
               echo "No release needed, skipping"
             else
-              echo "Release!!"
+              cr upload --generate-release-notes --skip-existing \
+                --commit $CIRCLE_BRANCH \
+                --git-repo $CIRCLE_PROJECT_REPONAME \
+                --owner $CIRCLE_PROJECT_USERNAME \
+                --release-name-template "v{{ .Version }}" \
+                --token $GITHUB_TOKEN
             fi
-#              cr upload --generate-release-notes --skip-existing \
-#                --commit $CIRCLE_BRANCH \
-#                --git-repo $CIRCLE_PROJECT_REPONAME \
-#                --owner $CIRCLE_PROJECT_USERNAME \
-#                --release-name-template "v{{ .Version }}" \
-#                --token $GITHUB_TOKEN
-#            fi
       - run:
           name: Add chart to gh-pages
           shell: "/bin/bash -eo pipefail"
@@ -427,15 +417,13 @@ jobs:
             then
               echo "No release, skipping"
             else
-              echo "Release!!"
               mkdir .cr-index
+              cr index --push \
+                --git-repo $CIRCLE_PROJECT_REPONAME \
+                --owner $CIRCLE_PROJECT_USERNAME \
+                --release-name-template "v{{ .Version }}" \
+                --token $GITHUB_TOKEN
             fi
-#              cr index --push \
-#                --git-repo $CIRCLE_PROJECT_REPONAME \
-#                --owner $CIRCLE_PROJECT_USERNAME \
-#                --release-name-template "v{{ .Version }}" \
-#                --token $GITHUB_TOKEN
-#            fi
 
   build:
     executor: rust_app
