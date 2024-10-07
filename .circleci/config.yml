@@ -323,18 +323,18 @@ jobs:
           command: npm install -g sass
       - attach_workspace:
           at: .
-      - run:
-          name: Copy benchmarks into documentation
-          command: |
-            mv ./encryption/report ./src/benchmarks/encryption
-            mv ./decryption/report ./src/benchmarks/decryption
-            mv ./health/report ./src/benchmarks/health
-      - run:
-          name: Reformat index files
-          command: |
-            mv ./src/benchmarks/encryption/index.html ./src/benchmarks/encryption/index.njk
-            mv ./src/benchmarks/decryption/index.html ./src/benchmarks/decryption/index.njk
-            mv ./src/benchmarks/health/index.html ./src/benchmarks/health/index.njk
+#      - run:
+#          name: Copy benchmarks into documentation
+#          command: |
+#            mv ./encryption/report ./src/benchmarks/encryption
+#            mv ./decryption/report ./src/benchmarks/decryption
+#            mv ./health/report ./src/benchmarks/health
+#      - run:
+#          name: Reformat index files
+#          command: |
+#            mv ./src/benchmarks/encryption/index.html ./src/benchmarks/encryption/index.njk
+#            mv ./src/benchmarks/decryption/index.html ./src/benchmarks/decryption/index.njk
+#            mv ./src/benchmarks/health/index.html ./src/benchmarks/health/index.njk
       - run:
           name: Build documentation
           command: pnpm run build
