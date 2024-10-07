@@ -397,14 +397,14 @@ jobs:
               echo "No release needed, skipping"
             else
               echo "Release!!"
-
+            fi
 #              cr upload --generate-release-notes --skip-existing \
 #                --commit $CIRCLE_BRANCH \
 #                --git-repo $CIRCLE_PROJECT_REPONAME \
 #                --owner $CIRCLE_PROJECT_USERNAME \
 #                --release-name-template "v{{ .Version }}" \
 #                --token $GITHUB_TOKEN
-            fi
+#            fi
       - run:
           name: Add chart to gh-pages
           command: |
