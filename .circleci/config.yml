@@ -342,7 +342,7 @@ jobs:
           name: Increment version
           command: |
             if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
-              cd ~ && node version/increment.js "$(git log -1 --pretty=%B)"
+              cd .. && node version/increment.js "$(git log -1 --pretty=%B)"
             fi
       - attach_workspace:
           at: .
