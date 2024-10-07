@@ -414,12 +414,13 @@ jobs:
             else
               echo "Release!!"
               mkdir .cr-index
+            fi
 #              cr index --push \
 #                --git-repo $CIRCLE_PROJECT_REPONAME \
 #                --owner $CIRCLE_PROJECT_USERNAME \
 #                --release-name-template "v{{ .Version }}" \
 #                --token $GITHUB_TOKEN
-            fi
+#            fi
 
   build:
     executor: rust_app
