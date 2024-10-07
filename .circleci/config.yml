@@ -402,16 +402,10 @@ jobs:
           command: |
             cat bash.env >> $BASH_ENV
             cat $BASH_ENV
-            echo "print"
-            printenv BASH_ENV
-            printenv MAIN_VERSION
-            printenv BRANCH_VERSION
       - run:
           name: Release chart
           shell: "/bin/bash -eo pipefail"
           command: |
-            printenv MAIN_VERSION
-            printenv BRANCH_VERSION
             if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
             then
               echo "No release needed, skipping"
