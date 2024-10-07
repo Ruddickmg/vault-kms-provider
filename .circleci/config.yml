@@ -359,8 +359,9 @@ jobs:
             then      
                echo "update docs!"
                cat bash.env
-#              gh-pages -a -d dist -m "[skip ci] update documentation"
             fi
+#              gh-pages -a -d dist -m "[skip ci] update documentation"
+#            fi
 
   release:
     executor: release
