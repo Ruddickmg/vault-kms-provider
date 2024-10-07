@@ -393,10 +393,12 @@ jobs:
       - run:
           name: Get version env variables
           command: |
-            cat bash.env >> $BASH_ENV
+            cat /etc/profile
+            cat bash.env >> /etc/profile
             cat bash.env
             ls
             echo "print"
+            printenv BASH_ENV
             printenv MAIN_VERSION
             printenv BRANCH_VERSION
       - run:
