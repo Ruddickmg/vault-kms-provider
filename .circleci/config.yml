@@ -367,6 +367,9 @@ jobs:
     executor: release
     steps:
       - run:
+          name: Update
+          command: apk update
+      - run:
           name: Install bash
           command: apk add bash
       - run:
@@ -395,17 +398,17 @@ jobs:
           at: .
       - run:
           name: Get version env variables
+          shell: "/bin/bash -eo pipefail"
           command: |
-            cat bash.env >> /etc/profile
-            cat /etc/profile
             cat bash.env >> $BASH_ENV
-            ls
+            cat $BASH_ENV
             echo "print"
             printenv BASH_ENV
             printenv MAIN_VERSION
             printenv BRANCH_VERSION
       - run:
           name: Release chart
+          shell: "/bin/bash -eo pipefail"
           command: |
             printenv MAIN_VERSION
             printenv BRANCH_VERSION
@@ -424,6 +427,7 @@ jobs:
 #            fi
       - run:
           name: Add chart to gh-pages
+          shell: "/bin/bash -eo pipefail"
           command: |
             if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
             then
