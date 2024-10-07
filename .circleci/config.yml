@@ -367,6 +367,9 @@ jobs:
     executor: release
     steps:
       - run:
+          name: Install bash
+          command: apk add bash
+      - run:
           name: Install ssh
           command: apk add openssh-client
       - run:
