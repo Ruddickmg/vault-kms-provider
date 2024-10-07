@@ -181,11 +181,15 @@ jobs:
       - checkout_main
       - increment_version
       - run:
-         name: Store versions
-         command: |
-           echo "export MAIN_VERSION=$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')" >> $BASH_ENV
-           echo "export BRANCH_VERSION=$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')" >> $BASH_ENV
-      - run: cp $BASH_ENV bash.env
+          name: Store versions
+          command: |
+            echo "export MAIN_VERSION=$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')" >> $BASH_ENV
+            echo "export BRANCH_VERSION=$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')" >> $BASH_ENV
+      - run:
+          name: Save environment
+          command: |
+            cp $BASH_ENV bash.env
+            cat bash.env
       - persist_to_workspace:
           root: .
           paths:
@@ -338,10 +342,8 @@ jobs:
           name: Increment version
           command: |
             if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
-              cd ~ && node version/increment.js "$(git log -1 --pretty=%B)"
+              cd .. && node version/increment.js "$(git log -1 --pretty=%B)"
             fi
-      - attach_workspace:
-          at: .
       - run:
           name: Get version env variables
           command: cat bash.env >> $BASH_ENV
@@ -354,9 +356,16 @@ jobs:
             then
               gh-pages -a -d dist -m "[skip ci] update documentation"
             fi
+
   release:
     executor: release
     steps:
+      - run:
+          name: Update
+          command: apk update
+      - run:
+          name: Install bash
+          command: apk add bash
       - run:
           name: Install ssh
           command: apk add openssh-client
@@ -383,9 +392,11 @@ jobs:
           at: .
       - run:
           name: Get version env variables
+          shell: "/bin/bash -eo pipefail"
           command: cat bash.env >> $BASH_ENV
       - run:
           name: Release chart
+          shell: "/bin/bash -eo pipefail"
           command: |
             if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
             then
@@ -400,6 +411,7 @@ jobs:
             fi
       - run:
           name: Add chart to gh-pages
+          shell: "/bin/bash -eo pipefail"
           command: |
             if [ "$MAIN_VERSION" == "$BRANCH_VERSION" ]
             then
