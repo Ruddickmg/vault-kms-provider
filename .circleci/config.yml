@@ -161,13 +161,13 @@ workflows:
       #              ignore: main
       #          requires:
       #            - benchmark
-#      - document:
+      - document:
           #          filters:
           #            branches:
           #              only:
           #                - main
-#          requires:
-#            - store_branch_versions
+          requires:
+            - store_branch_versions
             #            - release
 #            - benchmark
 
@@ -344,19 +344,22 @@ jobs:
             if [[ "$(git log -1 --pretty=%B)" != *"[skip ci] increment version"* ]]; then
               cd .. && node version/increment.js "$(git log -1 --pretty=%B)"
             fi
-      - attach_workspace:
-          at: .
       - run:
           name: Get version env variables
-          command: cat bash.env >> $BASH_ENV
+          command: |
+            cat bash.env >> $BASH_ENV
+            cat bash.env
+            ls
       - run:
           name: Release documentation
           command: |
             export COMMIT_MESSAGE="$(git log -1 --pretty=%B)"
             export TRIMMED="${COMMIT_MESSAGE##*( )}"
             if [ "$MAIN_VERSION" != "$BRANCH_VERSION" ] || [ "${TRIMMED:0:4}" == "docs" ]
-            then
-              gh-pages -a -d dist -m "[skip ci] update documentation"
+            then      
+               echo "update docs!"
+               cat bash.env
+#              gh-pages -a -d dist -m "[skip ci] update documentation"
             fi
 
   release:
@@ -388,7 +391,10 @@ jobs:
           at: .
       - run:
           name: Get version env variables
-          command: cat bash.env >> $BASH_ENV
+          command: |
+            cat bash.env >> $BASH_ENV
+            cat bash.env
+            ls
       - run:
           name: Release chart
           command: |
