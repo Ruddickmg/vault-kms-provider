@@ -106,6 +106,7 @@ workflows:
       - increment_version:
           requires:
             - store_branch_versions
+            - release
           filters:
             branches:
               only:
@@ -154,7 +155,6 @@ workflows:
           requires:
             - store_branch_versions
             - publish_latest_manifest
-            - increment_version
       - build_documentation:
           filters:
             branches:
