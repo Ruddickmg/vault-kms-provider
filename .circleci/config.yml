@@ -91,85 +91,85 @@ commands:
 workflows:
   ci_cd:
     jobs:
-      - benchmark
-      - chart_formatting
-      - generate_tag
-      - check_formatting
-      - build
-      - unit_tests
-      - integration_tests
-      - store_branch_versions:
-          filters:
-            branches:
-              only:
-                - main
+      #      - benchmark
+      #      - chart_formatting
+      #      - generate_tag
+      #      - check_formatting
+      #      - build
+      #      - unit_tests
+      #      - integration_tests
+      - store_branch_versions
+      #          filters:
+      #            branches:
+      #              only:
+      #                - main
       - increment_version:
           requires:
             - store_branch_versions
-            - release
+          #            - release
           filters:
             branches:
               only:
                 - main
-      - e2e_tests:
-          requires:
-            - publish_manifest
-      - publish_arm:
-          requires:
-            - generate_tag
-          context:
-            - dockerhub
-      - publish_amd:
-          requires:
-            - generate_tag
-          context:
-            - dockerhub
-      - publish_manifest:
-          context:
-            - dockerhub
-          requires:
-            - publish_amd
-            - publish_arm
-      - publish_manifest:
-          name: publish_latest_manifest
-          tag: latest
-          filters:
-            branches:
-              only:
-                - main
-          context:
-            - dockerhub
-          requires:
-            - generate_tag
-            - chart_formatting
-            - check_formatting
-            - build
-            - unit_tests
-            - integration_tests
-            - e2e_tests
-      - release:
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - store_branch_versions
-            - publish_latest_manifest
-      - build_documentation:
-          filters:
-            branches:
-              ignore: main
-          requires:
-            - benchmark
+      #      - e2e_tests:
+      #          requires:
+      #            - publish_manifest
+      #      - publish_arm:
+      #          requires:
+      #            - generate_tag
+      #          context:
+      #            - dockerhub
+      #      - publish_amd:
+      #          requires:
+      #            - generate_tag
+      #          context:
+      #            - dockerhub
+      #      - publish_manifest:
+      #          context:
+      #            - dockerhub
+      #          requires:
+      #            - publish_amd
+      #            - publish_arm
+      #      - publish_manifest:
+      #          name: publish_latest_manifest
+      #          tag: latest
+      #          filters:
+      #            branches:
+      #              only:
+      #                - main
+      #          context:
+      #            - dockerhub
+      #          requires:
+      #            - generate_tag
+      #            - chart_formatting
+      #            - check_formatting
+      #            - build
+      #            - unit_tests
+      #            - integration_tests
+      #            - e2e_tests
+      #      - release:
+      #          filters:
+      #            branches:
+      #              only:
+      #                - main
+      #          requires:
+      #            - store_branch_versions
+      #            - publish_latest_manifest
+      #      - build_documentation:
+      #          filters:
+      #            branches:
+      #              ignore: main
+      #          requires:
+      #            - benchmark
       - document:
-          filters:
-            branches:
-              only:
-                - main
+          #          filters:
+          #            branches:
+          #              only:
+          #                - main
           requires:
             - store_branch_versions
-            - release
-            - benchmark
+            #            - release
+#            - benchmark
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -181,11 +181,15 @@ jobs:
       - checkout_main
       - increment_version
       - run:
-         name: Store versions
-         command: |
-           echo "export MAIN_VERSION=$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')" >> $BASH_ENV
-           echo "export BRANCH_VERSION=$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')" >> $BASH_ENV
-      - run: cp $BASH_ENV bash.env
+          name: Store versions
+          command: |
+            echo "export MAIN_VERSION=$(cat ./vault-kms-provider/Cargo.toml | grep -oP '^version = "\K[^"]+')" >> $BASH_ENV
+            echo "export BRANCH_VERSION=$(cat ./Cargo.toml | grep -oP '^version = "\K[^"]+')" >> $BASH_ENV
+      - run:
+          name: Save environment
+          command: |
+            cp $BASH_ENV bash.env
+            cat bash.env
       - persist_to_workspace:
           root: .
           paths:
@@ -354,6 +358,7 @@ jobs:
             then
               gh-pages -a -d dist -m "[skip ci] update documentation"
             fi
+
   release:
     executor: release
     steps:
