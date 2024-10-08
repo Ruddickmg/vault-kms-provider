@@ -651,6 +651,9 @@ jobs:
           command: |
             helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
       - run:
+          name: Set permissions on mount directory
+          command: sudo chmod -r 777 /mnt
+      - run:
           name: Wait for startup
           command: sleep 10
       - run:
