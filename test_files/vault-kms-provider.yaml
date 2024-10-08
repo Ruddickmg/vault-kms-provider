@@ -9,7 +9,7 @@ spec:
   volumes:
     - name: tls-certs
       hostPath:
-        path: ./test_files/certs
+        path: /home/circleci/project/test_files/certs
         type: Directory
     - name: vault-kms-provider-socket-volume
       hostPath:
