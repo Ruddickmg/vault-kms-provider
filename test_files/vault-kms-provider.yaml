@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: static-vault-kms-provider
+  labels:
+    app: static-vault-kms-provider
+spec:
+  priorityClassName: system-cluster-critical
+  volumes:
+    - name: tls-certs
+      hostPath:
+        path: ./test_files/certs
+        type: Directory
+    - name: vault-kms-provider-socket-volume
+      hostPath:
+        path: /mnt
+        type: Directory
+  containers:
+    - name: vault-kms-provider
+      image: "ruddickmg/vault-kms-provider:latest"
+      imagePullPolicy: Always
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        capabilities:
+          drop:
+            - ALL
+      livenessProbe:
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        httpGet:
+          path: /health
+          port: 8080
+      readinessProbe:
+        initialDelaySeconds: 5
+        periodSeconds: 3
+        httpGet:
+          path: /ready
+          port: 8080
+      env:
+        - name: SOCKET_PATH
+          value: "/run/sockets/static-vault-kms-provider.sock"
+        - name: VAULT_CA_PATH
+          value: /etc/ssl/certs
+        - name: VAULT_CERTIFICATE_NAME
+          value: "vault-kms-provider"
+        - name: VAULT_CLIENT_CERT
+          value: "/etc/ssl/certs/public.crt"
+        - name: VAULT_CLIENT_KEY
+          value: "/etc/ssl/certs/private.key"
+      volumeMounts:
+        - name: vault-kms-provider-socket-volume
+          mountPath: /run/sockets
+        - name: tls-certs
+          mountPath: /etc/ssl/certs

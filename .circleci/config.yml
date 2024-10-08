@@ -619,6 +619,17 @@ jobs:
           name: Log requests
           command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
       - run:
+          name: Enable tls authentication
+          command: kubectl -n vault exec vault-0 -- vault auth enable cert
+      - run:
+          name: Configure tls authentication
+          command: |
+            kubectl -n vault exec vault-0 -- vault write auth/cert/certs/vault-kms-provider \
+                display_name=vault-kms-provider \
+                policies=$TRANSIT_POLICY \
+                certificate="$(cat ./test_files/certs/tls.crt)" \
+                ttl=3600
+      - run:
           name: Deploy vault-kms-provider
           command: |
             helm install vault-kms-provider ./helm -n vault -f test_files/values.yaml \
@@ -636,6 +647,15 @@ jobs:
               exit 1
             fi
       - run:
+          name: Update image tag
+          command: sed -i -e "s/vault-kms-provider:latest/vault-kms-provider:$(cat /tmp/workspace/docker_tag)/g" ./test_files/vault-kms-provider.yaml
+      - run:
+          name: Add static configuration
+          command: cp test_files/vault-kms-provider.yaml /var/lib/rancher/k3s/agent/pod-manifests/static-vault-kms-provider.yaml
+      - run:
+          name: Restart kubernetes
+          command: sudo systemctl start k3s
+      - run:
           name: Update encryption configuration file
           command: |
             helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
@@ -644,6 +664,16 @@ jobs:
           command: sleep 10
       - run:
           name: Run e2e tests
+          command: |
+            helm test vault-kms-provider -n vault --logs
+      - run:
+          name: Switch to static vault kms provider
+          command: |
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm \
+              --set "encryption.output=true" \
+              --set "socket.name=" > $ENCRYPTION_CONFIG
+      - run:
+          name: Run e2e tests against the static pod
           command: |
             helm test vault-kms-provider -n vault --logs
 

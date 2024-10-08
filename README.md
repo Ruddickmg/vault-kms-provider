@@ -8,8 +8,8 @@ See usage [documentation here](https://vault-kms-provider.io/)
 
 ### RoadMap:
 - [ ] Static deployment
-  - [ ] Support
-  - [ ] Document
+  - [x] Support
+  - [x] Document
   - [ ] Test
 
 ## Contributing
