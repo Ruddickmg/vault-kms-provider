@@ -39,6 +39,8 @@ spec:
           path: /ready
           port: 8080
       env:
+        - name: LOG_LEVEL
+          value: "debug"
         - name: SOCKET_PATH
           value: "/run/sockets/static-vault-kms-provider.sock"
         - name: VAULT_CA_PATH
