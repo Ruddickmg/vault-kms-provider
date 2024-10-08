@@ -653,7 +653,6 @@ jobs:
       - run:
           name: Set permissions on mount directory
           command: |
-            mkdir /mnt
             sudo chmod -R 777 /mnt
       - run:
           name: Wait for startup
