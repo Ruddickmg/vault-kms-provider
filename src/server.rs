@@ -36,8 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let vault_kms_server = vault::VaultKmsServer::new(client.clone());
     let _ = vault_kms_server
         .initialize()
-        .await
-        .map_err(|error| error!("Initialization failed: {:?}", error));
+        .await?;
     tokio::try_join!(
         async {
             Server::builder()
