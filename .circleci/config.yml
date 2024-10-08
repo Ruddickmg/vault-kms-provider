@@ -654,7 +654,7 @@ jobs:
           name: Set permissions on mount directory
           command: |
             mkdir /mnt
-            sudo chmod -r 777 /mnt
+            sudo chmod -R 777 /mnt
       - run:
           name: Wait for startup
           command: sleep 10
