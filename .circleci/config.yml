@@ -647,6 +647,17 @@ jobs:
               exit 1
             fi
       - run:
+          name: Update encryption configuration file
+          command: |
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
+      - run:
+          name: Wait for startup
+          command: sleep 10
+      - run:
+          name: Run e2e tests against helm deployment
+          command: |
+            helm test vault-kms-provider -n vault --logs
+      - run:
           name: Update image tag
           command: sed -i -e "s/vault-kms-provider:latest/vault-kms-provider:$(cat /tmp/workspace/docker_tag)/g" ./test_files/vault-kms-provider.yaml
       - run:
@@ -656,16 +667,8 @@ jobs:
           name: Restart kubernetes
           command: sudo systemctl start k3s
       - run:
-          name: Update encryption configuration file
-          command: |
-            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
-      - run:
           name: Wait for startup
           command: sleep 10
-      - run:
-          name: Run e2e tests
-          command: |
-            helm test vault-kms-provider -n vault --logs
       - run:
           name: Switch to static vault kms provider
           command: |
