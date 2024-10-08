@@ -651,7 +651,7 @@ jobs:
           command: sed -i -e "s/vault-kms-provider:latest/vault-kms-provider:$(cat /tmp/workspace/docker_tag)/g" ./test_files/vault-kms-provider.yaml
       - run:
           name: Add static configuration
-          command: cp test_files/vault-kms-provider.yaml /var/lib/rancher/k3s/agent/pod-manifests/static-vault-kms-provider.yaml
+          command: sudo cp test_files/vault-kms-provider.yaml /var/lib/rancher/k3s/agent/pod-manifests/static-vault-kms-provider.yaml
       - run:
           name: Restart kubernetes
           command: sudo systemctl start k3s
