@@ -149,7 +149,8 @@ workflows:
             - build
             - unit_tests
             - integration_tests
-            - e2e_tests
+            - static_e2e_tests
+            - helm_e2e_tests
       - release:
           filters:
             branches:
