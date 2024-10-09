@@ -1,4 +1,4 @@
-default: set_up_environment set_up_permissions set_up_authentication
+default: set_up_environment set_up_permissions set_up_authentication enable_logs
 
 set_up_permissions: configure_transit_access
 set_up_environment: start_vault enable_transit start_kms_provider
@@ -67,3 +67,6 @@ configure_cert_authentication:
 
 configure_transit_access:
     docker compose exec vault vault policy write vault-kms-provider /policies/transit.hcl
+
+enable_logs:
+   docker compose exec vault vault audit enable file file_path=stdout

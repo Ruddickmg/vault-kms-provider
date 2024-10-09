@@ -48,12 +48,10 @@ spec:
           value: "/run/sockets/static-vault-kms-provider.sock"
         - name: VAULT_CA_PATH
           value: /etc/ssl/certs
-        - name: VAULT_CERTIFICATE_NAME
+        - name: VAULT_USER
           value: "vault-kms-provider"
-        - name: VAULT_CLIENT_CERT
-          value: "/etc/ssl/certs/public.crt"
-        - name: VAULT_CLIENT_KEY
-          value: "/etc/ssl/certs/private.key"
+        - name: VAULT_PASSWORD
+          value: "password"
       volumeMounts:
         - name: vault-kms-provider-socket-volume
           mountPath: /run/sockets
