@@ -11,7 +11,6 @@ use lib::{
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tonic::transport::Server;
-use tracing::error;
 use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
 
 mod checks;
@@ -34,9 +33,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         &vault_config,
     )));
     let vault_kms_server = vault::VaultKmsServer::new(client.clone());
-    let _ = vault_kms_server
-        .initialize()
-        .await?;
+    vault_kms_server.initialize().await?;
     tokio::try_join!(
         async {
             Server::builder()

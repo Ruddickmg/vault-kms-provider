@@ -26,6 +26,7 @@ tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["json", "ansi", "env-filter"] }
 unix_mode = "0.1.4"
 vaultrs = "0.7.2"
+log = "0.4.21"
 
 [dev-dependencies]
 criterion = { version = "0.5.1", features = ["html_reports", "async_tokio", "async"] }

@@ -1,5 +1,6 @@
-default: set_up_environment set_up_authentication
+default: set_up_environment set_up_permissions set_up_authentication
 
+set_up_permissions: configure_transit_access
 set_up_environment: start_vault enable_transit start_kms_provider
 set_up_authentication: set_up_userpass_auth set_up_approle_auth set_up_jwt_auth set_up_cert_auth
 
@@ -24,7 +25,7 @@ enable_userpass_authentication:
 configure_userpass_authentication:
   docker compose exec vault vault write auth/userpass/users/vault-kms-provider \
       password=password \
-      policies=default
+      policies=vault-kms-provider
 
 enable_approle_authentication:
   docker compose exec vault vault auth enable approle
@@ -60,6 +61,9 @@ enable_cert_authentication:
 configure_cert_authentication:
   docker compose exec vault vault write auth/cert/certs/vault-kms-provider \
     display_name=vault-kms-provider \
-    policies=default \
+    policies=vault-kms-provider \
     certificate="$(cat ./test_files/certs/tls.crt)" \
     ttl=3600
+
+configure_transit_access:
+    docker compose exec vault vault policy write vault-kms-provider /policies/transit.hcl

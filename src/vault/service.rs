@@ -9,7 +9,7 @@ use std::sync::Arc;
 use std::{collections::HashMap, io::ErrorKind, string::ToString};
 use tokio::sync::RwLock;
 use tonic::{Code, Request, Response, Status};
-use tracing::{debug, info, instrument};
+use tracing::{debug, error, info, instrument};
 
 const OKAY_RESPONSE: &str = "ok";
 
@@ -25,15 +25,16 @@ impl VaultKmsServer {
     #[instrument(skip(self))]
     pub async fn initialize(&self) -> Result<(), std::io::Error> {
         let mut client = self.client.write().await;
-        client
-            .refresh_token()
-            .await
-            .map_err(|e| std::io::Error::other(e.to_string()))?;
+        client.refresh_token().await.map_err(|e| {
+            error!("Failed to authenticate during initialization: {:?}", e);
+            std::io::Error::other(e.to_string())
+        })?;
         client
             .request_encryption(&BASE64_STANDARD.encode("initialize".as_bytes()))
             .await
             .map_err(|error| {
                 let error = format!("Failed to initialize: {}", error.0.to_string());
+                error!("{}", error);
                 std::io::Error::new(ErrorKind::Other, error.as_str())
             })?;
         info!("Vault encryption has been initialized");
@@ -50,12 +51,13 @@ impl KeyManagementService for VaultKmsServer {
     ) -> Result<Response<StatusResponse>, Status> {
         debug!("Status request");
         let client = self.client.read().await;
-        let key = client.request_key().await?;
-        Ok(Response::new(StatusResponse {
-            version: key.version,
-            key_id: key.id,
-            healthz: OKAY_RESPONSE.to_string(),
-        }))
+        Ok(client.request_key().await.map(|key| {
+            Response::new(StatusResponse {
+                version: key.version,
+                key_id: key.id,
+                healthz: OKAY_RESPONSE.to_string(),
+            })
+        })?)
     }
 
     #[instrument(skip(self, request))]

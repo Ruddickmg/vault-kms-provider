@@ -2160,6 +2160,7 @@ dependencies = [
  "http-body-util",
  "hyper 1.4.1",
  "hyper-util",
+ "log",
  "notify",
  "pretty_assertions",
  "prost",
