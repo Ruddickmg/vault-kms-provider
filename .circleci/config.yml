@@ -736,7 +736,7 @@ jobs:
       - run:
           name: Run e2e tests against the static pod
           command: |
-            helm test vault-kms-provider --logs
+            helm test vault-kms-provider -n vault --logs
 
   publish_amd:
     executor: ubuntu
