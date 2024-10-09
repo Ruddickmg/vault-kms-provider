@@ -82,11 +82,11 @@
                      
                      <ul>
                        
+                         <li><a href=/benchmarks/health/>Health</a></li>
+                       
                          <li><a href=/benchmarks/decryption/>Decryption</a></li>
                        
                          <li><a href=/benchmarks/encryption/>Encryption</a></li>
-                       
-                         <li><a href=/benchmarks/health/>Health</a></li>
                        
                      </ul>
                    </div>
@@ -160,7 +160,7 @@
         <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> SOCKET_PATH
           <span class="token key atrule">value</span><span class="token punctuation">:</span> <span class="token string">"/sockets/vault-kms-provider.sock"</span>
       <span class="token key atrule">volumeMounts</span><span class="token punctuation">:</span>
-        <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider<span class="token punctuation">-</span>socket<span class="token punctuation">-</span>volume
+        <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider<span class="token punctuation">-</span>socket
           <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> /sockets</code></pre>
 <p>Move the configuration file to <code>/etc/kubernetes/manifest</code></p>
 <pre class="language-shell"><code class="language-shell"><span class="token function">mv</span> /path/to/static-vault-kms-provider-config.yaml /etc/kubernetes/manifest</code></pre>
