@@ -3,13 +3,14 @@ use http::{Request, Response, StatusCode};
 use http_body_util::Full;
 use std::convert::Infallible;
 use std::path::Path;
+use lib::configuration::socket::SocketConfiguration;
 
 extern crate lib;
 
 pub async fn readiness_check(
     _: Request<hyper::body::Incoming>,
 ) -> Result<Response<Full<Bytes>>, Infallible> {
-    let socket_path = lib::configuration::socket::SocketConfiguration::new().socket_path;
+    let socket_path = SocketConfiguration::silent().socket_path;
     let status = if Path::new(&socket_path).exists() {
         StatusCode::OK
     } else {

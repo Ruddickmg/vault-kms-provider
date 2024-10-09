@@ -47,7 +47,7 @@ spec:
         - name: SOCKET_PATH
           value: "/run/sockets/static-vault-kms-provider.sock"
         - name: VAULT_CA_PATH
-          value: /etc/ssl/certs
+          value: "/etc/ssl/certs"
         - name: VAULT_USER
           value: "vault-kms-provider"
         - name: VAULT_PASSWORD
