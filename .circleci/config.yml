@@ -111,7 +111,10 @@ workflows:
             branches:
               only:
                 - main
-      - e2e_tests:
+      - helm_e2e_tests:
+          requires:
+            - publish_manifest
+      - static_e2e_tests:
           requires:
             - publish_manifest
       - publish_arm:
@@ -146,7 +149,8 @@ workflows:
             - build
             - unit_tests
             - integration_tests
-            - e2e_tests
+            - static_e2e_tests
+            - helm_e2e_tests
       - release:
           filters:
             branches:
@@ -505,7 +509,7 @@ jobs:
           name: Run integration tests
           command: cargo test --test '*'
 
-  e2e_tests:
+  helm_e2e_tests:
     executor: ubuntu
     environment:
       TRANSIT_POLICY: vault-kms-provider-transit-access
@@ -619,6 +623,17 @@ jobs:
           name: Log requests
           command: kubectl -n vault exec vault-0 -- vault audit enable file file_path=stdout
       - run:
+          name: Enable tls authentication
+          command: kubectl -n vault exec vault-0 -- vault auth enable cert
+      - run:
+          name: Configure tls authentication
+          command: |
+            kubectl -n vault exec vault-0 -- vault write auth/cert/certs/vault-kms-provider \
+                display_name=vault-kms-provider \
+                policies=$TRANSIT_POLICY \
+                certificate="$(cat ./test_files/certs/tls.crt)" \
+                ttl=3600
+      - run:
           name: Deploy vault-kms-provider
           command: |
             helm install vault-kms-provider ./helm -n vault -f test_files/values.yaml \
@@ -627,15 +642,6 @@ jobs:
           name: Wait for vault-kms-provider startup
           command: sleep 35
       - run:
-          name: Check that socket file was created/mounted
-          command: |
-            ls /mnt
-            if [ -e  "$SOCKET_FILE" ]; then
-              exit 0
-            else
-              exit 1
-            fi
-      - run:
           name: Update encryption configuration file
           command: |
             helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
@@ -643,7 +649,93 @@ jobs:
           name: Wait for startup
           command: sleep 10
       - run:
-          name: Run e2e tests
+          name: Run e2e tests against helm deployment
+          command: |
+            helm test vault-kms-provider -n vault --logs
+
+  static_e2e_tests:
+    executor: ubuntu
+    environment:
+      TRANSIT_POLICY: vault-kms-provider-transit-access
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      SOCKET_FILE: /mnt/vault-kms-provider.sock
+      ENCRYPTION_CONFIG: /tmp/encryption/configuration.yaml
+      K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
+      K3S_DATASTORE_CAFILE: /tmp/certs/ca.crt
+      K3S_DATASTORE_CERTFILE: /tmp/certs/tls.crt
+      K3S_DATASTORE_KEYFILE: /tmp/certs/tls.key
+      ETCDCTL_ENDPOINTS: https://127.0.0.1:2379
+      ETCDCTL_CACERT: /tmp/certs/ca.crt
+      ETCDCTL_CERT: /tmp/certs/tls.crt
+      ETCDCTL_KEY: /tmp/certs/tls.key
+      ETCDCTL_API: 3
+      CERTS: /tmp/certs
+    steps:
+      - checkout_write
+      - attach_workspace:
+          at: /tmp/workspace
+      - helm/install_helm_client:
+          version: v3.15.1
+      - run:
+          name: Install rust
+          command:  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      - run:
+          name: Install just
+          command: cargo install just
+      - run:
+          name: Set up certificates
+          command: |
+            cp -r ./test_files/certs $CERTS
+            ls $CERTS
+      - run:
+          name: Run etcd
+          command: docker compose -f ./test_files/docker-compose.etcd.yml up -d
+      - run:
+          name: Create encryption configuration file
+          command: |
+            mkdir /tmp/encryption
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" --set "encryption.enabled=false" > $ENCRYPTION_CONFIG
+      - run:
+          name: Install k3s
+          command: |
+            curl -sfL https://get.k3s.io | sh -s - \
+              --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG \
+              --kube-apiserver-arg=encryption-provider-config-automatic-reload=true
+      - run:
+          name: Grant permissions on kube config
+          command: sudo chown $USER:$USER $KUBECONFIG
+      - run:
+          name: Deploy test infrastructure
+          command: |
+            helm install vault-kms-provider ./helm -n vault --create-namespace -f test_files/values.yaml \
+              --set "image.tag=$(cat /tmp/workspace/docker_tag)"
+      - run:
+          name: Start vault
+          command: just
+      - run:
+          name: Set permissions on mount directory
+          command: |
+            sudo chmod -R 777 /mnt
+      - run:
+          name: Update image tag
+          command: sed -i -e "s/vault-kms-provider:latest/vault-kms-provider:$(cat /tmp/workspace/docker_tag)/g" ./test_files/vault-kms-provider.yaml
+      - run:
+          name: Add static configuration
+          command: sudo cp test_files/vault-kms-provider.yaml /var/lib/rancher/k3s/agent/pod-manifests/static-vault-kms-provider.yaml
+      - run:
+          name: Switch to static vault kms provider
+          command: |
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm \
+              --set "encryption.output=true" \
+              --set "socket.name=static-vault-kms-provider.sock" > $ENCRYPTION_CONFIG
+      - run:
+          name: Restart kubernetes
+          command: sudo systemctl start k3s
+      - run:
+          name: Wait for startup
+          command: sleep 10
+      - run:
+          name: Run e2e tests against the static pod
           command: |
             helm test vault-kms-provider -n vault --logs
 

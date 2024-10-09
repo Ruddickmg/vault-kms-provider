@@ -6,12 +6,6 @@ A plugin for kubernetes encryption that allows the use of vault as a KMS provide
 
 See usage [documentation here](https://vault-kms-provider.io/)
 
-### RoadMap:
-- [ ] Static deployment
-  - [ ] Support
-  - [ ] Document
-  - [ ] Test
-
 ## Contributing
 
 ### Versioning

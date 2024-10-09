@@ -5,6 +5,7 @@ services:
     volumes:
       - ./test_files/certs:/vault/userconfig/tls-server
       - ./test_files/vault:/mnt
+      - ./policies:/policies
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: SiQOECxwSDCeQt1r0n5kqQCr
       VAULT_LOG_LEVEL: debug

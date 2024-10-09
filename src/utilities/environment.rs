@@ -61,7 +61,7 @@ impl From<String> for Environment {
 
 impl Environment {
     #[instrument]
-    pub fn get(&self) -> Option<String> {
+    pub fn silent_get(&self) -> Option<String> {
         let value = std::env::var(self.to_string()).ok();
         if self == &Self::Unknown {
             None
@@ -72,6 +72,14 @@ impl Environment {
                 Some(val)
             }
         } else {
+            None
+        }
+    }
+
+    #[instrument]
+    pub fn get(&self) -> Option<String> {
+        let result = self.silent_get();
+        if result.is_none() {
             debug!(
                 "{}",
                 format!(
@@ -79,8 +87,8 @@ impl Environment {
                     self.to_string(),
                 )
             );
-            None
         }
+        result
     }
 
     #[instrument]
@@ -94,6 +102,11 @@ impl Environment {
             );
         }
         value.unwrap_or(default.to_string())
+    }
+
+    #[instrument]
+    pub fn silent_or(&self, default: &str) -> String {
+        self.get().unwrap_or(default.to_string())
     }
 
     #[instrument]
