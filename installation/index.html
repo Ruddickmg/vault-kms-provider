@@ -67,6 +67,8 @@
                        
                          <li><a href=/installation/repository/>Repository</a></li>
                        
+                         <li><a href=/installation/static/>Static</a></li>
+                       
                      </ul>
                    </div>
                    
@@ -80,11 +82,11 @@
                      
                      <ul>
                        
+                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
+                       
                          <li><a href=/benchmarks/encryption/>Encryption</a></li>
                        
                          <li><a href=/benchmarks/health/>Health</a></li>
-                       
-                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
                        
                      </ul>
                    </div>
@@ -125,6 +127,45 @@
 <pre class="language-shell"><code class="language-shell"><span class="token function">git</span> clone https://github.com/Ruddickmg/vault-kms-provider.git</code></pre>
 <p>Run the application</p>
 <pre class="language-shell"><code class="language-shell"><span class="token function">cargo</span> run --manifest-path vault-kms-provider</code></pre>
+
+
+    <h2>Static pod installation</h2>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p></p>
+<ul>
+<li>
+<p>Vault KMS provider needs to be installed on the control plane node</p>
+</li>
+<li>
+<p>Adding a static pod manifest for Kubernetes may be different for certain Kubernetes distros. Consult your distro's documentation if necessary.</p>
+</li>
+</ul>
+</div>
+<p>Create a static pod configuration for the vault KMS provider, example below.</p>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Pod
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider
+  <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+    <span class="token key atrule">app</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider<span class="token punctuation">-</span>socket
+      <span class="token key atrule">hostPath</span><span class="token punctuation">:</span>
+        <span class="token key atrule">path</span><span class="token punctuation">:</span> /mnt
+        <span class="token key atrule">type</span><span class="token punctuation">:</span> Directory
+  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider
+      <span class="token key atrule">image</span><span class="token punctuation">:</span> <span class="token string">"ruddickmg/vault-kms-provider:latest"</span>
+      <span class="token key atrule">env</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> SOCKET_PATH
+          <span class="token key atrule">value</span><span class="token punctuation">:</span> <span class="token string">"/sockets/vault-kms-provider.sock"</span>
+      <span class="token key atrule">volumeMounts</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider<span class="token punctuation">-</span>socket<span class="token punctuation">-</span>volume
+          <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> /sockets</code></pre>
+<p>Move the configuration file to <code>/etc/kubernetes/manifest</code></p>
+<pre class="language-shell"><code class="language-shell"><span class="token function">mv</span> /path/to/static-vault-kms-provider-config.yaml /etc/kubernetes/manifest</code></pre>
+<p>Restart kubernetes</p>
+<pre class="language-shell"><code class="language-shell">systemctl restart kubelet</code></pre>
 
 
 
