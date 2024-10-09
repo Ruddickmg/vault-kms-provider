@@ -1,9 +1,9 @@
 use bytes::Bytes;
 use http::{Request, Response, StatusCode};
 use http_body_util::Full;
+use lib::configuration::socket::SocketConfiguration;
 use std::convert::Infallible;
 use std::path::Path;
-use lib::configuration::socket::SocketConfiguration;
 
 extern crate lib;
 

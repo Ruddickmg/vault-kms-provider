@@ -22,8 +22,8 @@ impl SocketConfiguration {
         Self {
             socket_path: Environment::SocketPath.silent_or(DEFAULT_SOCKET_PATH),
             permissions: Environment::SocketPermissions
-              .silent_or(DEFAULT_SOCKET_PERMISSIONS)
-              .to_string(),
+                .silent_or(DEFAULT_SOCKET_PERMISSIONS)
+                .to_string(),
         }
     }
 }
