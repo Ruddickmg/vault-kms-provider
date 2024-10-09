@@ -31,7 +31,7 @@ spec:
         - name: SOCKET_PATH
           value: "/sockets/vault-kms-provider.sock"
       volumeMounts:
-        - name: vault-kms-provider-socket-volume
+        - name: vault-kms-provider-socket
           mountPath: /sockets
 ```
 
