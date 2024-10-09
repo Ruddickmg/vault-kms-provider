@@ -706,7 +706,7 @@ jobs:
       - run:
           name: Deploy test infrastructure
           command: |
-            helm install vault-kms-provider ./helm -n vault -f test_files/values.yaml \
+            helm install vault-kms-provider ./helm -n vault --create-namespace -f test_files/values.yaml \
               --set "image.tag=$(cat /tmp/workspace/docker_tag)"
       - run:
           name: Start vault
