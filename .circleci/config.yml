@@ -111,7 +111,10 @@ workflows:
             branches:
               only:
                 - main
-      - e2e_tests:
+      - helm_e2e_tests:
+          requires:
+            - publish_manifest
+      - static_e2e_tests:
           requires:
             - publish_manifest
       - publish_arm:
