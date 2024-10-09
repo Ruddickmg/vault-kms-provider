@@ -728,9 +728,6 @@ jobs:
               --set "encryption.output=true" \
               --set "socket.name=static-vault-kms-provider.sock" > $ENCRYPTION_CONFIG
       - run:
-          name: Create infra for tests
-          command: helm install vault-kms-provider vault-kms-pro
-      - run:
           name: Restart kubernetes
           command: sudo systemctl start k3s
       - run:
