@@ -522,7 +522,7 @@ jobs:
           command: just
       - run:
           name: Run integration tests
-          command: cargo test --test '*' --all-features --workspace --lcov --output-path integration.coverage
+          command: cargo llvm-cov --test '*' --all-features --workspace --lcov --output-path integration.coverage
       - persist_to_workspace:
           root: .
           paths:
@@ -533,8 +533,7 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - codecov/upload:
-          file: "*.coverage"
+      - codecov/upload
 
   helm_e2e_tests:
     executor: ubuntu
