@@ -21,6 +21,7 @@ All commits must use conventional commit messages to ensure versioning happens c
   - [ ] add minimum supported version of k8s (1.32.0)
   - [ ] add link to github page, etc
   - [ ] add badges for relevant information
+- [ ] License checks
 
 ## Testing
 
