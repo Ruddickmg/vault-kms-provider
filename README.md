@@ -12,6 +12,17 @@ See usage [documentation here](https://vault-kms-provider.io/)
 
 All commits must use conventional commit messages to ensure versioning happens correctly. 
 
+### Road map
+- [ ] Testing
+  - [ ] Finish e2e tests (Waiting on Kubernetes 1.32.0 release)
+  - [ ] Check that secrets are encrypted
+  - [x] Collect code coverage metrics
+- [ ] Improve documentation
+  - [ ] add minimum supported version of k8s (1.32.0)
+  - [ ] add link to github page, etc
+  - [ ] add badges for relevant information
+- [ ] License checks
+
 ## Testing
 
 ### Unit
