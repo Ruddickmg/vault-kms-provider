@@ -99,10 +99,6 @@ workflows:
       - build
       - unit_tests
       - integration_tests
-      - upload_coverage:
-          requires:
-            - unit_tests
-            - integration_tests
       - store_branch_versions:
           filters:
             branches:
