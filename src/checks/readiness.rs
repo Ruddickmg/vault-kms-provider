@@ -1,11 +1,9 @@
 use bytes::Bytes;
 use http::{Request, Response, StatusCode};
 use http_body_util::Full;
-use lib::configuration::socket::SocketConfiguration;
 use std::convert::Infallible;
 use std::path::Path;
-
-extern crate lib;
+use crate::configuration::socket::SocketConfiguration;
 
 pub async fn readiness_check(
     _: Request<hyper::body::Incoming>,

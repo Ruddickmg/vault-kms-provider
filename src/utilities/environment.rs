@@ -127,109 +127,207 @@ impl Environment {
 #[cfg(test)]
 mod environment {
     use super::Environment;
-    use crate::utilities::source::Source;
-    use pretty_assertions::{assert_eq, assert_str_eq};
 
-    #[test]
-    fn or_returns_an_environment_variable_if_it_exists() {
-        let env_var = Environment::VaultTransitKey;
-        let variable = "hello";
-        unsafe {
-            std::env::set_var(env_var.to_string(), variable);
+    mod conversion {
+        use super::Environment;
+        use pretty_assertions::{assert_eq, assert_str_eq};
+
+        #[test]
+        fn converts_enum_name_to_environment_variable_name() {
+            assert_str_eq!(
+                Environment::VaultPasswordPath.to_string(),
+                "VAULT_PASSWORD_PATH".to_string()
+            );
         }
-        let retrieved = env_var.or("");
-        assert_eq!(variable, retrieved);
-    }
 
-    #[test]
-    fn or_returns_a_default_value_if_no_variable_exists() {
-        let default = "default";
-        let retrieved = Environment::HttpAddress.or(default);
-        assert_eq!(default, retrieved);
-    }
-
-    #[test]
-    fn get_returns_an_environment_variable_if_it_exists() {
-        let env_var = Environment::VaultSecretIdPath;
-        let variable = "world";
-        unsafe {
-            std::env::set_var(env_var.to_string(), variable);
+        #[test]
+        fn get_returns_none_for_unknown_environment_variables() {
+            unsafe {
+                std::env::set_var(Environment::Unknown.to_string(), "something!");
+            }
+            assert_eq!(Environment::Unknown.get(), None);
         }
-        let retrieved = env_var.get();
-        assert_eq!(Some(variable.to_string()), retrieved);
-    }
 
-    #[test]
-    fn get_returns_none_if_the_variable_is_an_empty_string() {
-        let env_var = Environment::VaultTokenPath;
-        let variable = "";
-        unsafe {
-            std::env::set_var(env_var.to_string(), variable);
+        #[test]
+        fn converts_a_string_to_an_environment_variable() {
+            let env_var = Environment::VaultTransitKey;
+            let variable = "hello";
+            unsafe {
+                std::env::set_var(env_var.to_string(), variable);
+            }
+            assert_eq!(
+                Environment::from(env_var.to_string()),
+                Environment::VaultTransitKey
+            );
         }
-        let retrieved = env_var.get();
-        assert_eq!(retrieved, None);
-    }
 
-    #[test]
-    fn get_returns_none_if_no_variable_exists() {
-        assert_eq!(Environment::VaultKubernetesRole.get(), None);
-    }
-
-    #[test]
-    fn source_returns_a_file_path_if_no_value_exists() {
-        let env_var = Environment::VaultPassword;
-        let path = "./some/file/path";
-        unsafe {
-            std::env::set_var(&format!("{}_PATH", env_var.to_string()), path);
+        #[test]
+        fn converts_a_str_to_an_environment_variable() {
+            let env_var = Environment::VaultTransitKey;
+            let variable = "hello";
+            unsafe {
+                std::env::set_var(env_var.to_string(), variable);
+            }
+            assert_eq!(
+                Environment::from(env_var.to_string().as_str()),
+                Environment::VaultTransitKey
+            );
         }
-        assert_eq!(env_var.source(), Some(Source::FilePath(path.to_string())))
     }
 
-    #[test]
-    fn source_returns_a_value_if_one_exists() {
-        let env_var = Environment::VaultAddress;
-        let value = "http://127.0.0.1:8200";
-        unsafe {
-            std::env::set_var(env_var.to_string(), value);
+    mod or {
+        use super::Environment;
+        use pretty_assertions::assert_eq;
+
+        #[test]
+        fn or_returns_an_environment_variable_if_it_exists() {
+            let env_var = Environment::VaultTransitKey;
+            let variable = "hello";
+            unsafe {
+                std::env::set_var(env_var.to_string(), variable);
+            }
+            let retrieved = env_var.or("");
+            assert_eq!(variable, retrieved);
         }
-        assert_eq!(env_var.source(), Some(Source::Value(value.to_string())))
-    }
 
-    #[test]
-    fn source_returns_none_if_no_value_or_file_path_exists() {
-        assert_eq!(Environment::VaultAuthMount.source(), None)
-    }
-
-    #[test]
-    fn converts_enum_name_to_environment_variable_name() {
-        assert_str_eq!(
-            Environment::VaultPasswordPath.to_string(),
-            "VAULT_PASSWORD_PATH".to_string()
-        );
-    }
-
-    #[test]
-    fn get_returns_none_for_unknown_environment_variables() {
-        unsafe {
-            std::env::set_var(Environment::Unknown.to_string(), "something!");
+        #[test]
+        fn or_returns_a_default_value_if_no_variable_exists() {
+            let default = "default";
+            let retrieved = Environment::HttpAddress.or(default);
+            assert_eq!(default, retrieved);
         }
-        assert_eq!(Environment::Unknown.get(), None);
+
+        #[test]
+        fn or_returns_default_value_for_unknown_environment_variables() {
+            let default = "default!";
+            unsafe {
+                std::env::set_var(Environment::Unknown.to_string(), "something!");
+            }
+            assert_eq!(Environment::Unknown.or(default), default.to_string());
+        }
+
+        #[test]
+        fn silent_or_returns_an_environment_variable_if_it_exists() {
+            let env_var = Environment::VaultTransitKey;
+            let variable = "hello";
+            unsafe {
+                std::env::set_var(env_var.to_string(), variable);
+            }
+            let retrieved = env_var.silent_or("");
+            assert_eq!(variable, retrieved);
+        }
+
+        #[test]
+        fn silent_or_returns_a_default_value_if_no_variable_exists() {
+            let default = "default";
+            let retrieved = Environment::HttpAddress.silent_or(default);
+            assert_eq!(default, retrieved);
+        }
+
+        #[test]
+        fn silent_or_returns_default_value_for_unknown_environment_variables() {
+            let default = "default!";
+            unsafe {
+                std::env::set_var(Environment::Unknown.to_string(), "something!");
+            }
+            assert_eq!(Environment::Unknown.silent_or(default), default.to_string());
+        }
     }
 
-    #[test]
-    fn or_returns_default_value_for_unknown_environment_variables() {
-        let default = "default!";
-        unsafe {
-            std::env::set_var(Environment::Unknown.to_string(), "something!");
+    mod get {
+        use super::Environment;
+        use pretty_assertions::assert_eq;
+        #[test]
+        fn get_returns_an_environment_variable_if_it_exists() {
+            let env_var = Environment::VaultSecretIdPath;
+            let variable = "world";
+            unsafe {
+                std::env::set_var(env_var.to_string(), variable);
+            }
+            let retrieved = env_var.get();
+            assert_eq!(Some(variable.to_string()), retrieved);
         }
-        assert_eq!(Environment::Unknown.or(default), default.to_string());
+
+        #[test]
+        fn get_returns_none_if_the_variable_is_an_empty_string() {
+            let env_var = Environment::VaultTokenPath;
+            let variable = "";
+            unsafe {
+                std::env::set_var(env_var.to_string(), variable);
+            }
+            let retrieved = env_var.get();
+            assert_eq!(retrieved, None);
+        }
+
+        #[test]
+        fn get_returns_none_if_no_variable_exists() {
+            assert_eq!(Environment::VaultKubernetesRole.get(), None);
+        }
+
+        #[test]
+        fn silent_get_returns_an_environment_variable_if_it_exists() {
+            let env_var = Environment::VaultSecretIdPath;
+            let variable = "world";
+            unsafe {
+                std::env::set_var(env_var.to_string(), variable);
+            }
+            let retrieved = env_var.silent_get();
+            assert_eq!(Some(variable.to_string()), retrieved);
+        }
+
+        #[test]
+        fn silent_get_returns_none_if_the_variable_is_an_empty_string() {
+            let env_var = Environment::VaultTokenPath;
+            let variable = "";
+            unsafe {
+                std::env::set_var(env_var.to_string(), variable);
+            }
+            let retrieved = env_var.silent_get();
+            assert_eq!(retrieved, None);
+        }
+
+        #[test]
+        fn silent_get_returns_none_if_no_variable_exists() {
+            assert_eq!(Environment::VaultKubernetesRole.silent_get(), None);
+        }
     }
 
-    #[test]
-    fn source_returns_none_for_unknown_environment_variables() {
-        unsafe {
-            std::env::set_var(Environment::Unknown.to_string(), "something!");
+    mod source {
+        use super::Environment;
+        use crate::utilities::source::Source;
+        use pretty_assertions::assert_eq;
+
+        #[test]
+        fn source_returns_a_file_path_if_no_value_exists() {
+            let env_var = Environment::VaultPassword;
+            let path = "./some/file/path";
+            unsafe {
+                std::env::set_var(&format!("{}_PATH", env_var.to_string()), path);
+            }
+            assert_eq!(env_var.source(), Some(Source::FilePath(path.to_string())))
         }
-        assert_eq!(Environment::Unknown.source(), None);
+
+        #[test]
+        fn source_returns_a_value_if_one_exists() {
+            let env_var = Environment::VaultAddress;
+            let value = "http://127.0.0.1:8200";
+            unsafe {
+                std::env::set_var(env_var.to_string(), value);
+            }
+            assert_eq!(env_var.source(), Some(Source::Value(value.to_string())))
+        }
+
+        #[test]
+        fn source_returns_none_if_no_value_or_file_path_exists() {
+            assert_eq!(Environment::VaultAuthMount.source(), None)
+        }
+
+        #[test]
+        fn source_returns_none_for_unknown_environment_variables() {
+            unsafe {
+                std::env::set_var(Environment::Unknown.to_string(), "something!");
+            }
+            assert_eq!(Environment::Unknown.source(), None);
+        }
     }
 }

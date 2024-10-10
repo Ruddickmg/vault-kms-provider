@@ -1,3 +1,7 @@
+![GitHub License](https://img.shields.io/github/license/Ruddickmg/vault-kms-provider)
+![CircleCI (branch)](https://img.shields.io/circleci/build/github/Ruddickmg/vault-kms-provider/main)
+![Codecov (with branch)](https://img.shields.io/codecov/c/github/Ruddickmg/vault-kms-provider/main)
+
 # Vault KMS Provider
 
 A plugin for kubernetes encryption that allows the use of vault as a KMS provider
