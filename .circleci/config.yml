@@ -533,7 +533,11 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - codecov/upload
+      - run:
+         name: Show files
+         command: ls
+      - codecov/upload:
+          file: '*.coverage'
 
   helm_e2e_tests:
     executor: ubuntu
