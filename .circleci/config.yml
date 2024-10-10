@@ -536,7 +536,11 @@ jobs:
       - run:
          name: Show files
          command: ls
-      - codecov/upload
+      - codecov/upload:
+          commit_args: --git-service github
+          report_args: --git-service github
+          upload_args: --git-service github
+
 
   helm_e2e_tests:
     executor: ubuntu
