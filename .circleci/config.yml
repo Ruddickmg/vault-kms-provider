@@ -504,7 +504,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - unit.coverage
+            - unit.info
 
   integration_tests:
     executor: ubuntu
@@ -526,7 +526,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - integration.coverage
+            - integration.info
 
   upload_coverage:
     executor: ubuntu
@@ -536,8 +536,8 @@ jobs:
       - run:
          name: Show files
          command: ls
-      - codecov/upload:
-          file: '*.coverage'
+      - codecov/upload
+#          file: '*.info'
 
   helm_e2e_tests:
     executor: ubuntu
