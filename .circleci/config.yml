@@ -536,8 +536,7 @@ jobs:
       - run:
          name: Show files
          command: ls
-      - codecov/upload:
-          file: "'*.coverage.json'"
+      - codecov/upload
 
   helm_e2e_tests:
     executor: ubuntu
