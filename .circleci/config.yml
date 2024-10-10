@@ -537,7 +537,7 @@ jobs:
          name: Show files
          command: ls
       - codecov/upload:
-          file: '*.info'
+          file: "'*.info'"
 
   helm_e2e_tests:
     executor: ubuntu
