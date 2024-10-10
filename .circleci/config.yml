@@ -500,11 +500,11 @@ jobs:
           command: cargo install cargo-llvm-cov@0.6.13
       - run:
           name: Run unit tests
-          command: cargo llvm-cov --bins --lib --all-features --workspace --lcov --output-path unit.info
+          command: cargo llvm-cov --bins --lib --all-features --workspace --codecov --output-path unit.coverage.json
       - persist_to_workspace:
           root: .
           paths:
-            - unit.info
+            - unit.coverage.json
 
   integration_tests:
     executor: ubuntu
@@ -522,11 +522,11 @@ jobs:
           command: just
       - run:
           name: Run integration tests
-          command: cargo llvm-cov --test '*' --all-features --workspace --lcov --output-path integration.info
+          command: cargo llvm-cov --test '*' --all-features --workspace --codecov --output-path integration.coverage.json
       - persist_to_workspace:
           root: .
           paths:
-            - integration.info
+            - integration.coverage.json
 
   upload_coverage:
     executor: ubuntu
@@ -537,7 +537,7 @@ jobs:
          name: Show files
          command: ls
       - codecov/upload:
-          file: "'*.info'"
+          file: "'*.coverage.json'"
 
   helm_e2e_tests:
     executor: ubuntu
