@@ -99,6 +99,10 @@ workflows:
       - build
       - unit_tests
       - integration_tests
+      - upload_coverage:
+          requires:
+            - unit_tests
+            - integration_tests
       - store_branch_versions:
           filters:
             branches:
@@ -496,15 +500,20 @@ jobs:
           command: cargo install cargo-llvm-cov@0.6.13
       - run:
           name: Run unit tests
-          command: cargo llvm-cov --bins --lib --all-features --workspace --lcov --output-path coverage.info
-      - codecov/upload:
-          file: coverage.info
+          command: cargo llvm-cov --bins --lib --all-features --workspace --lcov --output-path unit.coverage
+      - persist_to_workspace:
+          root: .
+          paths:
+            - unit.coverage
 
   integration_tests:
     executor: ubuntu
     steps:
       - checkout_write
       - rust/install
+      - run:
+          name: Install coverage tool
+          command: cargo install cargo-llvm-cov@0.6.13
       - run:
           name: Install just
           command: cargo install just
@@ -513,7 +522,19 @@ jobs:
           command: just
       - run:
           name: Run integration tests
-          command: cargo test --test '*'
+          command: cargo test --test '*' --all-features --workspace --lcov --output-path integration.coverage
+      - persist_to_workspace:
+          root: .
+          paths:
+            - integration.coverage
+
+  upload_coverage:
+    executor: ubuntu
+    steps:
+      - attach_workspace:
+          at: .
+      - codecov/upload:
+          file: "*.coverage"
 
   helm_e2e_tests:
     executor: ubuntu
