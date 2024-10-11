@@ -41,7 +41,7 @@ mod server {
                 server(config).await.map(|_| "failure".to_string())
             } => r,
             r = async {
-                tokio::time::sleep(Duration::from_millis(100)).await;
+                tokio::time::sleep(Duration::from_millis(500)).await;
                 Ok(success.clone())
             } => r,
         };
@@ -78,7 +78,7 @@ mod server {
                 server(config).await.map(|_| "failure".to_string())
             } => r,
             r = async {
-                tokio::time::sleep(Duration::from_millis(100)).await;
+                tokio::time::sleep(Duration::from_millis(500)).await;
                 Ok(success.clone())
             } => r,
         }?;
