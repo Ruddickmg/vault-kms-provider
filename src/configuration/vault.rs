@@ -13,8 +13,8 @@ pub struct VaultConfiguration {
     pub mount_path: String,
 }
 
-impl VaultConfiguration {
-    pub fn new() -> Self {
+impl Default for VaultConfiguration {
+    fn default() -> Self {
         Self {
             credentials: Credentials::from_env(),
             address: Environment::VaultAddress.or(DEFAULT_VAULT_ADDRESS),

@@ -101,9 +101,9 @@ mod watch {
                 Ok::<(), std::io::Error>
             } => (),
             _ = async {
-                tokio::time::sleep(Duration::from_millis(1)).await;
+                tokio::time::sleep(Duration::from_millis(100)).await;
                 std::fs::write(&path, "Goodbye Stranger!").unwrap();
-                tokio::time::sleep(Duration::from_millis(1)).await;
+                tokio::time::sleep(Duration::from_millis(100)).await;
                 Ok::<(), std::io::Error>(())
             } => (),
         }

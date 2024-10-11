@@ -6,8 +6,8 @@ pub struct HealthCheckConfiguration {
     pub endpoint: String,
 }
 
-impl HealthCheckConfiguration {
-    pub fn new() -> Self {
+impl Default for HealthCheckConfiguration {
+    fn default() -> Self {
         Self {
             endpoint: Environment::HttpAddress.or(DEFAULT_HEALTH_ENDPOINT),
         }

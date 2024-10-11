@@ -9,8 +9,8 @@ pub struct TlsConfiguration {
     pub directory: Option<String>,
 }
 
-impl TlsConfiguration {
-    pub fn new() -> Self {
+impl Default for TlsConfiguration {
+    fn default() -> Self {
         Self {
             directory: Environment::VaultCaPath.get(),
             cert: Environment::VaultClientCert.get(),
@@ -18,7 +18,9 @@ impl TlsConfiguration {
             ca: Environment::VaultCaCert.get(),
         }
     }
+}
 
+impl TlsConfiguration {
     pub fn identity(&self) -> Option<reqwest::Identity> {
         if let Some((key, cert)) = self.cert.clone().zip(self.key.clone()) {
             if let Some(pem) =

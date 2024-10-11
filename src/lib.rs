@@ -1,19 +1,16 @@
 extern crate core;
 
-use std::sync::Arc;
-use tokio::sync::RwLock;
 use crate::configuration::socket::SocketConfiguration;
+use crate::configuration::{authentication::Credentials, ServerConfiguration};
 use crate::kms::{
     key_management_service_client::KeyManagementServiceClient,
     key_management_service_server::KeyManagementServiceServer,
 };
-use crate::utilities::socket::Socket;
+use crate::utilities::{socket::Socket, watcher};
+use std::sync::Arc;
+use tokio::sync::RwLock;
 use tonic::transport::{Channel, Server};
 use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
-use crate::configuration::authentication::Credentials;
-use crate::configuration::tls;
-use crate::configuration::vault::VaultConfiguration;
-use crate::utilities::watcher;
 
 pub mod checks;
 pub mod configuration;
@@ -24,23 +21,27 @@ pub mod kms {
 }
 
 pub async fn client() -> Result<KeyManagementServiceClient<Channel>, tonic::transport::Error> {
-    let config = SocketConfiguration::new();
+    let config = SocketConfiguration::default();
     let socket = Socket::default();
     let channel = socket.connect(&config.socket_path).await?;
     Ok(KeyManagementServiceClient::new(channel))
 }
 
-pub async fn server() -> Result<(), Box<dyn std::error::Error>> {
-    let socket_config = SocketConfiguration::new();
+pub async fn server(
+    ServerConfiguration {
+        socket: socket_config,
+        tls: tls_config,
+        vault: vault_config,
+        health: health_config,
+    }: ServerConfiguration,
+) -> Result<(), Box<dyn std::error::Error>> {
     let socket = Socket::with_permissions(&socket_config.permissions);
     let stream = socket.listen(&socket_config.socket_path)?;
-    let vault_config = VaultConfiguration::new();
-    let tls_config = tls::TlsConfiguration::new();
     let settings = VaultClientSettingsBuilder::default()
-      .address(&vault_config.address)
-      .identity(tls_config.identity())
-      .ca_certs(tls_config.certs())
-      .build()?;
+        .address(&vault_config.address)
+        .identity(tls_config.identity())
+        .ca_certs(tls_config.certs())
+        .build()?;
     let client = Arc::new(RwLock::new(vault::Client::new(
         VaultClient::new(settings).unwrap(),
         &vault_config,
@@ -56,7 +57,7 @@ pub async fn server() -> Result<(), Box<dyn std::error::Error>> {
                 .map_err(|error| std::io::Error::other(error.to_string()))
         },
         async {
-            checks::serve()
+            checks::serve(&health_config.endpoint)
                 .await
                 .map_err(|error| std::io::Error::other(error.to_string()))
         },

@@ -8,8 +8,8 @@ pub struct SocketConfiguration {
     pub permissions: String,
 }
 
-impl SocketConfiguration {
-    pub fn new() -> Self {
+impl Default for SocketConfiguration {
+    fn default() -> Self {
         Self {
             socket_path: Environment::SocketPath.or(DEFAULT_SOCKET_PATH),
             permissions: Environment::SocketPermissions
@@ -17,7 +17,9 @@ impl SocketConfiguration {
                 .to_string(),
         }
     }
+}
 
+impl SocketConfiguration {
     pub fn silent() -> Self {
         Self {
             socket_path: Environment::SocketPath.silent_or(DEFAULT_SOCKET_PATH),
