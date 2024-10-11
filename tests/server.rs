@@ -11,6 +11,7 @@ mod server {
     use pretty_assertions::assert_eq;
     use std::time::Duration;
     use tokio;
+    use lib::utilities::logging;
 
     extern crate lib;
 
@@ -51,6 +52,7 @@ mod server {
 
     #[tokio::test]
     async fn connects_and_runs_without_error() -> Result<(), Box<dyn std::error::Error>> {
+        logging::initialize();
         let config = ServerConfiguration {
             health: HealthCheckConfiguration::default(),
             socket: SocketConfiguration {
