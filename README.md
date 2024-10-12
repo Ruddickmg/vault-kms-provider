@@ -4,7 +4,7 @@
 
 # Vault KMS Provider
 
-A plugin for kubernetes encryption that allows the use of vault as a KMS provider
+A plugin for kubernetes encryption at rest that allows the use of vault as a KMS provider
 
 ### Usage:
 
@@ -24,7 +24,7 @@ All commits must use conventional commit messages to ensure versioning happens c
 - [ ] Improve documentation
   - [ ] add minimum supported version of k8s (1.32.0)
   - [ ] add link to github page, etc
-  - [ ] add badges for relevant information
+  - [x] add badges for relevant information
 - [ ] License checks
 
 ## Testing

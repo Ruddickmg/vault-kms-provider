@@ -2,6 +2,7 @@ use crate::utilities::environment::Environment;
 use std::fs;
 use tracing::{debug, info};
 
+#[derive(Clone, Debug)]
 pub struct TlsConfiguration {
     pub cert: Option<String>,
     pub key: Option<String>,

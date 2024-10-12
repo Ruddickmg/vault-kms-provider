@@ -4,6 +4,7 @@ use crate::configuration::authentication::{
 use crate::configuration::vault::VaultConfiguration;
 use crate::utilities::watcher::Refresh;
 use crate::vault::keys::KeyInfo;
+use log::info;
 use std::string::ToString;
 use tonic::{async_trait, Code, Status};
 use tracing::{debug, instrument, warn};
@@ -141,12 +142,14 @@ impl Client {
         &self,
         credentials: &AppRole,
     ) -> Result<AuthInfo, ClientError> {
-        debug!("Logging in with AppRole credentials: {:?}", credentials);
+        let secret_id = credentials.secret_id.value()?;
+        info!("Logging in with AppRole credentials: {:?}", credentials);
+        info!("Secret id: {}", secret_id);
         Ok(vaultrs::auth::approle::login(
             &self.client,
             &credentials.mount_path,
             &credentials.role_id,
-            &credentials.secret_id.value()?,
+            &secret_id,
         )
         .await?)
     }

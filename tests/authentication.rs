@@ -1,83 +1,78 @@
+mod common;
+
 #[cfg(test)]
 mod authentication {
+    use super::common;
     use lib::configuration::authentication::{AppRole, Certificate, Credentials, Jwt, UserPass};
-    use lib::configuration::tls;
-    use lib::configuration::vault::VaultConfiguration;
+    use lib::utilities::logging;
     use lib::utilities::source::Source;
     use lib::vault::Client;
     use std::fs;
     use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
-    use vaultrs::error::ClientError;
 
-    async fn login_with_credentials(credentials: Credentials) -> Result<String, ClientError> {
-        let config: VaultConfiguration = VaultConfiguration {
-            address: "https://127.0.0.1:8400".to_string(),
-            transit_key: "vault-kms-provider".to_string(),
-            mount_path: "transit".to_string(),
-            credentials,
-        };
-        let tls_config = tls::TlsConfiguration {
-            cert: Some("./test_files/certs/tls.crt".to_string()),
-            key: Some("./test_files/certs/tls.key".to_string()),
-            ca: Some("./test_files/certs/ca.crt".to_string()),
-            directory: None,
-        };
+    async fn test_login_with_credentials(credentials: Credentials) {
+        let mut client_config = common::server_config();
+        client_config.vault.credentials = credentials;
         let settings = VaultClientSettingsBuilder::default()
-            .address(&config.address)
-            .identity(tls_config.identity())
-            .ca_certs(tls_config.certs())
+            .address(&client_config.vault.address.clone())
+            .identity(client_config.tls.identity())
+            .ca_certs(client_config.tls.certs())
             .build()
             .unwrap();
         let vault_client = VaultClient::new(settings).unwrap();
-        let client = Client::new(vault_client, &config);
-        client.get_token().await.map_err(|error| {
-            println!("Error retrieving token: {:?}", error);
-            error
-        })
+        let client = Client::new(vault_client, &client_config.vault);
+
+        let result = client.get_token().await;
+
+        assert!(result.is_ok());
     }
 
     #[tokio::test]
     async fn login_with_username_and_password() {
-        let result = login_with_credentials(Credentials::UserPass(UserPass {
+        test_login_with_credentials(Credentials::UserPass(UserPass {
             username: "vault-kms-provider".to_string(),
             password: Source::Value("password".to_string()),
             mount_path: "userpass".to_string(),
         }))
         .await;
-        assert!(result.is_ok());
     }
 
     #[tokio::test]
     async fn login_with_app_role() {
-        let role_id = fs::read_to_string("./test_files/role_id").unwrap();
-        let secret_id = Source::FilePath("./test_files/secret_id".to_string());
-        let result =
-            login_with_credentials(Credentials::AppRole(AppRole::new(role_id, secret_id, None)))
-                .await;
-        assert!(result.is_ok());
+        logging::initialize();
+        let role_id = fs::read_to_string("./test_files/role_id")
+            .unwrap()
+            .trim()
+            .to_string();
+        let secret_id = fs::read_to_string("./test_files/secret_id")
+            .unwrap()
+            .trim()
+            .to_string();
+        test_login_with_credentials(Credentials::AppRole(AppRole::new(
+            role_id,
+            Source::Value(secret_id),
+            None,
+        )))
+        .await;
     }
 
     #[tokio::test]
     async fn login_with_jwt() {
         let jwt = fs::read_to_string("./test_files/jwt/token").unwrap();
-        let result = login_with_credentials(Credentials::Jwt(Jwt::new(
+        test_login_with_credentials(Credentials::Jwt(Jwt::new(
             Source::Value(jwt.to_string()),
             Some("vault-kms-provider".to_string()),
             None,
         )))
         .await;
-
-        assert!(result.is_ok());
     }
 
     #[tokio::test]
     async fn login_with_certificate() {
-        let result = login_with_credentials(Credentials::Certificate(Certificate::new(
+        test_login_with_credentials(Credentials::Certificate(Certificate::new(
             "vault-kms-provider".to_string(),
             None,
         )))
         .await;
-
-        assert!(result.is_ok());
     }
 }

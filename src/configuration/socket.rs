@@ -3,6 +3,7 @@ use crate::utilities::environment::Environment;
 pub const DEFAULT_SOCKET_PATH: &str = "./sockets/vault-kms-provider.sock";
 const DEFAULT_SOCKET_PERMISSIONS: &str = "666";
 
+#[derive(Clone, Debug)]
 pub struct SocketConfiguration {
     pub socket_path: String,
     pub permissions: String,

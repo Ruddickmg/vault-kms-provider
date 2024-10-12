@@ -5,6 +5,7 @@ pub mod socket;
 pub mod tls;
 pub mod vault;
 
+#[derive(Clone, Debug)]
 pub struct ServerConfiguration {
     pub socket: socket::SocketConfiguration,
     pub vault: vault::VaultConfiguration,

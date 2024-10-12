@@ -19,7 +19,6 @@ services:
     networks:
       - vault-kms-provider
     ports:
-      - "8200:8400"
       - "8400:8400"
 
   vault-kms-provider:
