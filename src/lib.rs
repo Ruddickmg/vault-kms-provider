@@ -1,6 +1,6 @@
 extern crate core;
 
-use crate::configuration::{authentication::Credentials, ServerConfiguration};
+use crate::configuration::ServerConfiguration;
 use crate::kms::key_management_service_server::KeyManagementServiceServer;
 use crate::utilities::{socket::Socket, watcher};
 use std::sync::Arc;
@@ -45,21 +45,8 @@ pub async fn server(
                 .await
                 .map_err(|error| std::io::Error::other(error.to_string()))
         },
-        async {
-            checks::serve(&health_config.endpoint)
-                .await
-                .map_err(|error| std::io::Error::other(error.to_string()))
-        },
-        watcher::watch(
-            match vault_config.credentials {
-                Credentials::Kubernetes(credentials) => credentials.jwt.path(),
-                Credentials::AppRole(role) => role.secret_id.path(),
-                Credentials::Token(token) => token.path(),
-                Credentials::UserPass(credentials) => credentials.password.path(),
-                _ => None,
-            },
-            client
-        ),
+        checks::serve(&health_config.endpoint),
+        watcher::watch_credentials(vault_config.credentials, client)
     )?;
     Ok(())
 }

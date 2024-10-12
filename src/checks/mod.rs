@@ -8,7 +8,6 @@ use hyper_util::rt::TokioIo;
 use std::convert::Infallible;
 use std::net::SocketAddr;
 use std::str::FromStr;
-use tokio::io::Error;
 use tokio::net::TcpListener;
 use tracing::{error, info, instrument};
 
@@ -29,7 +28,7 @@ async fn checks(uri: String, socket_path: String) -> Result<Response<Full<Bytes>
 }
 
 #[instrument]
-pub async fn serve(http_address: &str) -> Result<(), Error> {
+pub async fn serve(http_address: &str) -> Result<(), std::io::Error> {
     let addr = SocketAddr::from_str(&http_address)
         .expect(&format!("Invalid http address: {:?}", http_address));
     let listener = TcpListener::bind(addr).await?;
