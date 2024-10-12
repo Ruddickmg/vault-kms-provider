@@ -2,7 +2,7 @@ use crate::utilities::source::Source;
 
 const DEFAULT_USER_PASS_AUTH_PATH: &str = "userpass";
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct UserPass {
     pub username: String,
     pub password: Source,

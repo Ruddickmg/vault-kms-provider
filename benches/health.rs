@@ -1,8 +1,8 @@
+use super::client;
 use criterion::{BenchmarkId, Criterion};
 use lib::kms::{EncryptRequest, StatusRequest};
 use tokio::runtime::Runtime;
 use tonic::Request;
-use super::client;
 
 const BENCHMARK_NAME: &str = "vault-kms-provider";
 

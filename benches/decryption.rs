@@ -1,9 +1,9 @@
+use super::client;
 use criterion::BenchmarkId;
 use criterion::Criterion;
 use lib::kms::{DecryptRequest, EncryptRequest};
 use tokio::runtime::Runtime;
 use tonic::Request;
-use super::client;
 
 extern crate lib;
 

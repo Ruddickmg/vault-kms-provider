@@ -1,6 +1,6 @@
 const DEFAULT_MOUNT_PATH: &str = "cert";
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Certificate {
     pub name: String,
     pub mount_path: String,

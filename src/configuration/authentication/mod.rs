@@ -14,7 +14,7 @@ use crate::utilities::{environment::Environment, source::Source};
 
 const DEFAULT_USER: &str = "vault-kms-provider";
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Credentials {
     AppRole(AppRole),
     UserPass(UserPass),
