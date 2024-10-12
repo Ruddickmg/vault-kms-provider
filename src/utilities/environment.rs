@@ -151,7 +151,7 @@ mod environment {
         #[test]
         fn converts_a_string_to_an_environment_variable() {
             let env_var = Environment::VaultTransitKey;
-            let variable = "hello";
+            let variable = "transit";
             unsafe {
                 std::env::set_var(env_var.to_string(), variable);
             }
@@ -164,7 +164,7 @@ mod environment {
         #[test]
         fn converts_a_str_to_an_environment_variable() {
             let env_var = Environment::VaultTransitKey;
-            let variable = "hello";
+            let variable = "transit";
             unsafe {
                 std::env::set_var(env_var.to_string(), variable);
             }
@@ -182,7 +182,7 @@ mod environment {
         #[test]
         fn or_returns_an_environment_variable_if_it_exists() {
             let env_var = Environment::VaultTransitKey;
-            let variable = "hello";
+            let variable = "transit";
             unsafe {
                 std::env::set_var(env_var.to_string(), variable);
             }
@@ -209,7 +209,7 @@ mod environment {
         #[test]
         fn silent_or_returns_an_environment_variable_if_it_exists() {
             let env_var = Environment::VaultTransitKey;
-            let variable = "hello";
+            let variable = "transit";
             unsafe {
                 std::env::set_var(env_var.to_string(), variable);
             }
@@ -239,8 +239,8 @@ mod environment {
         use pretty_assertions::assert_eq;
         #[test]
         fn get_returns_an_environment_variable_if_it_exists() {
-            let env_var = Environment::VaultSecretIdPath;
-            let variable = "world";
+            let env_var = Environment::VaultTransitKey;
+            let variable = "transit";
             unsafe {
                 std::env::set_var(env_var.to_string(), variable);
             }
@@ -250,7 +250,7 @@ mod environment {
 
         #[test]
         fn get_returns_none_if_the_variable_is_an_empty_string() {
-            let env_var = Environment::VaultTokenPath;
+            let env_var = Environment::LogLevel;
             let variable = "";
             unsafe {
                 std::env::set_var(env_var.to_string(), variable);
@@ -266,8 +266,8 @@ mod environment {
 
         #[test]
         fn silent_get_returns_an_environment_variable_if_it_exists() {
-            let env_var = Environment::VaultSecretIdPath;
-            let variable = "world";
+            let env_var = Environment::VaultTransitKey;
+            let variable = "transit";
             unsafe {
                 std::env::set_var(env_var.to_string(), variable);
             }
@@ -277,7 +277,7 @@ mod environment {
 
         #[test]
         fn silent_get_returns_none_if_the_variable_is_an_empty_string() {
-            let env_var = Environment::VaultTokenPath;
+            let env_var = Environment::LogLevel;
             let variable = "";
             unsafe {
                 std::env::set_var(env_var.to_string(), variable);
@@ -299,7 +299,7 @@ mod environment {
 
         #[test]
         fn source_returns_a_file_path_if_no_value_exists() {
-            let env_var = Environment::VaultPassword;
+            let env_var = Environment::VaultSecretId;
             let path = "./some/file/path";
             unsafe {
                 std::env::set_var(&format!("{}_PATH", env_var.to_string()), path);
@@ -309,8 +309,8 @@ mod environment {
 
         #[test]
         fn source_returns_a_value_if_one_exists() {
-            let env_var = Environment::VaultAddress;
-            let value = "http://127.0.0.1:8200";
+            let env_var = Environment::VaultTransitKey;
+            let value = "transit";
             unsafe {
                 std::env::set_var(env_var.to_string(), value);
             }
