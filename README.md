@@ -1,6 +1,7 @@
 ![GitHub License](https://img.shields.io/github/license/Ruddickmg/vault-kms-provider)
 ![CircleCI (branch)](https://img.shields.io/circleci/build/github/Ruddickmg/vault-kms-provider/main)
-![Codecov (with branch)](https://img.shields.io/codecov/c/github/Ruddickmg/vault-kms-provider/main)
+![Codecov (with branch)](https://img.shields.io/codecov/c/github/Ruddickmg/vault-kms-provider/main?logo=codecov)
+![GitHub Release](https://img.shields.io/github/v/release/Ruddickmg/vault-kms-provider)
 
 # Vault KMS Provider
 
@@ -22,9 +23,9 @@ All commits must use conventional commit messages to ensure versioning happens c
   - [ ] Check that secrets are encrypted
   - [x] Collect code coverage metrics
 - [ ] Improve documentation
-  - [ ] add minimum supported version of k8s (1.32.0)
-  - [ ] add link to github page, etc
+  - [x] add minimum supported version of k8s (1.32.0)
   - [x] add badges for relevant information
+  - [ ] add link to github page, etc
 - [ ] License checks
 
 ## Testing

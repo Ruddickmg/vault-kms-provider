@@ -1,0 +1,14 @@
+---
+layout: "nav.njk"
+---
+<div class="about-page">
+    <div class="content-header">
+        <h1>Vault KMS Provider</h1>
+        {% for alert in collections.alert %}
+            {{ alert.content }}
+        {% endfor %}
+    </div>
+    <div class="content-body">
+        {{ content }}
+    </div>
+</div>

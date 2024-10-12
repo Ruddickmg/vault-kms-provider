@@ -36,6 +36,9 @@ In order for Vault's CA files to be installed, they must be present in the conta
 
 The following are examples of how to mount Vault CA file(s) into the KMS provider.
 
+> [!NOTE]
+> A full list of [mount options and documentation](https://kubernetes.io/docs/concepts/storage/volumes/) can be found on the Kubernetes website. Chose what works best for your use case.
+
 #### Secrets
 
 ```yaml
@@ -70,6 +73,3 @@ volumeMounts:
     # path where the files will be in the KMS provider
     mountPath: /etc/ssl/certs
 ```
-
-> [!NOTE]
-> A full list of [mount options and documentation](https://kubernetes.io/docs/concepts/storage/volumes/) can be found on the Kubernetes website. Chose what works best for your use case.
