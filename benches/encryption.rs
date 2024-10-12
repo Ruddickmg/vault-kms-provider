@@ -1,19 +1,19 @@
 use criterion::{BenchmarkId, Criterion};
-use lib::kms::EncryptRequest;
-use tokio::runtime::Runtime;
-use tonic::Request;
-use tonic::transport::Channel;
 use lib::configuration::socket::SocketConfiguration;
 use lib::kms::key_management_service_client::KeyManagementServiceClient;
+use lib::kms::EncryptRequest;
 use lib::utilities::socket::Socket;
+use tokio::runtime::Runtime;
+use tonic::transport::Channel;
+use tonic::Request;
 
 const BENCHMARK_NAME: &str = "vault-kms-provider";
 
 pub async fn client() -> Result<KeyManagementServiceClient<Channel>, tonic::transport::Error> {
     let socket = Socket::default();
     let channel = socket
-      .connect(&SocketConfiguration::default().socket_path)
-      .await?;
+        .connect(&SocketConfiguration::default().socket_path)
+        .await?;
     Ok(KeyManagementServiceClient::new(channel))
 }
 
