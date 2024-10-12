@@ -2,11 +2,12 @@ use criterion::{BenchmarkId, Criterion};
 use lib::kms::{EncryptRequest, StatusRequest};
 use tokio::runtime::Runtime;
 use tonic::Request;
+use super::client;
 
 const BENCHMARK_NAME: &str = "vault-kms-provider";
 
 async fn check_health() -> Result<(), std::io::Error> {
-    let mut client = lib::client()
+    let mut client = client()
         .await
         .map_err(|e| std::io::Error::other(e.to_string()))?;
     client.status(Request::new(StatusRequest {})).await.unwrap();
@@ -18,7 +19,7 @@ pub fn health_check_benchmark(c: &mut Criterion) {
     let rt = Runtime::new().unwrap();
 
     rt.block_on(async {
-        let mut client = lib::client().await.unwrap();
+        let mut client = client().await.unwrap();
         client
             .encrypt(Request::new(EncryptRequest {
                 plaintext: "testing".as_bytes().to_vec(),

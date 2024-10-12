@@ -1,15 +1,11 @@
 extern crate core;
 
-use crate::configuration::socket::SocketConfiguration;
 use crate::configuration::{authentication::Credentials, ServerConfiguration};
-use crate::kms::{
-    key_management_service_client::KeyManagementServiceClient,
-    key_management_service_server::KeyManagementServiceServer,
-};
+use crate::kms::key_management_service_server::KeyManagementServiceServer;
 use crate::utilities::{socket::Socket, watcher};
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tonic::transport::{Channel, Server};
+use tonic::transport::Server;
 use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
 
 pub mod checks;
@@ -18,13 +14,6 @@ pub mod utilities;
 pub mod vault;
 pub mod kms {
     tonic::include_proto!("v2");
-}
-
-pub async fn client() -> Result<KeyManagementServiceClient<Channel>, tonic::transport::Error> {
-    let config = SocketConfiguration::default();
-    let socket = Socket::default();
-    let channel = socket.connect(&config.socket_path).await?;
-    Ok(KeyManagementServiceClient::new(channel))
 }
 
 pub async fn server(

@@ -3,6 +3,7 @@ use criterion::Criterion;
 use lib::kms::{DecryptRequest, EncryptRequest};
 use tokio::runtime::Runtime;
 use tonic::Request;
+use super::client;
 
 extern crate lib;
 
@@ -11,7 +12,7 @@ const BENCHMARK_NAME: &str = "vault-kms-provider";
 async fn decrypt(
     (encrypted, uid, key_id): &(Vec<u8>, String, String),
 ) -> Result<(), tonic::Status> {
-    let mut client = lib::client()
+    let mut client = client()
         .await
         .map_err(|e| tonic::Status::from_error(e.into()))?;
     client
@@ -32,7 +33,7 @@ pub fn decryption_benchmark(c: &mut Criterion) {
     let rt = Runtime::new().unwrap();
 
     rt.block_on(async {
-        let mut client = lib::client().await.unwrap();
+        let mut client = client().await.unwrap();
         let response = client
             .encrypt(Request::new(EncryptRequest {
                 plaintext: "testing".as_bytes().to_vec(),

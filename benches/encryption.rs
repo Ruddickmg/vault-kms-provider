@@ -2,11 +2,12 @@ use criterion::{BenchmarkId, Criterion};
 use lib::kms::EncryptRequest;
 use tokio::runtime::Runtime;
 use tonic::Request;
+use super::client;
 
 const BENCHMARK_NAME: &str = "vault-kms-provider";
 
 async fn encrypt((text, uid): &(Vec<u8>, String)) -> Result<(), tonic::Status> {
-    let mut client = lib::client()
+    let mut client = client()
         .await
         .map_err(|e| tonic::Status::from_error(e.into()))?;
     client
