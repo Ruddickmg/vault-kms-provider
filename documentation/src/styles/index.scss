@@ -3,6 +3,7 @@
 @use 'sidebar';
 @use 'content';
 @use 'about';
+@use 'github-link';
 
 .homepage {
   display: flex;
