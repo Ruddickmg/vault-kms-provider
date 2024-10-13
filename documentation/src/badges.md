@@ -1,3 +1,7 @@
+---
+tags: ["badges"]
+---
+
 ![GitHub Release](https://img.shields.io/github/v/release/Ruddickmg/vault-kms-provider)
 ![GitHub License](https://img.shields.io/github/license/Ruddickmg/vault-kms-provider)
 ![CircleCI (branch)](https://img.shields.io/circleci/build/github/Ruddickmg/vault-kms-provider/main)

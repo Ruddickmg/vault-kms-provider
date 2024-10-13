@@ -7,6 +7,9 @@ layout: "nav.njk"
         {% for alert in collections.alert %}
             {{ alert.content }}
         {% endfor %}
+        {% for badge in collections.badges %}
+            {{ badge.content }}
+        {% endfor %}
     </div>
     <div class="content-body">
         {{ content }}
