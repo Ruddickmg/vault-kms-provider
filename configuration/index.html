@@ -8,15 +8,33 @@
         <link href="https://unpkg.com/prismjs@1.20.0/themes/prism-solarizedlight.css" rel="stylesheet"/>
     </head>
     <body style="background-color: #ffffff">
+        <div class = "github-link">
+            <a href="https://github.com/Ruddickmg/vault-kms-provider">
+                <img src="/assets/github-mark.png" alt="GitHub" class="github-icon" />
+            </a>
+        </div>
         
 <div class="homepage">
     <div class="sidebar">
        <div class="navbar">
            <div>
              <a href="/">
+               <h2>About</h2>
+             </a>
+           </div>
+           <div>
+             <a href="/quick-start">
                <h2>Quick Start</h2>
              </a>
            </div>
+           
+               
+                   
+               
+           
+               
+                   
+               
            
                
                    
@@ -82,11 +100,11 @@
                      
                      <ul>
                        
-                         <li><a href=/benchmarks/encryption/>Encryption</a></li>
-                       
                          <li><a href=/benchmarks/health/>Health</a></li>
                        
                          <li><a href=/benchmarks/decryption/>Decryption</a></li>
+                       
+                         <li><a href=/benchmarks/encryption/>Encryption</a></li>
                        
                      </ul>
                    </div>
@@ -98,11 +116,6 @@
     <div class="content">
         
 <div class="content-header">
-    
-        <div class="markdown-alert markdown-alert-warning"><p class="markdown-alert-title"><svg class="octicon octicon-alert mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Warning</p><p>This plugin is currently awaiting <a href="https://github.com/kubernetes/kubernetes/pull/126930">a fix</a> to be released in <a href="https://github.com/kubernetes/kubernetes/milestone/65">Kubernetes version 1.32</a>. Until <a href="https://github.com/kubernetes/kubernetes/pull/126930">the fix</a> is released by the Kubernetes team, this plugin will not work.</p>
-</div>
-
-    
     <h1>Configuration</h1>
 </div>
 <div class="content-body">
@@ -249,6 +262,8 @@
 <h3>Mount Vault's CA files into the KMS provider</h3>
 <p>In order for Vault's CA files to be installed, they must be present in the container, we can mount the CA file(s) by defining volumes and volumeMounts in our values.yaml.</p>
 <p>The following are examples of how to mount Vault CA file(s) into the KMS provider.</p>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>A full list of <a href="https://kubernetes.io/docs/concepts/storage/volumes/">mount options and documentation</a> can be found on the Kubernetes website. Chose what works best for your use case.</p>
+</div>
 <h4>Secrets</h4>
 <pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">volumes</span><span class="token punctuation">:</span>
   <span class="token comment"># name of the volume, should match the volumeMount name</span>
@@ -276,8 +291,6 @@
   <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>ca<span class="token punctuation">-</span>certificate
     <span class="token comment"># path where the files will be in the KMS provider</span>
     <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> /etc/ssl/certs</code></pre>
-<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>A full list of <a href="https://kubernetes.io/docs/concepts/storage/volumes/">mount options and documentation</a> can be found on the Kubernetes website. Chose what works best for your use case.</p>
-</div>
 
 
 <h2>Set up Vault</h2>

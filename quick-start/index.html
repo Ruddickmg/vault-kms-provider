@@ -116,9 +116,11 @@
     <div class="content">
         
 <div class="content-header">
-    <h1>Configuration</h1>
+    <h1>Quick Start</h1>
 </div>
 <div class="content-body">
+    
+
     <h2>Configure Kubernetes</h2>
 <div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>Kubernetes documentation on setting up encryption can be found <a href="https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#use-the-new-encryption-configuration-file">here</a></p>
 </div>
@@ -146,6 +148,47 @@
         <span class="token comment"># Point to your encryption file</span>
         <span class="token punctuation">-</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>encryption<span class="token punctuation">-</span>provider<span class="token punctuation">-</span>config="/path/to/your/encryption<span class="token punctuation">-</span>configuration.yaml"</code></pre>
 <p>This is done in differently in some flavors of kubernetes, if yours is different, consult the documentation of your Kubernetes distro for instructions on how to point Kubernetes to your configuration file.</p>
+
+
+    <h2>Set up Vault</h2>
+<h3>Encryption</h3>
+<p>Enable the transit gateway in Vault for encryption/decryption of data for Kubernetes.</p>
+<pre class="language-shell"><code class="language-shell">vault secrets <span class="token builtin class-name">enable</span> transit</code></pre>
+<p>Create a policy granting the permissions to the KMS provider to encrypt/decrypt data.</p>
+<p><code>./transit.hcl</code></p>
+<pre class="language-hcl"><code class="language-hcl">path <span class="token string">"/transit/decrypt/vault-kms-provider"</span> <span class="token punctuation">{</span>
+  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"update"</span>, <span class="token string">"create"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+path <span class="token string">"/transit/encrypt/vault-kms-provider"</span> <span class="token punctuation">{</span>
+  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"update"</span>, <span class="token string">"create"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+path <span class="token string">"/transit/keys/vault-kms-provider"</span> <span class="token punctuation">{</span>
+  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"read"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Add the policy to vault</p>
+<pre class="language-shell"><code class="language-shell">vault policy <span class="token function">write</span> vault-kms-provider transit.hcl</code></pre>
+<h3>Authentication</h3>
+<p>Enable authentication via kubernetes</p>
+<pre class="language-shell"><code class="language-shell">vault auth <span class="token builtin class-name">enable</span> kubernetes</code></pre>
+<p>Set the host URL to the kubernetes API</p>
+<pre class="language-shell"><code class="language-shell">vault <span class="token function">write</span> auth/kubernetes/config <span class="token assign-left variable">kubernetes_host</span><span class="token operator">=</span><span class="token string">"https://kubernetes.default.svc/"</span></code></pre>
+<p>Create a role for the KMS provider's service account so that it can authenticate with vault.</p>
+<pre class="language-shell"><code class="language-shell">vault <span class="token function">write</span> auth/kubernetes/role/vault-kms-provider <span class="token punctuation">\</span>
+    <span class="token assign-left variable">bound_service_account_names</span><span class="token operator">=</span>vault-kms-provider <span class="token punctuation">\</span>
+    <span class="token assign-left variable">bound_service_account_namespaces</span><span class="token operator">=</span>default <span class="token punctuation">\</span>
+    <span class="token assign-left variable">audience</span><span class="token operator">=</span>vault <span class="token punctuation">\</span>
+    <span class="token assign-left variable">token_policies</span><span class="token operator">=</span>vault-kms-provider <span class="token punctuation">\</span>
+    <span class="token assign-left variable">ttl</span><span class="token operator">=</span>1h</code></pre>
+<p>With vault configured you should be able to deploy the vault-kms-provider to kubernetes without error.</p>
+
+
+    <h2>Install via Helm</h2>
+<p>Add the helm repository</p>
+<pre class="language-shell"><code class="language-shell">helm repo <span class="token function">add</span> vault-kms-provider https://vault-kms-provider.io </code></pre>
+<p>Install the chart</p>
+<pre class="language-shell"><code class="language-shell">helm <span class="token function">install</span> vault-kms-provider</code></pre>
+
+
 
 </div>
 

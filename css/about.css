@@ -1,0 +1,30 @@
+.about-page {
+  text-align: center;
+}
+.about-page .markdown-alert {
+  margin-left: 10%;
+  margin-bottom: 5%;
+}
+.about-page .content-body {
+  font-size: large;
+  padding: 20px 10%;
+}
+.about-page .content-header {
+  margin-top: 5%;
+  padding: 3% 25%;
+  border-bottom: lightgray;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+.about-page .content-header h1 {
+  font-size: xxx-large;
+}
+.about-page .content-header p {
+  display: flex;
+}
+.about-page .content-header p img {
+  flex: 0;
+  padding: 3px;
+}
+
+/*# sourceMappingURL=about.css.map */

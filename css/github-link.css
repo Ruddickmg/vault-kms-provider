@@ -1,0 +1,12 @@
+.github-link {
+  position: fixed;
+  display: block;
+  right: 10%;
+  top: 5%;
+}
+.github-link img {
+  width: 60px;
+  height: 60px;
+}
+
+/*# sourceMappingURL=github-link.css.map */
