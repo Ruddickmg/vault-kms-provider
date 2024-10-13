@@ -1,6 +1,11 @@
+![GitHub License](https://img.shields.io/github/license/Ruddickmg/vault-kms-provider)
+![CircleCI (branch)](https://img.shields.io/circleci/build/github/Ruddickmg/vault-kms-provider/main)
+![Codecov (with branch)](https://img.shields.io/codecov/c/github/Ruddickmg/vault-kms-provider/main?logo=codecov)
+![GitHub Release](https://img.shields.io/github/v/release/Ruddickmg/vault-kms-provider)
+
 # Vault KMS Provider
 
-A plugin for kubernetes encryption that allows the use of vault as a KMS provider
+A plugin for kubernetes encryption at rest that allows the use of vault as a KMS provider
 
 ### Usage:
 
@@ -13,15 +18,11 @@ See usage [documentation here](https://vault-kms-provider.io/)
 All commits must use conventional commit messages to ensure versioning happens correctly. 
 
 ### Road map
+- [ ] Refactor auth config enum to use structs directly
+- [ ] License checks
 - [ ] Testing
   - [ ] Finish e2e tests (Waiting on Kubernetes 1.32.0 release)
   - [ ] Check that secrets are encrypted
-  - [x] Collect code coverage metrics
-- [ ] Improve documentation
-  - [ ] add minimum supported version of k8s (1.32.0)
-  - [ ] add link to github page, etc
-  - [ ] add badges for relevant information
-- [ ] License checks
 
 ## Testing
 

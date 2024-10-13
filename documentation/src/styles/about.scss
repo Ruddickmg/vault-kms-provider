@@ -1,0 +1,31 @@
+.about-page {
+  text-align: center;
+
+  .markdown-alert {
+    margin-left: 10%;
+    margin-bottom: 5%;
+  }
+
+  .content-body {
+    font-size: large;
+    padding: 20px 10%;
+  }
+
+  .content-header {
+    h1 {
+      font-size: xxx-large;
+    }
+    margin-top: 5%;
+    padding: 3% 25%;
+    border-bottom: lightgray;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    p {
+      display: flex;
+      img {
+        flex: 0;
+        padding: 3px;
+      }
+    }
+  }
+}

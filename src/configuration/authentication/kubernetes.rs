@@ -3,7 +3,7 @@ use crate::utilities::source::Source;
 const DEFAULT_KUBERNETES_AUTH_MOUNT: &str = "kubernetes";
 const DEFAULT_VAULT_ROLE: &str = "vault-kms-provider";
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Kubernetes {
     pub role: String,
     pub jwt: Source,

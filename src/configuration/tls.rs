@@ -1,7 +1,8 @@
 use crate::utilities::environment::Environment;
 use std::fs;
-use tracing::{debug, info};
+use tracing::info;
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct TlsConfiguration {
     pub cert: Option<String>,
     pub key: Option<String>,
@@ -9,8 +10,8 @@ pub struct TlsConfiguration {
     pub directory: Option<String>,
 }
 
-impl TlsConfiguration {
-    pub fn new() -> Self {
+impl Default for TlsConfiguration {
+    fn default() -> Self {
         Self {
             directory: Environment::VaultCaPath.get(),
             cert: Environment::VaultClientCert.get(),
@@ -18,7 +19,9 @@ impl TlsConfiguration {
             ca: Environment::VaultCaCert.get(),
         }
     }
+}
 
+impl TlsConfiguration {
     pub fn identity(&self) -> Option<reqwest::Identity> {
         if let Some((key, cert)) = self.cert.clone().zip(self.key.clone()) {
             if let Some(pem) =
@@ -47,9 +50,6 @@ impl TlsConfiguration {
             }
         }
         info!("Importing CA certificates: {:?}", certs);
-        certs.iter().for_each(|cert| {
-            debug!("cert: \n{}", fs::read_to_string(cert).unwrap());
-        });
         certs
     }
 
@@ -70,19 +70,104 @@ impl TlsConfiguration {
     }
 }
 
-// #[test]
-// mod tls_certificate_tests {
-//     use super::*;
-//
-//     #[test]
-//     pub fn gets_all_certs_located_in_a_directory_path() -> () {}
-//
-//     #[test]
-//     pub fn gets_a_specified_cert_file_path() -> () {}
-//
-//     #[test]
-//     pub fn will_not_create_duplicate_file_paths() -> () {}
-//
-//     #[test]
-//     pub fn will_combine_files_from_directory_with_specific_files_if_both_are_defined() -> () {}
-// }
+#[cfg(test)]
+mod tls_certificate_tests {
+    use super::*;
+    use std::collections::HashSet;
+    use std::path::Path;
+
+    mod certs {
+        use super::*;
+
+        #[test]
+        pub fn gets_all_files_located_in_a_directory_path() -> () {
+            let mut config = TlsConfiguration::default();
+            config.directory = Some("./test_files".to_string());
+            let certs = config.certs();
+            let filtered: Vec<&String> = certs
+                .iter()
+                .filter(|o| Path::new(&o.to_string()).is_file())
+                .collect();
+            assert_ne!(filtered.len(), 0);
+            assert_eq!(filtered.len(), certs.len());
+        }
+
+        #[test]
+        pub fn gets_a_specified_cert_file_path() -> () {
+            let path = "./test_files/certs/ca.crt".to_string();
+            let config = TlsConfiguration {
+                ca: Some(path.clone()),
+                directory: None,
+                cert: None,
+                key: None,
+            };
+            assert_eq!(config.certs(), vec![path])
+        }
+
+        #[test]
+        pub fn will_not_create_duplicate_file_paths() -> () {
+            let config = TlsConfiguration {
+                directory: Some("./test_files/certs".to_string()),
+                ca: Some("./test_files/certs/ca.crt".to_string()),
+                cert: None,
+                key: None,
+            };
+            let mut certs = config.certs();
+            let mut unique: Vec<String> = certs
+                .clone()
+                .into_iter()
+                .collect::<HashSet<_>>()
+                .into_iter()
+                .collect();
+            assert_eq!(certs.sort(), unique.sort());
+        }
+    }
+
+    mod identity {
+        use super::*;
+
+        #[test]
+        fn returns_identity_if_both_cert_and_key_are_valid() {
+            let config = TlsConfiguration {
+                directory: Some("./test_files/certs".to_string()),
+                ca: Some("./test_files/certs/ca.crt".to_string()),
+                cert: Some("./test_files/certs/tls.crt".to_string()),
+                key: Some("./test_files/certs/tls.key".to_string()),
+            };
+            assert!(config.identity().is_some());
+        }
+
+        #[test]
+        fn returns_none_if_key_is_missing() {
+            let config = TlsConfiguration {
+                directory: Some("./test_files/certs".to_string()),
+                ca: Some("./test_files/certs/ca.crt".to_string()),
+                cert: Some("./test_files/certs/tls.crt".to_string()),
+                key: None,
+            };
+            assert!(config.identity().is_none());
+        }
+
+        #[test]
+        fn returns_none_if_both_cert_is_missing() {
+            let config = TlsConfiguration {
+                directory: Some("./test_files/certs".to_string()),
+                ca: Some("./test_files/certs/ca.crt".to_string()),
+                cert: None,
+                key: Some("./test_files/certs/tls.key".to_string()),
+            };
+            assert!(config.identity().is_none());
+        }
+
+        #[test]
+        fn returns_none_if_cert_or_key_are_invalid() {
+            let config = TlsConfiguration {
+                directory: Some("./test_files/certs".to_string()),
+                ca: Some("./test_files/certs/ca.crt".to_string()),
+                cert: Some("./test_files/certs/tls.crt".to_string()),
+                key: Some("./test_files/values.yaml".to_string()),
+            };
+            assert!(config.identity().is_none());
+        }
+    }
+}

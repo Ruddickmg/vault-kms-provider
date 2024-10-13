@@ -2,6 +2,8 @@
 @use 'markdown-it-github-alerts/styles/github-colors-light.css';
 @use 'sidebar';
 @use 'content';
+@use 'about';
+@use 'github-link';
 
 .homepage {
   display: flex;

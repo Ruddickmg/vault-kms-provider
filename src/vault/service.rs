@@ -65,18 +65,16 @@ impl KeyManagementService for VaultKmsServer {
         &self,
         request: Request<DecryptRequest>,
     ) -> Result<Response<DecryptResponse>, Status> {
-        info!("Decryption request");
+        debug!("Decryption request");
         let client = self.client.read().await;
         let encrypted = String::from_utf8(request.get_ref().ciphertext.to_vec())
             .map_err(|error| Status::new(Code::Internal, error.to_string()))?;
         let plaintext = client.request_decryption(&encrypted).await?;
-        let response = Ok(Response::new(DecryptResponse {
+        Ok(Response::new(DecryptResponse {
             plaintext: BASE64_STANDARD
                 .decode(plaintext.as_bytes())
                 .map_err(|error| Status::new(Code::Internal, error.to_string()))?,
-        }));
-        info!("Decryption successful");
-        response
+        }))
     }
 
     #[instrument(skip(self, request))]
@@ -84,17 +82,15 @@ impl KeyManagementService for VaultKmsServer {
         &self,
         request: Request<EncryptRequest>,
     ) -> Result<Response<EncryptResponse>, Status> {
-        info!("Encryption request");
+        debug!("Encryption request");
         let client = self.client.read().await;
         let encoded = BASE64_STANDARD.encode(&request.get_ref().plaintext);
         let ciphertext = client.request_encryption(&encoded).await?;
         let key = client.request_key().await?;
-        let response = Ok(Response::new(EncryptResponse {
+        Ok(Response::new(EncryptResponse {
             key_id: key.id,
             ciphertext: ciphertext.as_bytes().to_vec(),
             annotations: HashMap::new(),
-        }));
-        info!("Encryption successful");
-        response
+        }))
     }
 }

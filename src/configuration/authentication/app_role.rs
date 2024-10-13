@@ -2,7 +2,7 @@ use crate::utilities::source::Source;
 
 const DEFAULT_MOUNT_PATH: &str = "approle";
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct AppRole {
     pub role_id: String,
     pub secret_id: Source,

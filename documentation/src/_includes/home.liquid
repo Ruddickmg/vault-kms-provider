@@ -3,9 +3,6 @@ layout: nav.njk
 ---
 
 <div class="content-header">
-    {% for alert in collections.alert %}
-        {{ alert.content }}
-    {% endfor %}
     <h1>{{ header | default: 'Documentation' }}</h1>
 </div>
 <div class="content-body">

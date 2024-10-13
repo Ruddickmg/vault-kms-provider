@@ -2,7 +2,7 @@ use crate::utilities::source::Source;
 
 const DEFAULT_JWT_AUTH_MOUNT: &str = "jwt";
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Jwt {
     pub role: Option<String>,
     pub jwt: Source,

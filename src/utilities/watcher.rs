@@ -1,3 +1,4 @@
+use crate::configuration::authentication::Credentials;
 use futures::{
     channel::mpsc::{channel, Receiver},
     SinkExt,
@@ -63,14 +64,35 @@ pub async fn watch<T: Refresh>(
     Ok(())
 }
 
+pub async fn watch_credentials<T: Refresh>(
+    credentials: Credentials,
+    client: Arc<RwLock<T>>,
+) -> Result<(), std::io::Error> {
+    watch(
+        match credentials {
+            Credentials::Kubernetes(credentials) => credentials.jwt.path(),
+            Credentials::AppRole(role) => role.secret_id.path(),
+            Credentials::Token(token) => token.path(),
+            Credentials::UserPass(credentials) => credentials.password.path(),
+            Credentials::Jwt(credentials) => credentials.jwt.path(),
+            _ => None,
+        },
+        client,
+    )
+    .await
+}
+
 #[cfg(test)]
-mod watch {
+mod watcher {
     use super::*;
+    use crate::configuration::authentication::{AppRole, Jwt, Kubernetes, UserPass};
+    use crate::utilities::source::Source;
     use std::io::Error;
     use std::sync::Arc;
     use std::time::Duration;
     use tokio::sync::RwLock;
     use tonic::async_trait;
+    use uuid::Uuid;
 
     struct Mock {
         called: bool,
@@ -90,24 +112,105 @@ mod watch {
         }
     }
 
-    #[tokio::test]
-    async fn refreshes_token_when_file_changes() -> Result<(), Box<dyn std::error::Error>> {
-        let path = "./test_files/test_watched_file";
+    async fn check_credential_path(credentials: Credentials, file_path: &str) {
         let mock_client = Arc::new(RwLock::new(Mock::new()));
-        std::fs::write(&path, "Hello World!").unwrap();
+        std::fs::write(file_path, "Hello World!").unwrap();
         tokio::select! {
             _ = async {
-                watch(Some(path.to_string()), mock_client.clone()).await.unwrap();
-                Ok::<(), std::io::Error>
+                watch_credentials(credentials, mock_client.clone()).await.unwrap();
             } => (),
             _ = async {
-                tokio::time::sleep(Duration::from_millis(1)).await;
-                std::fs::write(&path, "Goodbye Stranger!").unwrap();
-                tokio::time::sleep(Duration::from_millis(1)).await;
-                Ok::<(), std::io::Error>(())
+                tokio::time::sleep(Duration::from_millis(100)).await;
+                std::fs::write(&file_path, "Goodbye Stranger!").unwrap();
+                tokio::time::sleep(Duration::from_millis(100)).await;
             } => (),
         }
         assert!(mock_client.read().await.called);
-        Ok(())
+    }
+
+    mod watch_credentials {
+        use super::*;
+        use crate::configuration::authentication::Certificate;
+
+        #[tokio::test]
+        async fn watches_kubernetes_jwt_path() {
+            let file_path = format!("./test_files/test-watch-file-{}", Uuid::new_v4());
+            let credentials = Credentials::Kubernetes(Kubernetes::new(
+                Source::FilePath(file_path.clone()),
+                None,
+                None,
+            ));
+            check_credential_path(credentials, &file_path).await;
+        }
+
+        #[tokio::test]
+        async fn watches_jwt_path() {
+            let file_path = format!("./test_files/test-watch-file-{}", Uuid::new_v4());
+            let credentials =
+                Credentials::Jwt(Jwt::new(Source::FilePath(file_path.clone()), None, None));
+            check_credential_path(credentials, &file_path).await;
+        }
+
+        #[tokio::test]
+        async fn watches_app_role_secret_id() {
+            let file_path = format!("./test_files/test-watch-file-{}", Uuid::new_v4());
+            let credentials = Credentials::AppRole(AppRole::new(
+                "role_id".to_string(),
+                Source::FilePath(file_path.clone()),
+                None,
+            ));
+            check_credential_path(credentials, &file_path).await;
+        }
+
+        #[tokio::test]
+        async fn watches_password() {
+            let file_path = format!("./test_files/test-watch-file-{}", Uuid::new_v4());
+            let credentials = Credentials::UserPass(UserPass::new(
+                "password".to_string(),
+                Source::FilePath(file_path.clone()),
+                None,
+            ));
+            check_credential_path(credentials, &file_path).await;
+        }
+
+        #[tokio::test]
+        async fn watches_token() {
+            let file_path = format!("./test_files/test-watch-file-{}", Uuid::new_v4());
+            let credentials = Credentials::Token(Source::FilePath(file_path.clone()));
+            check_credential_path(credentials, &file_path).await;
+        }
+
+        #[tokio::test]
+        async fn does_not_watch_credentials_with_no_path() {
+            let mock_client = Arc::new(RwLock::new(Mock::new()));
+            let credentials = Credentials::Certificate(Certificate::new("cert".to_string(), None));
+            let result = watch_credentials(credentials, mock_client).await;
+            assert!(result.is_ok());
+        }
+    }
+
+    mod watch {
+        use super::*;
+
+        #[tokio::test]
+        async fn refreshes_token_when_file_changes() -> Result<(), Box<dyn std::error::Error>> {
+            let path = "./test_files/test_watched_file";
+            let mock_client = Arc::new(RwLock::new(Mock::new()));
+            std::fs::write(&path, "Hello World!").unwrap();
+            tokio::select! {
+                _ = async {
+                    watch(Some(path.to_string()), mock_client.clone()).await.unwrap();
+                    Ok::<(), std::io::Error>
+                } => (),
+                _ = async {
+                    tokio::time::sleep(Duration::from_millis(100)).await;
+                    std::fs::write(&path, "Goodbye Stranger!").unwrap();
+                    tokio::time::sleep(Duration::from_millis(100)).await;
+                    Ok::<(), std::io::Error>(())
+                } => (),
+            }
+            assert!(mock_client.read().await.called);
+            Ok(())
+        }
     }
 }
