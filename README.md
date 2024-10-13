@@ -18,15 +18,10 @@ See usage [documentation here](https://vault-kms-provider.io/)
 All commits must use conventional commit messages to ensure versioning happens correctly. 
 
 ### Road map
+- [ ] License checks
 - [ ] Testing
   - [ ] Finish e2e tests (Waiting on Kubernetes 1.32.0 release)
   - [ ] Check that secrets are encrypted
-  - [x] Collect code coverage metrics
-- [ ] Improve documentation
-  - [x] add minimum supported version of k8s (1.32.0)
-  - [x] add badges for relevant information
-  - [ ] add link to GitHub page, etc
-- [ ] License checks
 
 ## Testing
 
