@@ -138,8 +138,8 @@
   padding: 20px 10%;
 }
 .about-page .content-header {
-  margin-top: 5%;
-  padding: 3% 25%;
+  margin-top: 3%;
+  padding: 1% 25%;
   border-bottom: lightgray;
   border-bottom-width: 1px;
   border-bottom-style: solid;
@@ -155,6 +155,11 @@
   padding: 3px;
 }
 
+.lock-icon {
+  height: 35%;
+  width: 35%;
+}
+
 .github-link {
   position: fixed;
   display: block;
@@ -164,6 +169,11 @@
 .github-link img {
   width: 60px;
   height: 60px;
+}
+
+body {
+  background-image: radial-gradient(farthest-side, white, #fdfcf8);
+  height: 100vh;
 }
 
 .homepage {

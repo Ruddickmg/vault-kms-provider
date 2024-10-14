@@ -10,8 +10,8 @@
   padding: 20px 10%;
 }
 .about-page .content-header {
-  margin-top: 5%;
-  padding: 3% 25%;
+  margin-top: 3%;
+  padding: 1% 25%;
   border-bottom: lightgray;
   border-bottom-width: 1px;
   border-bottom-style: solid;
@@ -25,6 +25,11 @@
 .about-page .content-header p img {
   flex: 0;
   padding: 3px;
+}
+
+.lock-icon {
+  height: 35%;
+  width: 35%;
 }
 
 /*# sourceMappingURL=about.css.map */
