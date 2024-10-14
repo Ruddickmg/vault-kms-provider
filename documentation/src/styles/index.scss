@@ -5,6 +5,11 @@
 @use 'about';
 @use 'github-link';
 
+body {
+  background-image: radial-gradient(farthest-side, white, #fdfcf8);
+  height: 100vh ;
+}
+
 .homepage {
   display: flex;
   flex-direction: row;
