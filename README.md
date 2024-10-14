@@ -18,10 +18,8 @@ See usage [documentation here](https://vault-kms-provider.io/)
 All commits must use conventional commit messages to ensure versioning happens correctly. 
 
 ### Road map
-- [ ] Refactor auth config enum to use structs directly
-- [ ] License checks
-- [ ] Testing
-  - [ ] Finish e2e tests (Waiting on Kubernetes 1.32.0 release)
+- [ ] Testing (Waiting on Kubernetes 1.32.0 release)
+  - [ ] Finish e2e tests
   - [ ] Check that secrets are encrypted
 
 ## Testing
