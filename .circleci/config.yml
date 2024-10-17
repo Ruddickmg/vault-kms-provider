@@ -36,7 +36,7 @@ executors:
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
-  rust_app:
+  rust:
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
@@ -99,6 +99,7 @@ workflows:
       - build
       - unit_tests
       - integration_tests
+      - check_license
       - store_branch_versions:
           filters:
             branches:
@@ -144,6 +145,7 @@ workflows:
           context:
             - dockerhub
           requires:
+            - check_license
             - generate_tag
             - chart_formatting
             - check_formatting
@@ -179,6 +181,17 @@ workflows:
 #-----------------------------------------------------------------------------------------------------------------------------
 
 jobs:
+  check_license:
+    executor: rust
+    steps:
+      - checkout
+      - run:
+          name: Install cargo-deny
+          command: cargo install --locked cargo-deny
+      - run:
+          name: Check for license
+          command: cargo deny check licenses
+
   store_branch_versions:
     executor: node
     steps:
@@ -431,7 +444,7 @@ jobs:
             fi
 
   build:
-    executor: rust_app
+    executor: rust
     steps:
       - checkout_write
       - run:
@@ -471,7 +484,7 @@ jobs:
             - docker_tag
 
   check_formatting:
-    executor: rust_app
+    executor: rust
     steps:
       - checkout_write
       - run:

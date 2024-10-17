@@ -1,8 +1,8 @@
 ---
-title: Provider
+title: Plugin
 ---
 
-## Provider
+## Plugin
 
 ### Helm values
 
