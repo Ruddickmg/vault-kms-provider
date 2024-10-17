@@ -2,7 +2,7 @@
 title: Plugin
 ---
 
-## Provider
+## Plugin
 
 ### Helm values
 
