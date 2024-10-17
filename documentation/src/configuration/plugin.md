@@ -1,5 +1,5 @@
 ---
-title: Provider
+title: Plugin
 ---
 
 ## Provider
