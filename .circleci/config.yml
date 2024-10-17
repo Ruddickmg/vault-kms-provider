@@ -512,7 +512,7 @@ jobs:
           command: cargo llvm-cov --bins --lib --all-features --workspace --lcov --output-path unit.coverage.info
       - codecov/upload:
           fail_on_error: true
-          file: unit.coverage.info
+          files: unit.coverage.info
           git_service: github
           upload_name: unit
 
@@ -535,7 +535,7 @@ jobs:
           command: cargo llvm-cov --test '*' --all-features --workspace --lcov --output-path integration.coverage.info
       - codecov/upload:
           fail_on_error: true
-          file: integration.coverage.info
+          files: integration.coverage.info
           git_service: github
           upload_name: integration
 
