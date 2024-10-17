@@ -512,9 +512,7 @@ jobs:
           command: cargo llvm-cov --bins --lib --all-features --workspace --lcov --output-path unit.coverage.info
       - codecov/upload:
           file: unit.coverage.info
-          commit_args: --git-service github
-          report_args: --git-service github
-          upload_args: --git-service github
+          git_service: github
           upload_name: unit
 
   integration_tests:
@@ -536,9 +534,7 @@ jobs:
           command: cargo llvm-cov --test '*' --all-features --workspace --lcov --output-path integration.coverage.info
       - codecov/upload:
           file: integration.coverage.info
-          commit_args: --git-service github
-          report_args: --git-service github
-          upload_args: --git-service github
+          git_service: github
           upload_name: integration
 
   helm_e2e_tests:
