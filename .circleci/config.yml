@@ -4,7 +4,7 @@ orbs:
   kubernetes: circleci/kubernetes@1.3.1
   helm: circleci/helm@3.0.3
   rust: circleci/rust@1.6.1
-  codecov: codecov/codecov@4.2.0
+  codecov: codecov/codecov@5.0.0
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -511,10 +511,9 @@ jobs:
           name: Run unit tests
           command: cargo llvm-cov --bins --lib --all-features --workspace --lcov --output-path unit.coverage.info
       - codecov/upload:
-          file: unit.coverage.info
-          commit_args: --git-service github
-          report_args: --git-service github
-          upload_args: --git-service github
+          fail_on_error: true
+          files: unit.coverage.info
+          git_service: github
           upload_name: unit
 
   integration_tests:
@@ -535,10 +534,9 @@ jobs:
           name: Run integration tests
           command: cargo llvm-cov --test '*' --all-features --workspace --lcov --output-path integration.coverage.info
       - codecov/upload:
-          file: integration.coverage.info
-          commit_args: --git-service github
-          report_args: --git-service github
-          upload_args: --git-service github
+          fail_on_error: true
+          files: integration.coverage.info
+          git_service: github
           upload_name: integration
 
   helm_e2e_tests:
