@@ -25,7 +25,8 @@ export default function (config) {
   }));
   config.setLibrary('md', md);
   config.addPassthroughCopy('src/benchmarks');
-  config.addPassthroughCopy('src/assets')
+  config.addPassthroughCopy('src/assets');
+  config.addPassthroughCopy('src/robots.txt');
   return {
     dir: {
       input: "src",
