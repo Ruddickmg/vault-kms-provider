@@ -1,0 +1,5 @@
+Sitemap: https://www.vault-kms-provider.io/sitemap.xml
+
+User-agent: *
+Disallow: /alerts/
+Disallow: /badges/
