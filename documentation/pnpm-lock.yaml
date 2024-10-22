@@ -9,13 +9,13 @@ importers:
   .:
     dependencies:
       '@11ty/eleventy':
-        specifier: ^3.0.0-alpha.19
+        specifier: ^3.0.0
         version: 3.0.0
       '@11ty/eleventy-plugin-syntaxhighlight':
         specifier: ^5.0.0
         version: 5.0.0
       liquidjs:
-        specifier: ^10.16.7
+        specifier: ^10.18.0
         version: 10.18.0
       markdown-it:
         specifier: ^14.1.0
@@ -36,7 +36,7 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1(nunjucks@3.2.4(chokidar@3.6.0))
       sass:
-        specifier: ^1.78.0
+        specifier: ^1.80.3
         version: 1.80.3
 
 packages:
