@@ -4,18 +4,18 @@
         <meta charset="UTF-8">
         <title>Vault KMS Provider</title>
         <link rel="stylesheet" href="/css/index.css">
-        <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
-        <link rel="icon" href="/assets/favicon.ico">
-        <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
-        <link rel="manifest" href="/assets/site.webmanifest">
+        <link rel="apple-touch-icon" sizes="180x180" href="https://vault-kms-provider.io/assets/apple-touch-icon.png">
+        <link rel="icon" href="https://vault-kms-provider.io/assets/favicon.ico">
+        <link rel="icon" type="image/png" sizes="32x32" href="https://vault-kms-provider.io/assets/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="https://vault-kms-provider.io/assets/favicon-16x16.png">
+        <link rel="manifest" href="https://vault-kms-provider.io/assets/site.webmanifest">
         <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
         <link href="https://unpkg.com/prismjs@1.20.0/themes/prism-solarizedlight.css" rel="stylesheet"/>
     </head>
     <body style="background-color: #ffffff">
         <div class = "github-link">
             <a href="https://github.com/Ruddickmg/vault-kms-provider">
-                <img src="/assets/github-mark.png" alt="GitHub" class="github-icon" />
+                <img src="https://vault-kms-provider.io/assets/github-mark.png" alt="GitHub" class="github-icon" />
             </a>
         </div>
         
@@ -38,6 +38,25 @@
                
            
                
+                   
+               
+           
+               
+                   
+                   <div>
+                     
+                       <h2>Benchmarks</h2>
+                     
+                     <ul>
+                       
+                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
+                       
+                         <li><a href=/benchmarks/encryption/>Encryption</a></li>
+                       
+                         <li><a href=/benchmarks/health/>Health</a></li>
+                       
+                     </ul>
+                   </div>
                    
                
            
@@ -91,25 +110,6 @@
                          <li><a href=/installation/repository/>Repository</a></li>
                        
                          <li><a href=/installation/static/>Static</a></li>
-                       
-                     </ul>
-                   </div>
-                   
-               
-           
-               
-                   
-                   <div>
-                     
-                       <h2>Benchmarks</h2>
-                     
-                     <ul>
-                       
-                         <li><a href=/benchmarks/encryption/>Encryption</a></li>
-                       
-                         <li><a href=/benchmarks/health/>Health</a></li>
-                       
-                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
                        
                      </ul>
                    </div>
@@ -244,39 +244,39 @@
                         <tbody>
                             <tr>
                                 <td>Slope</td>
-                                <td class="ci-bound">1.7965 ms</td>
-                                <td>1.8049 ms</td>
-                                <td class="ci-bound">1.8147 ms</td>
+                                <td class="ci-bound">1.7924 ms</td>
+                                <td>1.8010 ms</td>
+                                <td class="ci-bound">1.8114 ms</td>
                             </tr>
                             <tr>
                                 <td>R&#xb2;</td>
-                                <td class="ci-bound">0.9102977</td>
-                                <td>0.9129959</td>
-                                <td class="ci-bound">0.9094448</td>
+                                <td class="ci-bound">0.9272256</td>
+                                <td>0.9301168</td>
+                                <td class="ci-bound">0.9259644</td>
                             </tr>
                             <tr>
                                 <td>Mean</td>
-                                <td class="ci-bound">1.7984 ms</td>
+                                <td class="ci-bound">1.7990 ms</td>
                                 <td>1.8097 ms</td>
-                                <td class="ci-bound">1.8241 ms</td>
+                                <td class="ci-bound">1.8219 ms</td>
                             </tr>
                             <tr>
                                 <td title="Standard Deviation">Std. Dev.</td>
-                                <td class="ci-bound">28.739 µs</td>
-                                <td>66.283 µs</td>
-                                <td class="ci-bound">95.667 µs</td>
+                                <td class="ci-bound">41.247 µs</td>
+                                <td>58.873 µs</td>
+                                <td class="ci-bound">73.666 µs</td>
                             </tr>
                             <tr>
                                 <td>Median</td>
-                                <td class="ci-bound">1.7911 ms</td>
-                                <td>1.7928 ms</td>
-                                <td class="ci-bound">1.7951 ms</td>
+                                <td class="ci-bound">1.7879 ms</td>
+                                <td>1.7903 ms</td>
+                                <td class="ci-bound">1.7932 ms</td>
                             </tr>
                             <tr>
                                 <td title="Median Absolute Deviation">MAD</td>
-                                <td class="ci-bound">9.3264 µs</td>
-                                <td>12.585 µs</td>
-                                <td class="ci-bound">16.308 µs</td>
+                                <td class="ci-bound">9.0269 µs</td>
+                                <td>13.582 µs</td>
+                                <td class="ci-bound">20.363 µs</td>
                             </tr>
                         </tbody>
                     </table>
@@ -318,82 +318,6 @@
                         documentation</a> for more details on the additional statistics.</p>
             </section>
         </div>
-        <section class="plots">
-            <h3>Change Since Previous Benchmark</h3>
-            <div class="relative">
-                <table width="100%">
-                    <tbody>
-                        <tr>
-                            <td>
-                                <a href="both/pdf.svg">
-                                    <img src="relative_pdf_small.svg" alt="PDF Comparison" width="450"
-                                        height="300" />
-                                </a>
-                            </td>
-                            <td>
-                                <a href="both/regression.svg">
-                                    <img src="relative_regression_small.svg" alt="Regression Comparison" width="450"
-                                        height="300" />
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-        <section class="stats">
-            <div class="additional_stats">
-                <h4>Additional Statistics:</h4>
-                <table>
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th title="0.95 confidence level" class="ci-bound">Lower bound</th>
-                            <th>Estimate</th>
-                            <th title="0.95 confidence level" class="ci-bound">Upper bound</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Change in time</td>
-                            <td class="ci-bound">+0.9640%</td>
-                            <td>+1.8132%</td>
-                            <td class="ci-bound">+2.6881%</td>
-                            <td>(p = 0.00 &lt;
-                                0.05)</td>
-                        </tr>
-                    </tbody>
-                </table>
-                Change within noise threshold.
-            </div>
-            <div class="additional_plots">
-                <h4>Additional Plots:</h4>
-                <ul>
-                    
-                    <li>
-                        <a href="change/mean.svg">Change in mean</a>
-                    </li>
-                    <li>
-                        <a href="change/median.svg">Change in median</a>
-                    </li>
-                    <li>
-                        <a href="change/t-test.svg">T-Test</a>
-                    </li>
-                </ul>
-            </div>
-        </section>
-        <section class="explanation">
-            <h4>Understanding this report:</h4>
-            <p>The plot on the left shows the probability of the function taking a certain amount of time. The red
-                curve represents the saved measurements from the last time this benchmark was run, while the blue curve
-                shows the measurements from this run. The lines represent the mean time per iteration. Click on the
-                plot for a larger view.</p>
-            <p>The plot on the right shows the two regressions. Again, the red line represents the previous measurement
-                while the blue line shows the current measurement.</p>
-            <p>See <a href="https://bheisler.github.io/criterion.rs/book/user_guide/command_line_output.html#change">the
-                    documentation</a> for more details on the additional statistics.</p>
-        </section>
     </div>
     <div id="footer">
         <p>This report was generated by
