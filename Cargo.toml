@@ -12,7 +12,7 @@ http = "1.1.0"
 http-body-util = "0.1.2"
 hyper-util = { version = "0.1.9", features = ["tokio"] }
 hyper = { version = "1.4.1", features = ["http1", "server"] }
-notify = "6.1.1"
+notify = "7.0.0"
 prost = "0.13.3"
 prost-derive = "0.13.3"
 reqwest = { version = "0.11.27", features = ["rustls"], default-features = false }
