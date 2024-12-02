@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use vaultrs::api::transit::responses::{ReadPublicKeyEntry};
 use crate::utilities::date::from_iso_string_to_epoch;
+use std::collections::HashMap;
+use vaultrs::api::transit::responses::ReadPublicKeyEntry;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct KeyInfo {
@@ -27,7 +27,14 @@ impl From<&HashMap<String, ReadPublicKeyEntry>> for KeyInfo {
     fn from(value: &HashMap<String, ReadPublicKeyEntry>) -> Self {
         let mut keys: Vec<(String, String)> = value
             .iter()
-            .map(|(a, b)| (a.to_string(), from_iso_string_to_epoch(&b.creation_time).unwrap().to_string()))
+            .map(|(a, b)| {
+                (
+                    a.to_string(),
+                    from_iso_string_to_epoch(&b.creation_time)
+                        .unwrap()
+                        .to_string(),
+                )
+            })
             .collect::<Vec<(String, String)>>();
         keys.sort_by(|(_, a), (_, b)| b.cmp(a));
         let (version, id) = keys.first().unwrap();
