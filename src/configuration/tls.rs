@@ -22,7 +22,7 @@ impl Default for TlsConfiguration {
 }
 
 impl TlsConfiguration {
-    pub fn identity(&self) -> Option<reqwest::Identity> {
+    pub fn identity(&self) -> Option<vaultrs::client::Identity> {
         if let Some((key, cert)) = self.cert.clone().zip(self.key.clone()) {
             if let Some(pem) =
                 fs::read(cert)
@@ -33,7 +33,7 @@ impl TlsConfiguration {
                         raw_cert
                     })
             {
-                reqwest::Identity::from_pem(pem.as_slice()).ok()
+                vaultrs::client::Identity::from_pem(pem.as_slice()).ok()
             } else {
                 None
             }

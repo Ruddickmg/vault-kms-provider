@@ -9,6 +9,7 @@ use tonic::{async_trait, Code, Status};
 use tracing::{debug, instrument, warn};
 use vaultrs::client::{Client as ClientTrait, VaultClient};
 use vaultrs::{api::AuthInfo, error::ClientError, transit};
+use vaultrs::api::transit::responses::ReadKeyData;
 
 #[derive(Debug)]
 pub struct VaultError(pub ClientError);
@@ -153,12 +154,12 @@ impl Client {
 
     #[instrument(skip(self))]
     pub async fn request_key(&self) -> Result<KeyInfo, VaultError> {
-        Ok(
-            transit::key::read(&self.client, &self.mount_path, &self.key_name)
-                .await?
-                .keys
-                .into(),
-        )
+        Ok(match transit::key::read(&self.client, &self.mount_path, &self.key_name)
+          .await?
+          .keys {
+            ReadKeyData::Asymmetric(data) => data.into(),
+            ReadKeyData::Symmetric(data) => data.into(),
+        })
     }
 
     #[instrument(skip(self, data))]
