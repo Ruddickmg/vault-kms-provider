@@ -7,7 +7,6 @@ use crate::vault::keys::KeyInfo;
 use std::string::ToString;
 use tonic::{async_trait, Code, Status};
 use tracing::{debug, instrument, warn};
-use vaultrs::api::transit::responses::ReadKeyData;
 use vaultrs::client::{Client as ClientTrait, VaultClient};
 use vaultrs::{api::AuthInfo, error::ClientError, transit};
 
@@ -155,13 +154,10 @@ impl Client {
     #[instrument(skip(self))]
     pub async fn request_key(&self) -> Result<KeyInfo, VaultError> {
         Ok(
-            match transit::key::read(&self.client, &self.mount_path, &self.key_name)
+            transit::key::read(&self.client, &self.mount_path, &self.key_name)
                 .await?
                 .keys
-            {
-                ReadKeyData::Asymmetric(data) => data.into(),
-                ReadKeyData::Symmetric(data) => data.into(),
-            },
+                .into(),
         )
     }
 

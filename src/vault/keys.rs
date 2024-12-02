@@ -1,11 +1,23 @@
-use crate::utilities::date::from_iso_string_to_epoch;
 use std::collections::HashMap;
-use vaultrs::api::transit::responses::ReadPublicKeyEntry;
+use vaultrs::api::transit::responses::ReadKeyData;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct KeyInfo {
     pub id: String,
     pub version: String,
+}
+
+impl From<&ReadKeyData> for KeyInfo {
+    fn from(value: &ReadKeyData) -> Self {
+        match value {
+            ReadKeyData::Asymmetric(_data) => {
+                // TODO: uncomment after adding configurations for asymmetric key usage
+                // data.into()
+                panic!("Asymmetric keys not yet supported");
+            }
+            ReadKeyData::Symmetric(data) => data.into(),
+        }
+    }
 }
 
 impl From<&HashMap<String, u64>> for KeyInfo {
@@ -22,28 +34,28 @@ impl From<&HashMap<String, u64>> for KeyInfo {
         }
     }
 }
-
-impl From<&HashMap<String, ReadPublicKeyEntry>> for KeyInfo {
-    fn from(value: &HashMap<String, ReadPublicKeyEntry>) -> Self {
-        let mut keys: Vec<(String, String)> = value
-            .iter()
-            .map(|(a, b)| {
-                (
-                    a.to_string(),
-                    from_iso_string_to_epoch(&b.creation_time)
-                        .unwrap()
-                        .to_string(),
-                )
-            })
-            .collect::<Vec<(String, String)>>();
-        keys.sort_by(|(_, a), (_, b)| b.cmp(a));
-        let (version, id) = keys.first().unwrap();
-        KeyInfo {
-            version: version.to_string(),
-            id: id.to_string(),
-        }
-    }
-}
+// TODO: uncomment after adding configurations for asymmetric key usage
+// impl From<&HashMap<String, ReadPublicKeyEntry>> for KeyInfo {
+//     fn from(value: &HashMap<String, ReadPublicKeyEntry>) -> Self {
+//         let mut keys: Vec<(String, String)> = value
+//             .iter()
+//             .map(|(a, b)| {
+//                 (
+//                     a.to_string(),
+//                     from_iso_string_to_epoch(&b.creation_time)
+//                         .unwrap()
+//                         .to_string(),
+//                 )
+//             })
+//             .collect::<Vec<(String, String)>>();
+//         keys.sort_by(|(_, a), (_, b)| b.cmp(a));
+//         let (version, id) = keys.first().unwrap();
+//         KeyInfo {
+//             version: version.to_string(),
+//             id: id.to_string(),
+//         }
+//     }
+// }
 
 impl From<HashMap<String, u64>> for KeyInfo {
     fn from(value: HashMap<String, u64>) -> Self {
@@ -51,8 +63,15 @@ impl From<HashMap<String, u64>> for KeyInfo {
     }
 }
 
-impl From<HashMap<String, ReadPublicKeyEntry>> for KeyInfo {
-    fn from(value: HashMap<String, ReadPublicKeyEntry>) -> Self {
+// TODO: uncomment after adding configurations for asymmetric key usage
+// impl From<HashMap<String, ReadPublicKeyEntry>> for KeyInfo {
+//     fn from(value: HashMap<String, ReadPublicKeyEntry>) -> Self {
+//         KeyInfo::from(&value)
+//     }
+// }
+
+impl From<ReadKeyData> for KeyInfo {
+    fn from(value: ReadKeyData) -> Self {
         KeyInfo::from(&value)
     }
 }
