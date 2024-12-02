@@ -82,6 +82,15 @@ mod key_info {
     use pretty_assertions::assert_eq;
     use std::collections::HashMap;
     use std::time::{SystemTime, UNIX_EPOCH};
+    use vaultrs::api::transit::responses::{ReadKeyData, ReadPublicKeyEntry};
+
+    #[test]
+    #[should_panic]
+    fn panics_when_an_asymmetric_key_is_encountered() {
+        let data: HashMap<String, ReadPublicKeyEntry> = HashMap::new();
+        let key_data: ReadKeyData = ReadKeyData::Asymmetric(data);
+        let _ = KeyInfo::from(key_data);
+    }
 
     #[test]
     fn gets_most_recent_key_from_hash_map_of_keys() {
