@@ -1,6 +1,6 @@
+use crate::utilities::date::from_iso_string_to_epoch;
 use std::collections::HashMap;
 use vaultrs::api::transit::responses::{ReadKeyData, ReadPublicKeyEntry};
-use crate::utilities::date::from_iso_string_to_epoch;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct KeyInfo {
@@ -12,7 +12,7 @@ impl From<&ReadKeyData> for KeyInfo {
     fn from(value: &ReadKeyData) -> Self {
         match value {
             ReadKeyData::Asymmetric(data) => data.into(),
-            ReadKeyData::Symmetric(data) => data.into()
+            ReadKeyData::Symmetric(data) => data.into(),
         }
     }
 }
