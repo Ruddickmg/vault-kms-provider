@@ -1,5 +1,6 @@
+use crate::utilities::date::from_iso_string_to_epoch;
 use std::collections::HashMap;
-use vaultrs::api::transit::responses::ReadKeyData;
+use vaultrs::api::transit::responses::{ReadKeyData, ReadPublicKeyEntry};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct KeyInfo {
@@ -10,11 +11,7 @@ pub struct KeyInfo {
 impl From<&ReadKeyData> for KeyInfo {
     fn from(value: &ReadKeyData) -> Self {
         match value {
-            ReadKeyData::Asymmetric(_data) => {
-                // TODO: uncomment after adding configurations for asymmetric key usage
-                // data.into()
-                panic!("Asymmetric keys not yet supported");
-            }
+            ReadKeyData::Asymmetric(data) => data.into(),
             ReadKeyData::Symmetric(data) => data.into(),
         }
     }
@@ -34,28 +31,28 @@ impl From<&HashMap<String, u64>> for KeyInfo {
         }
     }
 }
-// TODO: uncomment after adding configurations for asymmetric key usage
-// impl From<&HashMap<String, ReadPublicKeyEntry>> for KeyInfo {
-//     fn from(value: &HashMap<String, ReadPublicKeyEntry>) -> Self {
-//         let mut keys: Vec<(String, String)> = value
-//             .iter()
-//             .map(|(a, b)| {
-//                 (
-//                     a.to_string(),
-//                     from_iso_string_to_epoch(&b.creation_time)
-//                         .unwrap()
-//                         .to_string(),
-//                 )
-//             })
-//             .collect::<Vec<(String, String)>>();
-//         keys.sort_by(|(_, a), (_, b)| b.cmp(a));
-//         let (version, id) = keys.first().unwrap();
-//         KeyInfo {
-//             version: version.to_string(),
-//             id: id.to_string(),
-//         }
-//     }
-// }
+
+impl From<&HashMap<String, ReadPublicKeyEntry>> for KeyInfo {
+    fn from(value: &HashMap<String, ReadPublicKeyEntry>) -> Self {
+        let mut keys: Vec<(String, String)> = value
+            .iter()
+            .map(|(a, b)| {
+                (
+                    a.to_string(),
+                    from_iso_string_to_epoch(&b.creation_time)
+                        .unwrap()
+                        .to_string(),
+                )
+            })
+            .collect::<Vec<(String, String)>>();
+        keys.sort_by(|(_, a), (_, b)| b.cmp(a));
+        let (version, id) = keys.first().unwrap();
+        KeyInfo {
+            version: version.to_string(),
+            id: id.to_string(),
+        }
+    }
+}
 
 impl From<HashMap<String, u64>> for KeyInfo {
     fn from(value: HashMap<String, u64>) -> Self {
@@ -63,12 +60,11 @@ impl From<HashMap<String, u64>> for KeyInfo {
     }
 }
 
-// TODO: uncomment after adding configurations for asymmetric key usage
-// impl From<HashMap<String, ReadPublicKeyEntry>> for KeyInfo {
-//     fn from(value: HashMap<String, ReadPublicKeyEntry>) -> Self {
-//         KeyInfo::from(&value)
-//     }
-// }
+impl From<HashMap<String, ReadPublicKeyEntry>> for KeyInfo {
+    fn from(value: HashMap<String, ReadPublicKeyEntry>) -> Self {
+        KeyInfo::from(&value)
+    }
+}
 
 impl From<ReadKeyData> for KeyInfo {
     fn from(value: ReadKeyData) -> Self {
@@ -79,6 +75,7 @@ impl From<ReadKeyData> for KeyInfo {
 #[cfg(test)]
 mod key_info {
     use super::KeyInfo;
+    use chrono::DateTime;
     use pretty_assertions::assert_eq;
     use std::collections::HashMap;
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -90,6 +87,35 @@ mod key_info {
         let data: HashMap<String, ReadPublicKeyEntry> = HashMap::new();
         let key_data: ReadKeyData = ReadKeyData::Asymmetric(data);
         let _ = KeyInfo::from(key_data);
+    }
+
+    #[test]
+    fn gets_most_recent_key_from_hash_map_of_asymmetric_keys() {
+        let mut data: HashMap<String, ReadPublicKeyEntry> = HashMap::new();
+        let start = SystemTime::now();
+        let mut since_the_epoch = start.duration_since(UNIX_EPOCH).unwrap().as_secs();
+        let mut latest_id = String::new();
+        for n in 1..10 {
+            since_the_epoch += 1;
+            data.insert(
+                format!("{}", n),
+                ReadPublicKeyEntry {
+                    creation_time: DateTime::from_timestamp(since_the_epoch as i64, 0)
+                        .unwrap()
+                        .to_rfc3339(),
+                    name: format!("some_key_name_{}", n),
+                    public_key: format!("some_key_{}", n),
+                },
+            );
+            latest_id = format!("{}", since_the_epoch);
+        }
+        assert_eq!(
+            KeyInfo::from(data),
+            KeyInfo {
+                id: latest_id,
+                version: "9".to_string()
+            }
+        );
     }
 
     #[test]
