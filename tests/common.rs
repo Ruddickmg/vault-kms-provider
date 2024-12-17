@@ -1,4 +1,3 @@
-use futures::lock;
 use lib::configuration::authentication::Credentials;
 use lib::configuration::health::HealthCheckConfiguration;
 use lib::configuration::socket::SocketConfiguration;
