@@ -110,7 +110,7 @@ mod key_info {
             latest_id = format!("{}", since_the_epoch);
         }
         assert_eq!(
-            KeyInfo::from(ReadKeyData::Asymmetric(data)),
+            KeyInfo::from(data),
             KeyInfo {
                 id: latest_id,
                 version: "9".to_string()
@@ -130,7 +130,7 @@ mod key_info {
             latest_id = format!("{}", since_the_epoch);
         }
         assert_eq!(
-            KeyInfo::from(ReadKeyData::Symmetric(map)),
+            KeyInfo::from(map),
             KeyInfo {
                 id: latest_id,
                 version: "9".to_string()
