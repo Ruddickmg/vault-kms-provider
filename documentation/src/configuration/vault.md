@@ -9,7 +9,7 @@ tags:
 > [!NOTE]
 > The Vault KMS Provider will use any transit key found at the default or user specified transit path, if no key is found the provider will initialize one with Vault transits default key type ([aes256-gcm96](https://developer.hashicorp.com/vault/api-docs/secret/transit#aes256-gcm96)).
 > 
-> See [Vault documentation](https://developer.hashicorp.com/vault/api-docs/secret/transit#create-key) creating keys.
+> See [Vault documentation](https://developer.hashicorp.com/vault/api-docs/secret/transit#create-key) for creating keys.
 
 ### Encryption
 
