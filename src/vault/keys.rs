@@ -75,10 +75,10 @@ impl From<ReadKeyData> for KeyInfo {
 #[cfg(test)]
 mod key_info {
     use super::KeyInfo;
+    use chrono::DateTime;
     use pretty_assertions::assert_eq;
     use std::collections::HashMap;
     use std::time::{SystemTime, UNIX_EPOCH};
-    use chrono::DateTime;
     use vaultrs::api::transit::responses::{ReadKeyData, ReadPublicKeyEntry};
 
     #[test]
@@ -97,11 +97,16 @@ mod key_info {
         let mut latest_id = String::new();
         for n in 1..10 {
             since_the_epoch += 1;
-            data.insert(format!("{}", n), ReadPublicKeyEntry {
-                creation_time: DateTime::from_timestamp(since_the_epoch as i64, 0).unwrap().to_rfc3339(),
-                name: format!("some_key_name_{}", n),
-                public_key: format!("some_key_{}", n),
-            });
+            data.insert(
+                format!("{}", n),
+                ReadPublicKeyEntry {
+                    creation_time: DateTime::from_timestamp(since_the_epoch as i64, 0)
+                        .unwrap()
+                        .to_rfc3339(),
+                    name: format!("some_key_name_{}", n),
+                    public_key: format!("some_key_{}", n),
+                },
+            );
             latest_id = format!("{}", since_the_epoch);
         }
         assert_eq!(
