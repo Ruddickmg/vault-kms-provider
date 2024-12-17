@@ -18,6 +18,9 @@ See usage [documentation here](https://vault-kms-provider.io/)
 All commits must use conventional commit messages to ensure versioning happens correctly. 
 
 ### Road map
+- [ ] Encryption
+  - [ ] Support convergent encryption
+  - [ ] Support key derivation
 - [ ] Testing (Waiting on Kubernetes 1.32.0 release)
   - [ ] Finish e2e tests
   - [ ] Check that secrets are encrypted
