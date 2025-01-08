@@ -46,22 +46,22 @@ executors:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
   arm_builder:
+    resource_class: arm.xlarge
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
     machine:
-      image: ubuntu-2204:2024.05.1
-      resource_class: arm.xlarge
-      docker_layer_caching: true
-  amd_builder:
-    environment:
-      PIPELINE_NUM: << pipeline.number >>
-      TZ: "America/Los_Angeles"
-    machine:
-      resource_class: xlarge
       image: ubuntu-2204:2024.05.1
       docker_layer_caching: true
   ubuntu:
+    resource_class: xlarge
+    environment:
+      PIPELINE_NUM: << pipeline.number >>
+      TZ: "America/Los_Angeles"
+    machine:
+      image: ubuntu-2204:2024.05.1
+      docker_layer_caching: true
+  ubuntu_small:
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
@@ -473,7 +473,7 @@ jobs:
             - "./target"
 
   generate_tag:
-    executor: ubuntu
+    executor: ubuntu_small
     steps:
       - checkout_write
       - run:
@@ -778,7 +778,7 @@ jobs:
             helm test vault-kms-provider -n vault --logs
 
   publish_amd:
-    executor: amd_builder
+    executor: ubuntu
     environment:
       ARCH: amd64
       PLATFORM: linux/amd64
