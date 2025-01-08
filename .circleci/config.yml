@@ -46,7 +46,7 @@ executors:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
   arm_builder:
-    resource_class: arm.xlarge
+    resource_class: arm.large
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
@@ -54,7 +54,7 @@ executors:
       image: ubuntu-2204:2024.05.1
       docker_layer_caching: true
   ubuntu:
-    resource_class: xlarge
+    resource_class: large
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
