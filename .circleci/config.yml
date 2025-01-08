@@ -51,7 +51,15 @@ executors:
       TZ: "America/Los_Angeles"
     machine:
       image: ubuntu-2204:2024.05.1
-      resource_class: arm.medium
+      resource_class: arm.xlarge
+      docker_layer_caching: true
+  amd_builder:
+    environment:
+      PIPELINE_NUM: << pipeline.number >>
+      TZ: "America/Los_Angeles"
+    machine:
+      resource_class: xlarge
+      image: ubuntu-2204:2024.05.1
       docker_layer_caching: true
   ubuntu:
     environment:
@@ -770,7 +778,7 @@ jobs:
             helm test vault-kms-provider -n vault --logs
 
   publish_amd:
-    executor: ubuntu
+    executor: amd_builder
     environment:
       ARCH: amd64
       PLATFORM: linux/amd64
