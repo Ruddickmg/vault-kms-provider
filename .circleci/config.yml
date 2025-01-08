@@ -46,14 +46,22 @@ executors:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
   arm_builder:
+    resource_class: arm.large
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
     machine:
       image: ubuntu-2204:2024.05.1
-      resource_class: arm.medium
       docker_layer_caching: true
   ubuntu:
+    resource_class: large
+    environment:
+      PIPELINE_NUM: << pipeline.number >>
+      TZ: "America/Los_Angeles"
+    machine:
+      image: ubuntu-2204:2024.05.1
+      docker_layer_caching: true
+  ubuntu_small:
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
@@ -465,7 +473,7 @@ jobs:
             - "./target"
 
   generate_tag:
-    executor: ubuntu
+    executor: ubuntu_small
     steps:
       - checkout_write
       - run:
