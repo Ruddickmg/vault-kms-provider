@@ -7,6 +7,7 @@
   "configMigration": true,
   "branchConcurrentLimit": 2,
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    ":semanticCommits"
   ]
 }
