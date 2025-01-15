@@ -8,98 +8,98 @@
         
             <url>
                 <loc>https://vault-kms-provider.io/configuration/authentication/</loc>
-                <lastmod>2025-01-14T04:25:55.480Z</lastmod>
+                <lastmod>2025-01-15T01:54:49.487Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/configuration/kubernetes/</loc>
-                <lastmod>2025-01-14T04:25:55.480Z</lastmod>
+                <lastmod>2025-01-15T01:54:49.488Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/configuration/plugin/</loc>
-                <lastmod>2025-01-14T04:25:55.480Z</lastmod>
+                <lastmod>2025-01-15T01:54:49.488Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/configuration/tls/</loc>
-                <lastmod>2025-01-14T04:25:55.480Z</lastmod>
+                <lastmod>2025-01-15T01:54:49.488Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/configuration/vault/</loc>
-                <lastmod>2025-01-14T04:25:55.480Z</lastmod>
+                <lastmod>2025-01-15T01:54:49.488Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/</loc>
-                <lastmod>2025-01-14T04:25:55.480Z</lastmod>
+                <lastmod>2025-01-15T01:54:49.488Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/installation/docker/</loc>
-                <lastmod>2025-01-14T04:25:55.480Z</lastmod>
+                <lastmod>2025-01-15T01:54:49.488Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/installation/helm/</loc>
-                <lastmod>2025-01-14T04:25:55.480Z</lastmod>
+                <lastmod>2025-01-15T01:54:49.488Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/installation/repository/</loc>
-                <lastmod>2025-01-14T04:25:55.480Z</lastmod>
+                <lastmod>2025-01-15T01:54:49.488Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/installation/static/</loc>
-                <lastmod>2025-01-14T04:25:55.480Z</lastmod>
+                <lastmod>2025-01-15T01:54:49.488Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/quick-start/</loc>
-                <lastmod>2025-01-14T04:25:55.480Z</lastmod>
+                <lastmod>2025-01-15T01:54:49.488Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/benchmarks/health/</loc>
-                <lastmod>2025-01-14T04:26:00.992Z</lastmod>
-            </url>
-        
-    
-        
-            <url>
-                <loc>https://vault-kms-provider.io/benchmarks/encryption/</loc>
-                <lastmod>2025-01-14T04:26:00.993Z</lastmod>
+                <lastmod>2025-01-15T01:54:56.208Z</lastmod>
             </url>
         
     
         
             <url>
                 <loc>https://vault-kms-provider.io/benchmarks/decryption/</loc>
-                <lastmod>2025-01-14T04:26:00.994Z</lastmod>
+                <lastmod>2025-01-15T01:54:56.209Z</lastmod>
+            </url>
+        
+    
+        
+            <url>
+                <loc>https://vault-kms-provider.io/benchmarks/encryption/</loc>
+                <lastmod>2025-01-15T01:54:56.209Z</lastmod>
             </url>
         
     
