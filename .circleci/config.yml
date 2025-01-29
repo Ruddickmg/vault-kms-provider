@@ -762,10 +762,10 @@ jobs:
           command: just
       - run:
           name: Set up test infrastructure
-          command: helm install vault-kms-provider ./helm -f test_files/values.yaml --set "replicas=0"
+          command: helm install vault-kms-provider ./helm -f test_files/values.yaml --create-namespace -n vault -set "replicas=0"
       - run:
           name: Run e2e tests against the static pod
-          command: helm test vault-kms-provider --logs
+          command: helm test vault-kms-provider -n vault --logs
 
   publish_amd:
     executor: ubuntu
