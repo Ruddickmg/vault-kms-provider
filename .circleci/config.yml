@@ -731,23 +731,6 @@ jobs:
           name: Run etcd
           command: docker compose -f ./test_files/docker-compose.etcd.yml up -d
       - run:
-          name: Create encryption configuration file
-          command: |
-            mkdir /tmp/encryption
-            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" --set "encryption.enabled=false" > $ENCRYPTION_CONFIG
-      - run:
-          name: Install k3s
-          command: |
-            curl -sfL https://get.k3s.io | sh -s - \
-              --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG \
-              --kube-apiserver-arg=encryption-provider-config-automatic-reload=true
-      - run:
-          name: Grant permissions on kube config
-          command: sudo chown $USER:$USER $KUBECONFIG
-      - run:
-          name: Start vault
-          command: just
-      - run:
           name: Set permissions on mount directory
           command: sudo chmod -R 777 /mnt
       - run:
@@ -755,19 +738,28 @@ jobs:
           command: sed -i -e "s/vault-kms-provider:latest/vault-kms-provider:$(cat /tmp/workspace/docker_tag)/g" ./test_files/vault-kms-provider.yaml
       - run:
           name: Add static configuration
-          command: sudo cp test_files/vault-kms-provider.yaml /var/lib/rancher/k3s/agent/pod-manifests/static-vault-kms-provider.yaml
-      - run:
-          name: Switch to static vault kms provider
           command: |
+            mkdir -p /var/lib/rancher/k3s/agent/pod-manifests
+            sudo cp test_files/vault-kms-provider.yaml /var/lib/rancher/k3s/agent/pod-manifests/static-vault-kms-provider.yaml
+      - run:
+          name: Create encryption configuration file
+          command: |
+            mkdir /tmp/encryption
             helm template -s templates/configurations/encryption-configuration.yaml ./helm \
               --set "encryption.output=true" \
+              --set "encryption.fallback=false" \
               --set "socket.name=static-vault-kms-provider.sock" > $ENCRYPTION_CONFIG
       - run:
-          name: Restart kubernetes
-          command: sudo systemctl start k3s
+          name: Install k3s
+          command: |
+            curl -sfL https://get.k3s.io | sh -s - \
+              --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG
       - run:
-          name: Wait for startup
-          command: sleep 35
+          name: Grant permissions on kube config
+          command: sudo chown $USER:$USER $KUBECONFIG
+      - run:
+          name: Start vault
+          command: just
       - run:
           name: Set up test infrastructure
           command: helm install vault-kms-provider ./helm -f test_files/values.yaml --set "replicas=0"
