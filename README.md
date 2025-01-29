@@ -21,9 +21,6 @@ All commits must use conventional commit messages to ensure versioning happens c
 - [ ] Encryption
   - [ ] Support convergent encryption
   - [ ] Support key derivation
-- [ ] Testing (Waiting on Kubernetes 1.32.0 release)
-  - [ ] Finish e2e tests
-  - [ ] Check that secrets are encrypted
 
 ## Testing
 
