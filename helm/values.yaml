@@ -152,6 +152,9 @@ envFrom: {}
 # environment variables for the container
 env: {}
 
+# amount of replicas to create/deploy
+replicas: 1
+
 volumes: {}
 volumeMounts: {}
 podAnnotations: {}
