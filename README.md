@@ -76,6 +76,11 @@ Once the vault KMS provider has been set up, you can run the tests with the foll
 helm test vault-kms-provider
 ```
 
+K3s can be debugged using the following command:
+```shell
+journalctl -xefu k3s.service
+```
+
 ## Tls
 
 Tls is enabled by setting environment variables that point to the relevant certificate files required for tls.

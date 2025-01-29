@@ -686,7 +686,7 @@ jobs:
             helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
       - run:
           name: Wait for startup
-          command: sleep 10
+          command: sleep 35
       - run:
           name: Run e2e tests against helm deployment
           command: |
@@ -773,7 +773,7 @@ jobs:
           command: sudo systemctl start k3s
       - run:
           name: Wait for startup
-          command: sleep 10
+          command: sleep 35
       - run:
           name: Run e2e tests against the static pod
           command: |
