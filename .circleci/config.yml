@@ -554,6 +554,7 @@ jobs:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       SOCKET_FILE: /mnt/vault-kms-provider.sock
       ENCRYPTION_CONFIG: /tmp/encryption/configuration.yaml
+      INSTALL_K3S_VERSION: v1.32.1+k3s1
       K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
       K3S_DATASTORE_CAFILE: /tmp/certs/ca.crt
       K3S_DATASTORE_CERTFILE: /tmp/certs/tls.crt
@@ -698,6 +699,7 @@ jobs:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       SOCKET_FILE: /mnt/vault-kms-provider.sock
       ENCRYPTION_CONFIG: /tmp/encryption/configuration.yaml
+      INSTALL_K3S_VERSION: v1.32.1+k3s1
       K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
       K3S_DATASTORE_CAFILE: /tmp/certs/ca.crt
       K3S_DATASTORE_CERTFILE: /tmp/certs/tls.crt
