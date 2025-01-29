@@ -772,7 +772,7 @@ jobs:
       - run:
           name: Run e2e tests against the static pod
           command: |
-            helm test vault-kms-provider -n vault --logs --create-namespace -f test_files/values.yaml \
+            helm test vault-kms-provider --logs -f test_files/values.yaml \
               --set "image.tag=$(cat /tmp/workspace/docker_tag)"
 
   publish_amd:
