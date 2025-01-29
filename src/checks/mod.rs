@@ -1,4 +1,3 @@
-use crate::configuration::socket::SocketConfiguration;
 use bytes::Bytes;
 use http::{Response, StatusCode};
 use http_body_util::Full;
@@ -28,7 +27,7 @@ async fn checks(uri: String, socket_path: String) -> Result<Response<Full<Bytes>
 }
 
 #[instrument]
-pub async fn serve(http_address: &str) -> Result<(), std::io::Error> {
+pub async fn serve(http_address: &str, socket_path: &str) -> Result<(), std::io::Error> {
     let addr = SocketAddr::from_str(&http_address)
         .expect(&format!("Invalid http address: {:?}", http_address));
     let listener = TcpListener::bind(addr).await?;
@@ -39,16 +38,14 @@ pub async fn serve(http_address: &str) -> Result<(), std::io::Error> {
     loop {
         let (stream, _) = listener.accept().await?;
         let io = TokioIo::new(stream);
+        let socket_path = socket_path.to_string();
 
         tokio::task::spawn(async move {
             if let Err(err) = http1::Builder::new()
                 .serve_connection(
                     io,
                     service_fn(|request| {
-                        checks(
-                            request.uri().path().to_string(),
-                            SocketConfiguration::silent().socket_path,
-                        )
+                        checks(request.uri().path().to_string(), socket_path.clone())
                     }),
                 )
                 .await
@@ -68,13 +65,14 @@ mod serve {
     #[tokio::test]
     async fn responds_to_http_requests() {
         let path = "127.0.0.1:8085";
+        let socket_path = "socket/path";
         let result = tokio::select! {
             r = async {
                 tokio::time::sleep(Duration::from_millis(100)).await;
                 reqwest::get(&format!("http://{}/health", path)).await.unwrap().status()
             } => Some(r),
             _ = async {
-                serve(path).await.unwrap()
+                serve(path, socket_path).await.unwrap()
             } => None
         };
         assert_eq!(result, Some(StatusCode::OK));
