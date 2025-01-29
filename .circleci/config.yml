@@ -764,6 +764,13 @@ jobs:
               --set "encryption.output=true" \
               --set "socket.name=static-vault-kms-provider.sock" > $ENCRYPTION_CONFIG
       - run:
+          name: Deploy test infrastructure
+          command: |
+            helm install vault-kms-provider ./helm \
+              -f test_files/values.yaml \
+              -f test_files/static/values.yaml \
+              --set "image.tag=$(cat /tmp/workspace/docker_tag)"
+      - run:
           name: Restart kubernetes
           command: sudo systemctl start k3s
       - run:
@@ -772,7 +779,7 @@ jobs:
       - run:
           name: Run e2e tests against the static pod
           command: |
-            helm test vault-kms-provider --logs -f test_files/values.yaml \
+            helm test vault-kms-provider --logs \
               --set "image.tag=$(cat /tmp/workspace/docker_tag)"
 
   publish_amd:
