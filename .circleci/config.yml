@@ -739,7 +739,7 @@ jobs:
       - run:
           name: Add static configuration
           command: |
-            mkdir -p /var/lib/rancher/k3s/agent/pod-manifests
+            sudo mkdir -p /var/lib/rancher/k3s/agent/pod-manifests
             sudo cp test_files/vault-kms-provider.yaml /var/lib/rancher/k3s/agent/pod-manifests/static-vault-kms-provider.yaml
       - run:
           name: Create encryption configuration file
