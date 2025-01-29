@@ -749,8 +749,8 @@ jobs:
           command: |
             helm install vault-kms-provider ./helm -n vault --create-namespace \
               -f test_files/values.yaml \
-              -f test_files/static/values.yaml \
-              --set "image.tag=$(cat /tmp/workspace/docker_tag)"
+              --set "serviceAccount.create=false" \
+              --set "image.tag=$(cat /tmp/workspace/docker_tag)" \
       - run:
           name: Start vault
           command: just
