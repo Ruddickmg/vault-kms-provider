@@ -745,11 +745,6 @@ jobs:
           name: Grant permissions on kube config
           command: sudo chown $USER:$USER $KUBECONFIG
       - run:
-          name: Deploy test infrastructure
-          command: |
-            helm install vault-kms-provider ./helm -n vault --create-namespace -f test_files/values.yaml \
-              --set "image.tag=$(cat /tmp/workspace/docker_tag)"
-      - run:
           name: Start vault
           command: just
       - run:
@@ -777,7 +772,8 @@ jobs:
       - run:
           name: Run e2e tests against the static pod
           command: |
-            helm test vault-kms-provider -n vault --logs
+            helm test vault-kms-provider -n vault --logs --create-namespace -f test_files/values.yaml \
+              --set "image.tag=$(cat /tmp/workspace/docker_tag)"
 
   publish_amd:
     executor: ubuntu
