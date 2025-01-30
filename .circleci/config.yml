@@ -731,44 +731,63 @@ jobs:
           name: Run etcd
           command: docker compose -f ./test_files/docker-compose.etcd.yml up -d
       - run:
-          name: Update image tag
-          command: sed -i -e "s/vault-kms-provider:latest/vault-kms-provider:$(cat /tmp/workspace/docker_tag)/g" ./test_files/vault-kms-provider.yaml
+          name: Create encryption configuration file
+          command: |
+            mkdir /tmp/encryption
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" --set "encryption.enabled=false" > $ENCRYPTION_CONFIG
+      - run:
+          name: Install k3s
+          command: |
+            curl -sfL https://get.k3s.io | sh -s - \
+              --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG \
+              --kube-apiserver-arg=encryption-provider-config-automatic-reload=true
+      - run:
+          name: Grant permissions on kube config
+          command: sudo chown $USER:$USER $KUBECONFIG
+      - run:
+          name: Deploy test infrastructure
+          command: |
+            helm install vault-kms-provider ./helm -n vault --create-namespace -f test_files/values.yaml \
+              --set "image.tag=$(cat /tmp/workspace/docker_tag)"
       - run:
           name: Start vault
           command: just
       - run:
-          name: Move socket file to mount directory
-          command: sudo mv ./sockets/vault-kms-provider.sock /mnt/static-vault-kms-provider.sock
-      - run:
           name: Set permissions on mount directory
-          command: sudo chmod -R 777 /mnt
+          command: |
+            sudo chmod -R 777 /mnt
+      - run:
+          name: Update image tag
+          command: sed -i -e "s/vault-kms-provider:latest/vault-kms-provider:$(cat /tmp/workspace/docker_tag)/g" ./test_files/vault-kms-provider.yaml
       - run:
           name: Add static configuration
-          command: |
-            sudo mkdir -p /var/lib/rancher/k3s/agent/pod-manifests
-            sudo cp test_files/vault-kms-provider.yaml /var/lib/rancher/k3s/agent/pod-manifests/static-vault-kms-provider.yaml
+          command: sudo cp test_files/vault-kms-provider.yaml /var/lib/rancher/k3s/agent/pod-manifests/static-vault-kms-provider.yaml
       - run:
-          name: Create encryption configuration file
+          name: Switch to static vault kms provider
           command: |
-            mkdir /tmp/encryption
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm \
+              --set "encryption.output=true" \
+              --set "socket.name=static-vault-kms-provider.sock" > $ENCRYPTION_CONFIG
+      - run:
+          name: Restart kubernetes
+          command: sudo systemctl start k3s
+      - run:
+          name: Wait for startup
+          command: sleep 35
+      - run:
+          name: Encrypt all secrets
+          command: kubectl get secrets --all-namespaces -o json | kubectl replace -f -
+      - run:
+          name: Remove fallback
+          command: |
             helm template -s templates/configurations/encryption-configuration.yaml ./helm \
               --set "encryption.output=true" \
               --set "encryption.fallback=false" \
               --set "socket.name=static-vault-kms-provider.sock" > $ENCRYPTION_CONFIG
       - run:
-          name: Install k3s
-          command: |
-            curl -sfL https://get.k3s.io | sh -s - \
-              --kube-apiserver-arg=encryption-provider-config=$ENCRYPTION_CONFIG
-      - run:
-          name: Grant permissions on kube config
-          command: sudo chown $USER:$USER $KUBECONFIG
-      - run:
-          name: Set up test infrastructure
-          command: helm install vault-kms-provider ./helm -f test_files/values.yaml --create-namespace -n vault -set "replicas=0"
-      - run:
           name: Run e2e tests against the static pod
-          command: helm test vault-kms-provider -n vault --logs
+          command: |
+            helm test vault-kms-provider -n vault --logs
 
   publish_amd:
     executor: ubuntu
