@@ -734,6 +734,15 @@ jobs:
           name: Update image tag
           command: sed -i -e "s/vault-kms-provider:latest/vault-kms-provider:$(cat /tmp/workspace/docker_tag)/g" ./test_files/vault-kms-provider.yaml
       - run:
+          name: Start vault
+          command: just
+      - run:
+          name: Move socket file to mount directory
+          command: sudo cp ./sockets/vault-kms-provider.sock /mnt/static-vault-kms-provider.sock
+      - run:
+          name: Set permissions on mount directory
+          command: sudo chmod -R 777 /mnt
+      - run:
           name: Add static configuration
           command: |
             sudo mkdir -p /var/lib/rancher/k3s/agent/pod-manifests
@@ -754,15 +763,6 @@ jobs:
       - run:
           name: Grant permissions on kube config
           command: sudo chown $USER:$USER $KUBECONFIG
-      - run:
-          name: Start vault
-          command: just
-      - run:
-          name: Move socket file to mount directory
-          command: sudo cp ./sockets/vault-kms-provider.sock /mnt/static-vault-kms-provider.sock
-      - run:
-          name: Set permissions on mount directory
-          command: sudo chmod -R 777 /mnt
       - run:
           name: Set up test infrastructure
           command: helm install vault-kms-provider ./helm -f test_files/values.yaml --create-namespace -n vault -set "replicas=0"
