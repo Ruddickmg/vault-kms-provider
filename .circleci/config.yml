@@ -785,6 +785,9 @@ jobs:
               --set "encryption.fallback=false" \
               --set "socket.name=static-vault-kms-provider.sock" > $ENCRYPTION_CONFIG
       - run:
+          name: Wait for startup
+          command: sleep 10
+      - run:
           name: Run e2e tests against the static pod
           command: |
             helm test vault-kms-provider -n vault --logs
