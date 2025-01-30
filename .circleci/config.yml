@@ -738,7 +738,7 @@ jobs:
           command: just
       - run:
           name: Move socket file to mount directory
-          command: sudo cp ./sockets/vault-kms-provider.sock /mnt/static-vault-kms-provider.sock
+          command: sudo mv ./sockets/vault-kms-provider.sock /mnt/static-vault-kms-provider.sock
       - run:
           name: Set permissions on mount directory
           command: sudo chmod -R 777 /mnt
