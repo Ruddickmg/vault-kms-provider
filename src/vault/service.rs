@@ -12,6 +12,7 @@ use tonic::{Code, Request, Response, Status};
 use tracing::{debug, error, info, instrument};
 
 const OKAY_RESPONSE: &str = "ok";
+const API_VERSION: &str = "v2";
 
 pub struct VaultKmsServer {
     client: Arc<RwLock<client::Client>>,
@@ -53,7 +54,7 @@ impl KeyManagementService for VaultKmsServer {
         let client = self.client.read().await;
         Ok(client.request_key().await.map(|key| {
             Response::new(StatusResponse {
-                version: key.version,
+                version: API_VERSION.to_string(),
                 key_id: key.id,
                 healthz: OKAY_RESPONSE.to_string(),
             })

@@ -554,6 +554,7 @@ jobs:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       SOCKET_FILE: /mnt/vault-kms-provider.sock
       ENCRYPTION_CONFIG: /tmp/encryption/configuration.yaml
+      INSTALL_K3S_VERSION: v1.32.1+k3s1
       K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
       K3S_DATASTORE_CAFILE: /tmp/certs/ca.crt
       K3S_DATASTORE_CERTFILE: /tmp/certs/tls.crt
@@ -685,7 +686,7 @@ jobs:
             helm template -s templates/configurations/encryption-configuration.yaml ./helm --set "encryption.output=true" > $ENCRYPTION_CONFIG
       - run:
           name: Wait for startup
-          command: sleep 10
+          command: sleep 35
       - run:
           name: Run e2e tests against helm deployment
           command: |
@@ -698,6 +699,7 @@ jobs:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       SOCKET_FILE: /mnt/vault-kms-provider.sock
       ENCRYPTION_CONFIG: /tmp/encryption/configuration.yaml
+      INSTALL_K3S_VERSION: v1.32.1+k3s1
       K3S_DATASTORE_ENDPOINT: https://127.0.0.1:2379
       K3S_DATASTORE_CAFILE: /tmp/certs/ca.crt
       K3S_DATASTORE_CERTFILE: /tmp/certs/tls.crt
@@ -771,7 +773,17 @@ jobs:
           command: sudo systemctl start k3s
       - run:
           name: Wait for startup
-          command: sleep 10
+          command: sleep 35
+      - run:
+          name: Encrypt all secrets
+          command: kubectl get secrets --all-namespaces -o json | kubectl replace -f -
+      - run:
+          name: Remove fallback
+          command: |
+            helm template -s templates/configurations/encryption-configuration.yaml ./helm \
+              --set "encryption.output=true" \
+              --set "encryption.fallback=false" \
+              --set "socket.name=static-vault-kms-provider.sock" > $ENCRYPTION_CONFIG
       - run:
           name: Run e2e tests against the static pod
           command: |

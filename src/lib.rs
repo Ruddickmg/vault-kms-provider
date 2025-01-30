@@ -45,7 +45,7 @@ pub async fn server(
                 .await
                 .map_err(|error| std::io::Error::other(error.to_string()))
         },
-        checks::serve(&health_config.endpoint),
+        checks::serve(&health_config.endpoint, &socket_config.socket_path),
         watcher::watch_credentials(vault_config.credentials, client)
     )?;
     Ok(())

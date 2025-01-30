@@ -21,9 +21,6 @@ All commits must use conventional commit messages to ensure versioning happens c
 - [ ] Encryption
   - [ ] Support convergent encryption
   - [ ] Support key derivation
-- [ ] Testing (Waiting on Kubernetes 1.32.0 release)
-  - [ ] Finish e2e tests
-  - [ ] Check that secrets are encrypted
 
 ## Testing
 
@@ -77,6 +74,11 @@ The tests will need to be able to make requests to etcd. In order to communicate
 Once the vault KMS provider has been set up, you can run the tests with the following command:
 ```shell
 helm test vault-kms-provider
+```
+
+K3s can be debugged using the following command:
+```shell
+journalctl -xefu k3s.service
 ```
 
 ## Tls
