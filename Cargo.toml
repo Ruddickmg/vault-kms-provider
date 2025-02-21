@@ -16,8 +16,8 @@ notify = "7.0.0"
 prost = "0.13.3"
 prost-derive = "0.13.3"
 reqwest = { version = "0.11.27", features = ["rustls"], default-features = false }
-strum = "0.26.3"
-strum_macros = "0.26.4"
+strum = "0.27.0"
+strum_macros = "0.27.0"
 tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
 tokio-stream = { version = "0.1.16", features = ["net"] }
 tonic = "0.12.3"
