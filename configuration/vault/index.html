@@ -130,32 +130,32 @@
 </div>
 <h3>Encryption</h3>
 <p>Enable the transit gateway in Vault for encryption/decryption of data for Kubernetes.</p>
-<pre class="language-shell"><code class="language-shell">vault secrets <span class="token builtin class-name">enable</span> transit</code></pre>
+<pre class="language-shell"><code class="language-shell">vault secrets enable transit</code></pre>
 <p>Create a policy granting the permissions to the KMS provider to encrypt/decrypt data.</p>
 <p><code>./transit.hcl</code></p>
-<pre class="language-hcl"><code class="language-hcl">path <span class="token string">"/transit/decrypt/vault-kms-provider"</span> <span class="token punctuation">{</span>
-  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"update"</span>, <span class="token string">"create"</span><span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
-path <span class="token string">"/transit/encrypt/vault-kms-provider"</span> <span class="token punctuation">{</span>
-  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"update"</span>, <span class="token string">"create"</span><span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
-path <span class="token string">"/transit/keys/vault-kms-provider"</span> <span class="token punctuation">{</span>
-  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"read"</span><span class="token punctuation">]</span>
-<span class="token punctuation">}</span></code></pre>
+<pre class="language-hcl"><code class="language-hcl">path "/transit/decrypt/vault-kms-provider" {
+  capabilities = ["update", "create"]
+}
+path "/transit/encrypt/vault-kms-provider" {
+  capabilities = ["update", "create"]
+}
+path "/transit/keys/vault-kms-provider" {
+  capabilities = ["read"]
+}</code></pre>
 <p>Add the policy to vault</p>
-<pre class="language-shell"><code class="language-shell">vault policy <span class="token function">write</span> vault-kms-provider transit.hcl</code></pre>
+<pre class="language-shell"><code class="language-shell">vault policy write vault-kms-provider transit.hcl</code></pre>
 <h3>Authentication</h3>
 <p>Enable authentication via kubernetes</p>
-<pre class="language-shell"><code class="language-shell">vault auth <span class="token builtin class-name">enable</span> kubernetes</code></pre>
+<pre class="language-shell"><code class="language-shell">vault auth enable kubernetes</code></pre>
 <p>Set the host URL to the kubernetes API</p>
-<pre class="language-shell"><code class="language-shell">vault <span class="token function">write</span> auth/kubernetes/config <span class="token assign-left variable">kubernetes_host</span><span class="token operator">=</span><span class="token string">"https://kubernetes.default.svc/"</span></code></pre>
+<pre class="language-shell"><code class="language-shell">vault write auth/kubernetes/config kubernetes_host="https://kubernetes.default.svc/"</code></pre>
 <p>Create a role for the KMS provider's service account so that it can authenticate with vault.</p>
-<pre class="language-shell"><code class="language-shell">vault <span class="token function">write</span> auth/kubernetes/role/vault-kms-provider <span class="token punctuation">\</span>
-    <span class="token assign-left variable">bound_service_account_names</span><span class="token operator">=</span>vault-kms-provider <span class="token punctuation">\</span>
-    <span class="token assign-left variable">bound_service_account_namespaces</span><span class="token operator">=</span>default <span class="token punctuation">\</span>
-    <span class="token assign-left variable">audience</span><span class="token operator">=</span>vault <span class="token punctuation">\</span>
-    <span class="token assign-left variable">token_policies</span><span class="token operator">=</span>vault-kms-provider <span class="token punctuation">\</span>
-    <span class="token assign-left variable">ttl</span><span class="token operator">=</span>1h</code></pre>
+<pre class="language-shell"><code class="language-shell">vault write auth/kubernetes/role/vault-kms-provider \
+    bound_service_account_names=vault-kms-provider \
+    bound_service_account_namespaces=default \
+    audience=vault \
+    token_policies=vault-kms-provider \
+    ttl=1h</code></pre>
 <p>With vault configured you should be able to deploy the vault-kms-provider to kubernetes without error.</p>
 
 </div>

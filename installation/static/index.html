@@ -136,29 +136,29 @@
 </ul>
 </div>
 <p>Create a static pod configuration for the vault KMS provider, example below.</p>
-<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
-<span class="token key atrule">kind</span><span class="token punctuation">:</span> Pod
-<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
-  <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider
-  <span class="token key atrule">labels</span><span class="token punctuation">:</span>
-    <span class="token key atrule">app</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider
-<span class="token key atrule">spec</span><span class="token punctuation">:</span>
-  <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
-    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider<span class="token punctuation">-</span>socket
-      <span class="token key atrule">hostPath</span><span class="token punctuation">:</span>
-        <span class="token key atrule">path</span><span class="token punctuation">:</span> /mnt
-        <span class="token key atrule">type</span><span class="token punctuation">:</span> Directory
-  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
-    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider
-      <span class="token key atrule">image</span><span class="token punctuation">:</span> <span class="token string">"ruddickmg/vault-kms-provider:latest"</span>
-      <span class="token key atrule">env</span><span class="token punctuation">:</span>
-        <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> SOCKET_PATH
-          <span class="token key atrule">value</span><span class="token punctuation">:</span> <span class="token string">"/sockets/vault-kms-provider.sock"</span>
-      <span class="token key atrule">volumeMounts</span><span class="token punctuation">:</span>
-        <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider<span class="token punctuation">-</span>socket
-          <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> /sockets</code></pre>
+<pre class="language-yaml"><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: vault-kms-provider
+  labels:
+    app: vault-kms-provider
+spec:
+  volumes:
+    - name: vault-kms-provider-socket
+      hostPath:
+        path: /mnt
+        type: Directory
+  containers:
+    - name: vault-kms-provider
+      image: "ruddickmg/vault-kms-provider:latest"
+      env:
+        - name: SOCKET_PATH
+          value: "/sockets/vault-kms-provider.sock"
+      volumeMounts:
+        - name: vault-kms-provider-socket
+          mountPath: /sockets</code></pre>
 <p>Move the configuration file to <code>/etc/kubernetes/manifest</code></p>
-<pre class="language-shell"><code class="language-shell"><span class="token function">mv</span> /path/to/static-vault-kms-provider-config.yaml /etc/kubernetes/manifest</code></pre>
+<pre class="language-shell"><code class="language-shell">mv /path/to/static-vault-kms-provider-config.yaml /etc/kubernetes/manifest</code></pre>
 <p>Restart kubernetes</p>
 <pre class="language-shell"><code class="language-shell">systemctl restart kubelet</code></pre>
 

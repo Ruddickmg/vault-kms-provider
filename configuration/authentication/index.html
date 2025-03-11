@@ -135,57 +135,57 @@
 <li><a href="https://developer.hashicorp.com/vault/docs/auth/cert">Certificate</a></li>
 </ul>
 <p>Configuration of auth methods is done using the environment variables listed below.</p>
-<pre class="language-hcl"><code class="language-hcl"><span class="token comment"># Path defined for the authentication route, ex: auth/custom-auth-path/...</span>
-<span class="token comment">#  if not set, will default to the associated auth method, ex: auth/userpass/.. or auth/kubernetes/..</span>
-<span class="token property">VAULT_AUTH_MOUNT</span> <span class="token punctuation">=</span> <span class="token string">"custom-auth-path"</span>
+<pre class="language-hcl"><code class="language-hcl"># Path defined for the authentication route, ex: auth/custom-auth-path/...
+#  if not set, will default to the associated auth method, ex: auth/userpass/.. or auth/kubernetes/..
+VAULT_AUTH_MOUNT = "custom-auth-path"
 
-<span class="token comment"># Vault token for vault access</span>
-<span class="token property">VAULT_TOKEN</span> <span class="token punctuation">=</span> <span class="token string">"SiQOECxwSDCeQt1r0n5kqQCr"</span>
-<span class="token comment"># path to file containing vault token</span>
-<span class="token property">VAULT_TOKEN_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/vault/token"</span>
+# Vault token for vault access
+VAULT_TOKEN = "SiQOECxwSDCeQt1r0n5kqQCr"
+# path to file containing vault token
+VAULT_TOKEN_PATH = "/path/to/vault/token"
 
-<span class="token comment"># user and password for userpass authentication</span>
-<span class="token property">VAULT_USER</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
-<span class="token property">VAULT_PASSWORD</span> <span class="token punctuation">=</span> <span class="token string">"some-password"</span>
-<span class="token comment"># path to file containing vault password</span>
-<span class="token property">VAULT_PASSWORD_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/vault/password"</span>
+# user and password for userpass authentication
+VAULT_USER = "vault-kms-provider"
+VAULT_PASSWORD = "some-password"
+# path to file containing vault password
+VAULT_PASSWORD_PATH = "/path/to/vault/password"
 
-<span class="token comment"># path to mounted JWT for kubernetes auth</span>
-<span class="token property">VAULT_KUBERNETES_JWT_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/vault.jwt"</span>
-<span class="token comment"># jwt for kubernetes auth</span>
-<span class="token property">VAULT_KUBERNETES_JWT</span> <span class="token punctuation">=</span> <span class="token string">"jwt"</span>
-<span class="token comment"># role for kubernetes auth </span>
-<span class="token property">VAULT_KUBERNETES_ROLE</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
+# path to mounted JWT for kubernetes auth
+VAULT_KUBERNETES_JWT_PATH = "/path/to/vault.jwt"
+# jwt for kubernetes auth
+VAULT_KUBERNETES_JWT = "jwt"
+# role for kubernetes auth 
+VAULT_KUBERNETES_ROLE = "vault-kms-provider"
 
-<span class="token comment"># role_id and secret_id for approle authentication</span>
-<span class="token property">VAULT_ROLE_ID</span> <span class="token punctuation">=</span> <span class="token string">"role"</span>
-<span class="token property">VAULT_SECRET_ID</span> <span class="token punctuation">=</span> <span class="token string">"secret"</span>
-<span class="token comment"># path to file containing secret id</span>
-<span class="token property">VAULT_SECRET_ID_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/secret/id"</span>
+# role_id and secret_id for approle authentication
+VAULT_ROLE_ID = "role"
+VAULT_SECRET_ID = "secret"
+# path to file containing secret id
+VAULT_SECRET_ID_PATH = "/path/to/secret/id"
 
-<span class="token comment"># jwt for jwt auth</span>
-<span class="token property">VAULT_JWT</span> <span class="token punctuation">=</span> <span class="token string">"jwt"</span>
-<span class="token comment"># path to mounted jwt for jwt auth</span>
-<span class="token property">VAULT_JWT_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/jwt"</span>
-<span class="token comment"># role for jwt, optional</span>
-<span class="token property">VAULT_JWT_ROLE</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
+# jwt for jwt auth
+VAULT_JWT = "jwt"
+# path to mounted jwt for jwt auth
+VAULT_JWT_PATH = "/path/to/jwt"
+# role for jwt, optional
+VAULT_JWT_ROLE = "vault-kms-provider"
 
-<span class="token comment"># name of the trusted certificate created in vault for authentication</span>
-<span class="token property">VAULT_CERTIFICATE_NAME</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
-<span class="token comment"># path to client cert and key for certificate authentication</span>
-<span class="token property">VAULT_CLIENT_CERT</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/client/public.crt"</span>
-<span class="token property">VAULT_CLIENT_KEY</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/client/private.key"</span></code></pre>
+# name of the trusted certificate created in vault for authentication
+VAULT_CERTIFICATE_NAME = "vault-kms-provider"
+# path to client cert and key for certificate authentication
+VAULT_CLIENT_CERT = "/path/to/client/public.crt"
+VAULT_CLIENT_KEY = "/path/to/client/private.key"</code></pre>
 <p>Environment variables can be configured using the <code>env</code> property in the values.yaml, ex:</p>
-<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">env</span><span class="token punctuation">:</span>
-  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> VAULT_TOKEN
-    <span class="token key atrule">valueFrom</span><span class="token punctuation">:</span>
-      <span class="token key atrule">secretKeyRef</span><span class="token punctuation">:</span>
-        <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>token<span class="token punctuation">-</span>secret
-        <span class="token key atrule">key</span><span class="token punctuation">:</span> token</code></pre>
+<pre class="language-yaml"><code class="language-yaml">env:
+  - name: VAULT_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: vault-token-secret
+        key: token</code></pre>
 <p>The <code>envFrom</code> property is also configurable in the values.yaml file, allowing configMaps, etc to be added. ex:</p>
-<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">envFrom</span><span class="token punctuation">:</span>
-  <span class="token punctuation">-</span> <span class="token key atrule">configMapRef</span><span class="token punctuation">:</span>
-    <span class="token key atrule">name</span><span class="token punctuation">:</span> my<span class="token punctuation">-</span>custom<span class="token punctuation">-</span>config<span class="token punctuation">-</span>map</code></pre>
+<pre class="language-yaml"><code class="language-yaml">envFrom:
+  - configMapRef:
+    name: my-custom-config-map</code></pre>
 
 </div>
 

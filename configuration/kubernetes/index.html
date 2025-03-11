@@ -129,27 +129,27 @@
 </div>
 <p>Create an encryption configuration for the Kubernetes api server</p>
 <p><code>./encryption-configuration.yaml</code></p>
-<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> apiserver.config.k8s.io/v1
-<span class="token key atrule">kind</span><span class="token punctuation">:</span> EncryptionConfiguration
-<span class="token key atrule">resources</span><span class="token punctuation">:</span>
-  <span class="token punctuation">-</span> <span class="token key atrule">resources</span><span class="token punctuation">:</span>
-      <span class="token punctuation">-</span> secrets
-    <span class="token key atrule">providers</span><span class="token punctuation">:</span>
-      <span class="token punctuation">-</span> <span class="token key atrule">kms</span><span class="token punctuation">:</span>
-          <span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v2
-          <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider
-          <span class="token key atrule">endpoint</span><span class="token punctuation">:</span> unix<span class="token punctuation">:</span>///mnt/vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider.sock
-          <span class="token key atrule">timeout</span><span class="token punctuation">:</span> 3s
-      <span class="token punctuation">-</span> <span class="token key atrule">identity</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
+<pre class="language-yaml"><code class="language-yaml">apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+    providers:
+      - kms:
+          apiVersion: v2
+          name: vault-kms-provider
+          endpoint: unix:///mnt/vault-kms-provider.sock
+          timeout: 3s
+      - identity: {}</code></pre>
 <p>Point the api server to your encryption configuration</p>
 <p><code>/etc/kubernetes/manifests/kube-apiserver.yaml</code></p>
-<pre class="language-yaml"><code class="language-yaml"><span class="token comment"># add these commands to your Kubernetes api server configuration</span>
-<span class="token key atrule">spec</span><span class="token punctuation">:</span>
-  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
-    <span class="token punctuation">-</span> <span class="token key atrule">command</span><span class="token punctuation">:</span>
-        <span class="token punctuation">-</span> kube<span class="token punctuation">-</span>apiserver
-        <span class="token comment"># Point to your encryption file</span>
-        <span class="token punctuation">-</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>encryption<span class="token punctuation">-</span>provider<span class="token punctuation">-</span>config="/path/to/your/encryption<span class="token punctuation">-</span>configuration.yaml"</code></pre>
+<pre class="language-yaml"><code class="language-yaml"># add these commands to your Kubernetes api server configuration
+spec:
+  containers:
+    - command:
+        - kube-apiserver
+        # Point to your encryption file
+        - --encryption-provider-config="/path/to/your/encryption-configuration.yaml"</code></pre>
 <p>This is done in differently in some flavors of kubernetes, if yours is different, consult the documentation of your Kubernetes distro for instructions on how to point Kubernetes to your configuration file.</p>
 
 </div>
