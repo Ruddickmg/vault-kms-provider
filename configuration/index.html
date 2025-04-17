@@ -10,7 +10,6 @@
         <link rel="icon" type="image/png" sizes="16x16" href="https://vault-kms-provider.io/assets/favicon-16x16.png">
         <link rel="manifest" href="https://vault-kms-provider.io/assets/site.webmanifest">
         <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
-        <link href="https://unpkg.com/prismjs@1.20.0/themes/prism-solarizedlight.css" rel="stylesheet"/>
     </head>
     <body style="background-color: #ffffff">
         <div class = "github-link">
@@ -46,6 +45,25 @@
                
            
                
+                   
+               
+           
+               
+                   
+                   <div>
+                     
+                       <h2>Benchmarks</h2>
+                     
+                     <ul>
+                       
+                         <li><a href=/benchmarks/health/>Health</a></li>
+                       
+                         <li><a href=/benchmarks/encryption/>Encryption</a></li>
+                       
+                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
+                       
+                     </ul>
+                   </div>
                    
                
            
@@ -97,25 +115,6 @@
                    
                
            
-               
-                   
-                   <div>
-                     
-                       <h2>Benchmarks</h2>
-                     
-                     <ul>
-                       
-                         <li><a href=/benchmarks/health/>Health</a></li>
-                       
-                         <li><a href=/benchmarks/encryption/>Encryption</a></li>
-                       
-                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
-                       
-                     </ul>
-                   </div>
-                   
-               
-           
        </div>
     </div>
     <div class="content">
@@ -137,57 +136,57 @@
 <li><a href="https://developer.hashicorp.com/vault/docs/auth/cert">Certificate</a></li>
 </ul>
 <p>Configuration of auth methods is done using the environment variables listed below.</p>
-<pre class="language-hcl"><code class="language-hcl"># Path defined for the authentication route, ex: auth/custom-auth-path/...
-#  if not set, will default to the associated auth method, ex: auth/userpass/.. or auth/kubernetes/..
-VAULT_AUTH_MOUNT = "custom-auth-path"
+<pre class="language-hcl"><code class="language-hcl"><span class="token comment"># Path defined for the authentication route, ex: auth/custom-auth-path/...</span>
+<span class="token comment">#  if not set, will default to the associated auth method, ex: auth/userpass/.. or auth/kubernetes/..</span>
+<span class="token property">VAULT_AUTH_MOUNT</span> <span class="token punctuation">=</span> <span class="token string">"custom-auth-path"</span>
 
-# Vault token for vault access
-VAULT_TOKEN = "SiQOECxwSDCeQt1r0n5kqQCr"
-# path to file containing vault token
-VAULT_TOKEN_PATH = "/path/to/vault/token"
+<span class="token comment"># Vault token for vault access</span>
+<span class="token property">VAULT_TOKEN</span> <span class="token punctuation">=</span> <span class="token string">"SiQOECxwSDCeQt1r0n5kqQCr"</span>
+<span class="token comment"># path to file containing vault token</span>
+<span class="token property">VAULT_TOKEN_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/vault/token"</span>
 
-# user and password for userpass authentication
-VAULT_USER = "vault-kms-provider"
-VAULT_PASSWORD = "some-password"
-# path to file containing vault password
-VAULT_PASSWORD_PATH = "/path/to/vault/password"
+<span class="token comment"># user and password for userpass authentication</span>
+<span class="token property">VAULT_USER</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
+<span class="token property">VAULT_PASSWORD</span> <span class="token punctuation">=</span> <span class="token string">"some-password"</span>
+<span class="token comment"># path to file containing vault password</span>
+<span class="token property">VAULT_PASSWORD_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/vault/password"</span>
 
-# path to mounted JWT for kubernetes auth
-VAULT_KUBERNETES_JWT_PATH = "/path/to/vault.jwt"
-# jwt for kubernetes auth
-VAULT_KUBERNETES_JWT = "jwt"
-# role for kubernetes auth 
-VAULT_KUBERNETES_ROLE = "vault-kms-provider"
+<span class="token comment"># path to mounted JWT for kubernetes auth</span>
+<span class="token property">VAULT_KUBERNETES_JWT_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/vault.jwt"</span>
+<span class="token comment"># jwt for kubernetes auth</span>
+<span class="token property">VAULT_KUBERNETES_JWT</span> <span class="token punctuation">=</span> <span class="token string">"jwt"</span>
+<span class="token comment"># role for kubernetes auth </span>
+<span class="token property">VAULT_KUBERNETES_ROLE</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
 
-# role_id and secret_id for approle authentication
-VAULT_ROLE_ID = "role"
-VAULT_SECRET_ID = "secret"
-# path to file containing secret id
-VAULT_SECRET_ID_PATH = "/path/to/secret/id"
+<span class="token comment"># role_id and secret_id for approle authentication</span>
+<span class="token property">VAULT_ROLE_ID</span> <span class="token punctuation">=</span> <span class="token string">"role"</span>
+<span class="token property">VAULT_SECRET_ID</span> <span class="token punctuation">=</span> <span class="token string">"secret"</span>
+<span class="token comment"># path to file containing secret id</span>
+<span class="token property">VAULT_SECRET_ID_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/secret/id"</span>
 
-# jwt for jwt auth
-VAULT_JWT = "jwt"
-# path to mounted jwt for jwt auth
-VAULT_JWT_PATH = "/path/to/jwt"
-# role for jwt, optional
-VAULT_JWT_ROLE = "vault-kms-provider"
+<span class="token comment"># jwt for jwt auth</span>
+<span class="token property">VAULT_JWT</span> <span class="token punctuation">=</span> <span class="token string">"jwt"</span>
+<span class="token comment"># path to mounted jwt for jwt auth</span>
+<span class="token property">VAULT_JWT_PATH</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/jwt"</span>
+<span class="token comment"># role for jwt, optional</span>
+<span class="token property">VAULT_JWT_ROLE</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
 
-# name of the trusted certificate created in vault for authentication
-VAULT_CERTIFICATE_NAME = "vault-kms-provider"
-# path to client cert and key for certificate authentication
-VAULT_CLIENT_CERT = "/path/to/client/public.crt"
-VAULT_CLIENT_KEY = "/path/to/client/private.key"</code></pre>
+<span class="token comment"># name of the trusted certificate created in vault for authentication</span>
+<span class="token property">VAULT_CERTIFICATE_NAME</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
+<span class="token comment"># path to client cert and key for certificate authentication</span>
+<span class="token property">VAULT_CLIENT_CERT</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/client/public.crt"</span>
+<span class="token property">VAULT_CLIENT_KEY</span> <span class="token punctuation">=</span> <span class="token string">"/path/to/client/private.key"</span></code></pre>
 <p>Environment variables can be configured using the <code>env</code> property in the values.yaml, ex:</p>
-<pre class="language-yaml"><code class="language-yaml">env:
-  - name: VAULT_TOKEN
-    valueFrom:
-      secretKeyRef:
-        name: vault-token-secret
-        key: token</code></pre>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">env</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> VAULT_TOKEN
+    <span class="token key atrule">valueFrom</span><span class="token punctuation">:</span>
+      <span class="token key atrule">secretKeyRef</span><span class="token punctuation">:</span>
+        <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>token<span class="token punctuation">-</span>secret
+        <span class="token key atrule">key</span><span class="token punctuation">:</span> token</code></pre>
 <p>The <code>envFrom</code> property is also configurable in the values.yaml file, allowing configMaps, etc to be added. ex:</p>
-<pre class="language-yaml"><code class="language-yaml">envFrom:
-  - configMapRef:
-    name: my-custom-config-map</code></pre>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">envFrom</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">configMapRef</span><span class="token punctuation">:</span>
+    <span class="token key atrule">name</span><span class="token punctuation">:</span> my<span class="token punctuation">-</span>custom<span class="token punctuation">-</span>config<span class="token punctuation">-</span>map</code></pre>
 
 
 <h2>Configure Kubernetes</h2>
@@ -195,27 +194,27 @@ VAULT_CLIENT_KEY = "/path/to/client/private.key"</code></pre>
 </div>
 <p>Create an encryption configuration for the Kubernetes api server</p>
 <p><code>./encryption-configuration.yaml</code></p>
-<pre class="language-yaml"><code class="language-yaml">apiVersion: apiserver.config.k8s.io/v1
-kind: EncryptionConfiguration
-resources:
-  - resources:
-      - secrets
-    providers:
-      - kms:
-          apiVersion: v2
-          name: vault-kms-provider
-          endpoint: unix:///mnt/vault-kms-provider.sock
-          timeout: 3s
-      - identity: {}</code></pre>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> apiserver.config.k8s.io/v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> EncryptionConfiguration
+<span class="token key atrule">resources</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">resources</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> secrets
+    <span class="token key atrule">providers</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token key atrule">kms</span><span class="token punctuation">:</span>
+          <span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v2
+          <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider
+          <span class="token key atrule">endpoint</span><span class="token punctuation">:</span> unix<span class="token punctuation">:</span>///mnt/vault<span class="token punctuation">-</span>kms<span class="token punctuation">-</span>provider.sock
+          <span class="token key atrule">timeout</span><span class="token punctuation">:</span> 3s
+      <span class="token punctuation">-</span> <span class="token key atrule">identity</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
 <p>Point the api server to your encryption configuration</p>
 <p><code>/etc/kubernetes/manifests/kube-apiserver.yaml</code></p>
-<pre class="language-yaml"><code class="language-yaml"># add these commands to your Kubernetes api server configuration
-spec:
-  containers:
-    - command:
-        - kube-apiserver
-        # Point to your encryption file
-        - --encryption-provider-config="/path/to/your/encryption-configuration.yaml"</code></pre>
+<pre class="language-yaml"><code class="language-yaml"><span class="token comment"># add these commands to your Kubernetes api server configuration</span>
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">command</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> kube<span class="token punctuation">-</span>apiserver
+        <span class="token comment"># Point to your encryption file</span>
+        <span class="token punctuation">-</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>encryption<span class="token punctuation">-</span>provider<span class="token punctuation">-</span>config="/path/to/your/encryption<span class="token punctuation">-</span>configuration.yaml"</code></pre>
 <p>This is done in differently in some flavors of kubernetes, if yours is different, consult the documentation of your Kubernetes distro for instructions on how to point Kubernetes to your configuration file.</p>
 
 
@@ -224,29 +223,29 @@ spec:
 <div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>You can reference the helm <a href="https://github.com/Ruddickmg/vault-kms-provider/blob/main/helm/values.yaml">values.yaml</a> for a full list of configurations</p>
 </div>
 <p>When deploying via helm, it is important to ensure that the <code>vault.address</code> is set correctly.</p>
-<pre class="language-shell"><code class="language-shell">helm install vault-kms-provider --set "vault.address=https://vault.default.svc.cluster.local:8200"</code></pre>
+<pre class="language-shell"><code class="language-shell">helm <span class="token function">install</span> vault-kms-provider <span class="token parameter variable">--set</span> <span class="token string">"vault.address=https://vault.default.svc.cluster.local:8200"</span></code></pre>
 <p>Depending on the type of authentication you require you may want to disable the service account.</p>
-<pre class="language-shell"><code class="language-shell">helm install vault-kms-provider --set "serviceAccount.create=false"</code></pre>
+<pre class="language-shell"><code class="language-shell">helm <span class="token function">install</span> vault-kms-provider <span class="token parameter variable">--set</span> <span class="token string">"serviceAccount.create=false"</span></code></pre>
 <h3>Environment variables</h3>
 <p>Below are some general environment variables and their defaults for configuration of the KMS provider</p>
-<pre class="language-hcl"><code class="language-hcl"># Url of the vault service
-VAULT_ADDRESS = "https://vault.vault.svc.cluster.local:8200"
+<pre class="language-hcl"><code class="language-hcl"><span class="token comment"># Url of the vault service</span>
+<span class="token property">VAULT_ADDRESS</span> <span class="token punctuation">=</span> <span class="token string">"https://vault.vault.svc.cluster.local:8200"</span>
 
-# The endpoint that the health checks will listen on
-HEALTH_ENDPOINT = "0.0.0.0:8080"
+<span class="token comment"># The endpoint that the health checks will listen on</span>
+<span class="token property">HEALTH_ENDPOINT</span> <span class="token punctuation">=</span> <span class="token string">"0.0.0.0:8080"</span>
 
-# Path to the socket used for communication with the Kubernetes API server. Can be either abstract (@path/to/abstract.sock) or file path.
-# Abstract socket paths must be prefixed with the "@" symbol
-SOCKET_PATH = "./sockets/vault-kms-provider.sock"
+<span class="token comment"># Path to the socket used for communication with the Kubernetes API server. Can be either abstract (@path/to/abstract.sock) or file path.</span>
+<span class="token comment"># Abstract socket paths must be prefixed with the "@" symbol</span>
+<span class="token property">SOCKET_PATH</span> <span class="token punctuation">=</span> <span class="token string">"./sockets/vault-kms-provider.sock"</span>
 
-# The level of permissions granted to the socket (does not apply to abstract sockets)
-SOCKET_PERMISSIONS = "666"
+<span class="token comment"># The level of permissions granted to the socket (does not apply to abstract sockets)</span>
+<span class="token property">SOCKET_PERMISSIONS</span> <span class="token punctuation">=</span> <span class="token string">"666"</span>
 
-# The string identifier used to store the encryption keys in the vault transit gateway
-VAULT_TRANSIT_KEY = "vault-kms-provider"
+<span class="token comment"># The string identifier used to store the encryption keys in the vault transit gateway</span>
+<span class="token property">VAULT_TRANSIT_KEY</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
 
-# path defined for the transit gateway, ex: auth/transit/... or auth/transit-path/...
-VAULT_TRANSIT_MOUNT = "transit"</code></pre>
+<span class="token comment"># path defined for the transit gateway, ex: auth/transit/... or auth/transit-path/...</span>
+<span class="token property">VAULT_TRANSIT_MOUNT</span> <span class="token punctuation">=</span> <span class="token string">"transit"</span></code></pre>
 
 
 <h2>Set up TLS communication</h2>
@@ -254,48 +253,48 @@ VAULT_TRANSIT_MOUNT = "transit"</code></pre>
 </div>
 <h3>Add Vault's CA file(s) to the KMS provider</h3>
 <p>To allow TLS encrypted communication with vault, Vault's CA (certificate authority) file(s) need to be installed in the KMS provider. This can be set in the values.yaml for the helm chart.</p>
-<pre class="language-yaml"><code class="language-yaml">vault:
-  ca:
-    # full path to a specific CA file
-    file: "/path/to/ca.crt"
-    # full path to a directory containing CA file(s)
-    directory: "/path/to/ca/directory"</code></pre>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">vault</span><span class="token punctuation">:</span>
+  <span class="token key atrule">ca</span><span class="token punctuation">:</span>
+    <span class="token comment"># full path to a specific CA file</span>
+    <span class="token key atrule">file</span><span class="token punctuation">:</span> <span class="token string">"/path/to/ca.crt"</span>
+    <span class="token comment"># full path to a directory containing CA file(s)</span>
+    <span class="token key atrule">directory</span><span class="token punctuation">:</span> <span class="token string">"/path/to/ca/directory"</span></code></pre>
 <p>If you have a single CA file for vault, you can set a specific path to it.</p>
-<pre class="language-shell"><code class="language-shell">helm install vault-kms-provider --set "vault.ca.file=/path/to/ca.crt"</code></pre>
+<pre class="language-shell"><code class="language-shell">helm <span class="token function">install</span> vault-kms-provider <span class="token parameter variable">--set</span> <span class="token string">"vault.ca.file=/path/to/ca.crt"</span></code></pre>
 <p>If you have more than one file, or would rather just point to a directory, you can also specify a directory path. All certificates in the directory path will be installed in the KMS provider.</p>
-<pre class="language-shell"><code class="language-shell">helm install vault-kms-provider --set "vault.ca.directory=/path/to/directory"</code></pre>
+<pre class="language-shell"><code class="language-shell">helm <span class="token function">install</span> vault-kms-provider <span class="token parameter variable">--set</span> <span class="token string">"vault.ca.directory=/path/to/directory"</span></code></pre>
 <h3>Mount Vault's CA files into the KMS provider</h3>
 <p>In order for Vault's CA files to be installed, they must be present in the container, we can mount the CA file(s) by defining volumes and volumeMounts in our values.yaml.</p>
 <p>The following are examples of how to mount Vault CA file(s) into the KMS provider.</p>
 <div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>A full list of <a href="https://kubernetes.io/docs/concepts/storage/volumes/">mount options and documentation</a> can be found on the Kubernetes website. Chose what works best for your use case.</p>
 </div>
 <h4>Secrets</h4>
-<pre class="language-yaml"><code class="language-yaml">volumes:
-  # name of the volume, should match the volumeMount name
-  - name: vault-ca-certificate
-    secret:
-      # The name of the secret that contains the Vault CA certificate(s)
-      secretName: vault-ca-certs
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+  <span class="token comment"># name of the volume, should match the volumeMount name</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>ca<span class="token punctuation">-</span>certificate
+    <span class="token key atrule">secret</span><span class="token punctuation">:</span>
+      <span class="token comment"># The name of the secret that contains the Vault CA certificate(s)</span>
+      <span class="token key atrule">secretName</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>ca<span class="token punctuation">-</span>certs
 
-volumeMounts:
-  # Match with volume name
-  - name: vault-ca-certificate
-    # path where the files will be in the KMS provider
-    mountPath: /etc/ssl/certs</code></pre>
+<span class="token key atrule">volumeMounts</span><span class="token punctuation">:</span>
+  <span class="token comment"># Match with volume name</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>ca<span class="token punctuation">-</span>certificate
+    <span class="token comment"># path where the files will be in the KMS provider</span>
+    <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> /etc/ssl/certs</code></pre>
 <h4>Volumes</h4>
-<pre class="language-yaml"><code class="language-yaml">volumes:
-  # name of the volume, should match the volumeMount name
-  - name: vault-ca-certificates
-    hostPath:
-      # Path to the directory where the Vault CA certificate(s) are located on the host machine
-      path: /path/to/host/certificates
-      type: Directory
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+  <span class="token comment"># name of the volume, should match the volumeMount name</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>ca<span class="token punctuation">-</span>certificates
+    <span class="token key atrule">hostPath</span><span class="token punctuation">:</span>
+      <span class="token comment"># Path to the directory where the Vault CA certificate(s) are located on the host machine</span>
+      <span class="token key atrule">path</span><span class="token punctuation">:</span> /path/to/host/certificates
+      <span class="token key atrule">type</span><span class="token punctuation">:</span> Directory
 
-volumeMounts:
-  # Match with volume name
-  - name: vault-ca-certificate
-    # path where the files will be in the KMS provider
-    mountPath: /etc/ssl/certs</code></pre>
+<span class="token key atrule">volumeMounts</span><span class="token punctuation">:</span>
+  <span class="token comment"># Match with volume name</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>ca<span class="token punctuation">-</span>certificate
+    <span class="token comment"># path where the files will be in the KMS provider</span>
+    <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> /etc/ssl/certs</code></pre>
 
 
 <h2>Set up Vault</h2>
@@ -304,32 +303,32 @@ volumeMounts:
 </div>
 <h3>Encryption</h3>
 <p>Enable the transit gateway in Vault for encryption/decryption of data for Kubernetes.</p>
-<pre class="language-shell"><code class="language-shell">vault secrets enable transit</code></pre>
+<pre class="language-shell"><code class="language-shell">vault secrets <span class="token builtin class-name">enable</span> transit</code></pre>
 <p>Create a policy granting the permissions to the KMS provider to encrypt/decrypt data.</p>
 <p><code>./transit.hcl</code></p>
-<pre class="language-hcl"><code class="language-hcl">path "/transit/decrypt/vault-kms-provider" {
-  capabilities = ["update", "create"]
-}
-path "/transit/encrypt/vault-kms-provider" {
-  capabilities = ["update", "create"]
-}
-path "/transit/keys/vault-kms-provider" {
-  capabilities = ["read"]
-}</code></pre>
+<pre class="language-hcl"><code class="language-hcl">path <span class="token string">"/transit/decrypt/vault-kms-provider"</span> <span class="token punctuation">{</span>
+  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"update"</span>, <span class="token string">"create"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+path <span class="token string">"/transit/encrypt/vault-kms-provider"</span> <span class="token punctuation">{</span>
+  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"update"</span>, <span class="token string">"create"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+path <span class="token string">"/transit/keys/vault-kms-provider"</span> <span class="token punctuation">{</span>
+  <span class="token property">capabilities</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"read"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
 <p>Add the policy to vault</p>
-<pre class="language-shell"><code class="language-shell">vault policy write vault-kms-provider transit.hcl</code></pre>
+<pre class="language-shell"><code class="language-shell">vault policy <span class="token function">write</span> vault-kms-provider transit.hcl</code></pre>
 <h3>Authentication</h3>
 <p>Enable authentication via kubernetes</p>
-<pre class="language-shell"><code class="language-shell">vault auth enable kubernetes</code></pre>
+<pre class="language-shell"><code class="language-shell">vault auth <span class="token builtin class-name">enable</span> kubernetes</code></pre>
 <p>Set the host URL to the kubernetes API</p>
-<pre class="language-shell"><code class="language-shell">vault write auth/kubernetes/config kubernetes_host="https://kubernetes.default.svc/"</code></pre>
+<pre class="language-shell"><code class="language-shell">vault <span class="token function">write</span> auth/kubernetes/config <span class="token assign-left variable">kubernetes_host</span><span class="token operator">=</span><span class="token string">"https://kubernetes.default.svc/"</span></code></pre>
 <p>Create a role for the KMS provider's service account so that it can authenticate with vault.</p>
-<pre class="language-shell"><code class="language-shell">vault write auth/kubernetes/role/vault-kms-provider \
-    bound_service_account_names=vault-kms-provider \
-    bound_service_account_namespaces=default \
-    audience=vault \
-    token_policies=vault-kms-provider \
-    ttl=1h</code></pre>
+<pre class="language-shell"><code class="language-shell">vault <span class="token function">write</span> auth/kubernetes/role/vault-kms-provider <span class="token punctuation">\</span>
+    <span class="token assign-left variable">bound_service_account_names</span><span class="token operator">=</span>vault-kms-provider <span class="token punctuation">\</span>
+    <span class="token assign-left variable">bound_service_account_namespaces</span><span class="token operator">=</span>default <span class="token punctuation">\</span>
+    <span class="token assign-left variable">audience</span><span class="token operator">=</span>vault <span class="token punctuation">\</span>
+    <span class="token assign-left variable">token_policies</span><span class="token operator">=</span>vault-kms-provider <span class="token punctuation">\</span>
+    <span class="token assign-left variable">ttl</span><span class="token operator">=</span>1h</code></pre>
 <p>With vault configured you should be able to deploy the vault-kms-provider to kubernetes without error.</p>
 
 

@@ -10,7 +10,6 @@
         <link rel="icon" type="image/png" sizes="16x16" href="https://vault-kms-provider.io/assets/favicon-16x16.png">
         <link rel="manifest" href="https://vault-kms-provider.io/assets/site.webmanifest">
         <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
-        <link href="https://unpkg.com/prismjs@1.20.0/themes/prism-solarizedlight.css" rel="stylesheet"/>
     </head>
     <body style="background-color: #ffffff">
         <div class = "github-link">
@@ -46,6 +45,25 @@
                
            
                
+                   
+               
+           
+               
+                   
+                   <div>
+                     
+                       <h2>Benchmarks</h2>
+                     
+                     <ul>
+                       
+                         <li><a href=/benchmarks/health/>Health</a></li>
+                       
+                         <li><a href=/benchmarks/encryption/>Encryption</a></li>
+                       
+                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
+                       
+                     </ul>
+                   </div>
                    
                
            
@@ -97,25 +115,6 @@
                    
                
            
-               
-                   
-                   <div>
-                     
-                       <h2>Benchmarks</h2>
-                     
-                     <ul>
-                       
-                         <li><a href=/benchmarks/health/>Health</a></li>
-                       
-                         <li><a href=/benchmarks/encryption/>Encryption</a></li>
-                       
-                         <li><a href=/benchmarks/decryption/>Decryption</a></li>
-                       
-                     </ul>
-                   </div>
-                   
-               
-           
        </div>
     </div>
     <div class="content">
@@ -129,29 +128,29 @@
 <div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>You can reference the helm <a href="https://github.com/Ruddickmg/vault-kms-provider/blob/main/helm/values.yaml">values.yaml</a> for a full list of configurations</p>
 </div>
 <p>When deploying via helm, it is important to ensure that the <code>vault.address</code> is set correctly.</p>
-<pre class="language-shell"><code class="language-shell">helm install vault-kms-provider --set "vault.address=https://vault.default.svc.cluster.local:8200"</code></pre>
+<pre class="language-shell"><code class="language-shell">helm <span class="token function">install</span> vault-kms-provider <span class="token parameter variable">--set</span> <span class="token string">"vault.address=https://vault.default.svc.cluster.local:8200"</span></code></pre>
 <p>Depending on the type of authentication you require you may want to disable the service account.</p>
-<pre class="language-shell"><code class="language-shell">helm install vault-kms-provider --set "serviceAccount.create=false"</code></pre>
+<pre class="language-shell"><code class="language-shell">helm <span class="token function">install</span> vault-kms-provider <span class="token parameter variable">--set</span> <span class="token string">"serviceAccount.create=false"</span></code></pre>
 <h3>Environment variables</h3>
 <p>Below are some general environment variables and their defaults for configuration of the KMS provider</p>
-<pre class="language-hcl"><code class="language-hcl"># Url of the vault service
-VAULT_ADDRESS = "https://vault.vault.svc.cluster.local:8200"
+<pre class="language-hcl"><code class="language-hcl"><span class="token comment"># Url of the vault service</span>
+<span class="token property">VAULT_ADDRESS</span> <span class="token punctuation">=</span> <span class="token string">"https://vault.vault.svc.cluster.local:8200"</span>
 
-# The endpoint that the health checks will listen on
-HEALTH_ENDPOINT = "0.0.0.0:8080"
+<span class="token comment"># The endpoint that the health checks will listen on</span>
+<span class="token property">HEALTH_ENDPOINT</span> <span class="token punctuation">=</span> <span class="token string">"0.0.0.0:8080"</span>
 
-# Path to the socket used for communication with the Kubernetes API server. Can be either abstract (@path/to/abstract.sock) or file path.
-# Abstract socket paths must be prefixed with the "@" symbol
-SOCKET_PATH = "./sockets/vault-kms-provider.sock"
+<span class="token comment"># Path to the socket used for communication with the Kubernetes API server. Can be either abstract (@path/to/abstract.sock) or file path.</span>
+<span class="token comment"># Abstract socket paths must be prefixed with the "@" symbol</span>
+<span class="token property">SOCKET_PATH</span> <span class="token punctuation">=</span> <span class="token string">"./sockets/vault-kms-provider.sock"</span>
 
-# The level of permissions granted to the socket (does not apply to abstract sockets)
-SOCKET_PERMISSIONS = "666"
+<span class="token comment"># The level of permissions granted to the socket (does not apply to abstract sockets)</span>
+<span class="token property">SOCKET_PERMISSIONS</span> <span class="token punctuation">=</span> <span class="token string">"666"</span>
 
-# The string identifier used to store the encryption keys in the vault transit gateway
-VAULT_TRANSIT_KEY = "vault-kms-provider"
+<span class="token comment"># The string identifier used to store the encryption keys in the vault transit gateway</span>
+<span class="token property">VAULT_TRANSIT_KEY</span> <span class="token punctuation">=</span> <span class="token string">"vault-kms-provider"</span>
 
-# path defined for the transit gateway, ex: auth/transit/... or auth/transit-path/...
-VAULT_TRANSIT_MOUNT = "transit"</code></pre>
+<span class="token comment"># path defined for the transit gateway, ex: auth/transit/... or auth/transit-path/...</span>
+<span class="token property">VAULT_TRANSIT_MOUNT</span> <span class="token punctuation">=</span> <span class="token string">"transit"</span></code></pre>
 
 </div>
 
