@@ -1,5 +1,6 @@
 @use 'markdown-it-github-alerts/styles/github-base.css';
 @use 'markdown-it-github-alerts/styles/github-colors-light.css';
+@use 'prism-themes/themes/prism-one-light.min.css';
 @use 'sidebar';
 @use 'content';
 @use 'about';
