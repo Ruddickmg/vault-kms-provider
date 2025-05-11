@@ -40,7 +40,7 @@ importers:
         version: 1.9.0
       sass:
         specifier: ^1.80.3
-        version: 1.87.0
+        version: 1.88.0
 
 packages:
 
@@ -537,8 +537,8 @@ packages:
     resolution: {integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==}
     engines: {node: '>= 0.8'}
 
-  immutable@5.1.1:
-    resolution: {integrity: sha512-3jatXi9ObIsPGr3N5hGw/vWWcTkq6hUYhpQz4k0wLC+owqWi/LiugIw9x0EdNZ2yGedKN/HzePiBvaJRXa0Ujg==}
+  immutable@5.1.2:
+    resolution: {integrity: sha512-qHKXW1q6liAk1Oys6umoaZbDRqjcjgSrbnrifHsfsttza7zcvRAsL7mMV6xWcyhwQy7Xj5v4hhbr6b+iDYwlmQ==}
 
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
@@ -829,8 +829,8 @@ packages:
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
 
-  sass@1.87.0:
-    resolution: {integrity: sha512-d0NoFH4v6SjEK7BoX810Jsrhj7IQSYHAHLi/iSpgqKc7LaIDshFRlSg5LOymf9FqQhxEHs2W5ZQXlvy0KD45Uw==}
+  sass@1.88.0:
+    resolution: {integrity: sha512-sF6TWQqjFvr4JILXzG4ucGOLELkESHL+I5QJhh7CNaE+Yge0SI+ehCatsXhJ7ymU1hAFcIS3/PBpjdIbXoyVbg==}
     engines: {node: '>=14.0.0'}
     hasBin: true
 
@@ -1488,7 +1488,7 @@ snapshots:
       statuses: 2.0.1
       toidentifier: 1.0.1
 
-  immutable@5.1.1: {}
+  immutable@5.1.2: {}
 
   inherits@2.0.4: {}
 
@@ -1726,10 +1726,10 @@ snapshots:
     dependencies:
       queue-microtask: 1.2.3
 
-  sass@1.87.0:
+  sass@1.88.0:
     dependencies:
       chokidar: 4.0.3
-      immutable: 5.1.1
+      immutable: 5.1.2
       source-map-js: 1.2.1
     optionalDependencies:
       '@parcel/watcher': 2.5.1
