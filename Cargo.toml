@@ -28,7 +28,7 @@ log = "0.4.26"
 chrono = "0.4.40"
 
 [dev-dependencies]
-criterion = { version = "0.5.1", features = ["html_reports", "async_tokio", "async"] }
+criterion = { version = "0.6.0", features = ["html_reports", "async_tokio", "async"] }
 pretty_assertions = "1.4.1"
 uuid = { version = "1.15.1", features = ["v4", "fast-rng"] }
 
