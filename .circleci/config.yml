@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  kubernetes: circleci/kubernetes@2.0.0
+  kubernetes: circleci/kubernetes@2.0.1
   helm: circleci/helm@3.2.0
   rust: circleci/rust@1.7.0
   codecov: codecov/codecov@5.4.3
