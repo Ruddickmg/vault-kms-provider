@@ -389,14 +389,14 @@ pre.diff-highlight > code .token.token.inserted:not(.prefix) ::selection, pre.di
   padding: 3% 3%;
 }
 
+.content-header h1 {
+  font-size: xxx-large;
+}
 .content-header {
   padding: 3% 3%;
   border-bottom: lightgray;
   border-bottom-width: 1px;
   border-bottom-style: solid;
-}
-.content-header h1 {
-  font-size: xxx-large;
 }
 .content-header p {
   display: flex;
@@ -417,15 +417,15 @@ pre.diff-highlight > code .token.token.inserted:not(.prefix) ::selection, pre.di
   font-size: large;
   padding: 20px 10%;
 }
+.about-page .content-header h1 {
+  font-size: xxx-large;
+}
 .about-page .content-header {
   margin-top: 3%;
   padding: 1% 25%;
   border-bottom: lightgray;
   border-bottom-width: 1px;
   border-bottom-style: solid;
-}
-.about-page .content-header h1 {
-  font-size: xxx-large;
 }
 .about-page .content-header p {
   display: flex;
