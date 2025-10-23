@@ -16,7 +16,7 @@ importers:
         version: 5.0.2
       liquidjs:
         specifier: ^10.18.0
-        version: 10.22.0
+        version: 10.23.0
       markdown-it:
         specifier: ^14.1.0
         version: 14.1.0
@@ -465,8 +465,8 @@ packages:
   linkify-it@5.0.0:
     resolution: {integrity: sha512-5aHCbzQRADcdP+ATqnDuhhJ/MRIqDkZX5pyjFHRRysS8vZ5AbqGEoFIb6pYHPZ+L/OC2Lc+xT8uHVVR5CAK/wQ==}
 
-  liquidjs@10.22.0:
-    resolution: {integrity: sha512-SGBYxl7U7vqmmAQdP/PTP3P3q11f99xUjdtxVICqNQqPecl+JIMCsTshDObGzicHaAqWAnPW0o25a9hDaJxOng==}
+  liquidjs@10.23.0:
+    resolution: {integrity: sha512-Chm3luYvACZUj+Wlq7Nxwi0YvGXJv3vx+LPIGfa6n1FaUoMxe8T2M+5S1m2YkSToqJcsxZRK0VeCPZNrSa2yOw==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -790,7 +790,7 @@ snapshots:
       iso-639-1: 3.1.5
       js-yaml: 4.1.0
       kleur: 4.1.5
-      liquidjs: 10.22.0
+      liquidjs: 10.23.0
       luxon: 3.6.1
       markdown-it: 14.1.0
       minimist: 1.2.8
@@ -1146,7 +1146,7 @@ snapshots:
     dependencies:
       uc.micro: 2.1.0
 
-  liquidjs@10.22.0:
+  liquidjs@10.23.0:
     dependencies:
       commander: 10.0.1
 
