@@ -28,7 +28,7 @@ importers:
         version: 1.0.0(markdown-it@14.1.0)
       markdown-it-prism:
         specifier: ^3.0.0
-        version: 3.0.0
+        version: 3.0.1(markdown-it@14.1.0)
       nunjucks:
         specifier: ^3.2.4
         version: 3.2.4(chokidar@3.6.0)
@@ -488,9 +488,11 @@ packages:
     peerDependencies:
       markdown-it: '>= 13.0.0'
 
-  markdown-it-prism@3.0.0:
-    resolution: {integrity: sha512-M0LQsbVzjbzufV95nYdtbs99Sm/8f7zLnqFblb5yQZtFTGLM+y6hxMZ8BdujY3FFqVvTbnZ52/uoicQUqZUYbg==}
+  markdown-it-prism@3.0.1:
+    resolution: {integrity: sha512-JVnVGW8Gjw1TUtArXApnb/paeWye9TZW0kWzV2iqIUp1bxw+Rjh0WGg/BschKxn6fd1lCfv4FebSPMlcviGYSQ==}
     engines: {node: '>=20.0.0'}
+    peerDependencies:
+      markdown-it: '>=7.0.1 <15.0.0'
 
   markdown-it@14.1.0:
     resolution: {integrity: sha512-a54IwgWPaeBCAAsv13YgmALOF1elABB08FxO9i+r4VFk5Vl4pKokRPeX8u5TCgSsPi6ec1otfLjdOpVcgbpshg==}
@@ -1162,8 +1164,9 @@ snapshots:
     dependencies:
       markdown-it: 14.1.0
 
-  markdown-it-prism@3.0.0:
+  markdown-it-prism@3.0.1(markdown-it@14.1.0):
     dependencies:
+      markdown-it: 14.1.0
       prismjs: 1.30.0
 
   markdown-it@14.1.0:
