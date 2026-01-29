@@ -51,7 +51,7 @@ executors:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
     machine:
-      image: ubuntu-2204:2024.05.1
+      image: ubuntu-2204:2025.09.1
       docker_layer_caching: true
   ubuntu:
     resource_class: large
@@ -59,14 +59,14 @@ executors:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
     machine:
-      image: ubuntu-2204:2024.05.1
+      image: ubuntu-2204:2025.09.1
       docker_layer_caching: true
   ubuntu_small:
     environment:
       PIPELINE_NUM: << pipeline.number >>
       TZ: "America/Los_Angeles"
     machine:
-      image: ubuntu-2204:2024.05.1
+      image: ubuntu-2204:2025.09.1
       docker_layer_caching: true
 
 #-----------------------------------------------------------------------------------------------------------------------------
