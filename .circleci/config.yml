@@ -52,7 +52,7 @@ executors:
       TZ: "America/Los_Angeles"
     machine:
       image: ubuntu-2204:2025.09.1
-      docker_layer_caching: true
+      docker_layer_caching: false
   ubuntu:
     resource_class: large
     environment:
