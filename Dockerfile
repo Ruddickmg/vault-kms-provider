@@ -1,4 +1,4 @@
-FROM rust as builder
+FROM rust:latest as builder
 
 ARG PKG_NAME="vault-kms-provider"
 ARG BIN_NAME="server"
