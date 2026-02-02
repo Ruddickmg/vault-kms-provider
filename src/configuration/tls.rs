@@ -80,7 +80,7 @@ mod tls_certificate_tests {
         use super::*;
 
         #[test]
-        pub fn gets_all_files_located_in_a_directory_path() -> () {
+        pub fn gets_all_files_located_in_a_directory_path() {
             let mut config = TlsConfiguration::default();
             config.directory = Some("./test_files".to_string());
             let certs = config.certs();
@@ -93,7 +93,7 @@ mod tls_certificate_tests {
         }
 
         #[test]
-        pub fn gets_a_specified_cert_file_path() -> () {
+        pub fn gets_a_specified_cert_file_path() {
             let path = "./test_files/certs/ca.crt".to_string();
             let config = TlsConfiguration {
                 ca: Some(path.clone()),
@@ -105,7 +105,7 @@ mod tls_certificate_tests {
         }
 
         #[test]
-        pub fn will_not_create_duplicate_file_paths() -> () {
+        pub fn will_not_create_duplicate_file_paths() {
             let config = TlsConfiguration {
                 directory: Some("./test_files/certs".to_string()),
                 ca: Some("./test_files/certs/ca.crt".to_string()),

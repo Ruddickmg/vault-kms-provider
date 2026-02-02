@@ -14,7 +14,7 @@ mod authentication {
         let mut client_config = common::server_config();
         client_config.vault.credentials = credentials;
         let settings = VaultClientSettingsBuilder::default()
-            .address(&client_config.vault.address.clone())
+            .address(client_config.vault.address.clone())
             .identity(client_config.tls.identity())
             .ca_certs(client_config.tls.certs())
             .build()
