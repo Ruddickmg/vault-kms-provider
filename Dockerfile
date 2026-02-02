@@ -1,4 +1,4 @@
-FROM rust as builder
+FROM rust:1.93-bullseye as builder
 
 ARG PKG_NAME="vault-kms-provider"
 ARG BIN_NAME="server"
@@ -16,7 +16,7 @@ ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-Clink-self-contained=yes
 ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUNNER="qemu-aarch64 -L /usr/aarch64-linux-gnu"
 
 RUN apt-get update
-RUN apt-get install protobuf-compiler musl-tools clang llvm -y
+RUN apt-get install protobuf-compiler musl-dev build-essential musl-tools clang llvm -y
 
 RUN if [ "$TARGETPLATFORM" = "$ARM_64" ]; then rustup target add $ARM_64_TARGET; fi
 RUN if [ "$TARGETPLATFORM" = "$AMD_64" ]; then rustup target add $AMD_64_TARGET; fi
