@@ -15,8 +15,8 @@ ENV AR_aarch64_unknown_linux_musl=llvm-ar
 ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-Clink-self-contained=yes -Clinker=rust-lld"
 ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUNNER="qemu-aarch64 -L /usr/aarch64-linux-gnu"
 
-# RUN apt-get update
-# RUN apt-get install protobuf-compiler musl-dev build-essential musl-tools clang llvm -y
+RUN apt-get update
+RUN apt-get install protobuf-compiler musl-dev build-essential musl-tools clang llvm -y
 
 RUN if [ "$TARGETPLATFORM" = "$ARM_64" ]; then rustup target add $ARM_64_TARGET; fi
 RUN if [ "$TARGETPLATFORM" = "$AMD_64" ]; then rustup target add $AMD_64_TARGET; fi
