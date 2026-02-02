@@ -1,6 +1,6 @@
 [package]
 name = "vault_kms_provider"
-version = "1.2.130"
+version = "1.2.131"
 edition = "2021"
 
 [lib]
