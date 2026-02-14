@@ -2,6 +2,21 @@ apiVersion: v1
 entries:
   vault-kms-provider:
   - apiVersion: v2
+    appVersion: 1.3.154
+    created: "2026-02-14T09:32:34.44631391Z"
+    description: A Helm chart for deploying the vault-kms-provider. vault-kms-provider
+      is a plugin allowing vault to be used as a kms service for kubernetes encryption
+      at rest
+    digest: 1941d6416b85ec476bc4067bf8921281c6368000bad1745988aa56a14a700a47
+    maintainers:
+    - email: ruddickmg@gmail.com
+      name: ruddickmg
+    name: vault-kms-provider
+    type: application
+    urls:
+    - https://github.com/Ruddickmg/vault-kms-provider/releases/download/v1.3.154/vault-kms-provider-1.3.154.tgz
+    version: 1.3.154
+  - apiVersion: v2
     appVersion: 1.3.153
     created: "2026-02-14T05:52:40.030776385Z"
     description: A Helm chart for deploying the vault-kms-provider. vault-kms-provider
@@ -3118,4 +3133,4 @@ entries:
     urls:
     - https://github.com/Ruddickmg/vault-kms-provider/releases/download/vault-kms-provider-0.1.0/vault-kms-provider-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-14T05:52:40.031404451Z"
+generated: "2026-02-14T09:32:34.446848486Z"
