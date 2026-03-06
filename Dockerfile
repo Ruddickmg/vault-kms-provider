@@ -1,4 +1,4 @@
-FROM rust:1.93-bullseye as builder
+FROM rust:1.94-bullseye as builder
 
 ARG PKG_NAME="vault-kms-provider"
 ARG BIN_NAME="server"
